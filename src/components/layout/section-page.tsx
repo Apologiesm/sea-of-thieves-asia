@@ -8,6 +8,7 @@ type SectionPageProps = {
   description: string;
   eyebrow?: string;
   emptyTitle?: string;
+  emptyDescription?: string;
 };
 
 export function SectionPage({
@@ -15,6 +16,7 @@ export function SectionPage({
   description,
   eyebrow = "BETA",
   emptyTitle,
+  emptyDescription,
 }: SectionPageProps) {
   return (
     <>
@@ -23,7 +25,7 @@ export function SectionPage({
         <div className="py-12 sm:py-16">
           <EmptyState
             title={emptyTitle ?? `${title}: ${SITE.comingSoon}`}
-            description={`${title} are marked EMPTY_FOR_BETA. No entries are published yet.`}
+            description={emptyDescription ?? "Nothing has been published yet."}
           />
         </div>
       </Container>

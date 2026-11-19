@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
 import { SectionPage } from "@/components/layout/section-page";
+import { getPreview, getSection } from "@/lib/content/site-config";
+
+const section = getSection("crewListings");
+const preview = getPreview("crewListings");
 
 export const metadata: Metadata = {
-  title: "Crew Listings",
-  description: "Crew listings for Sea of Thieves Asia (beta).",
+  title: section.title,
+  description: section.description,
 };
 
 export default function CrewPage() {
   return (
     <SectionPage
-      title="Crew Listings"
-      description="Find a crew for your next voyage when listings are available."
+      title={section.title}
+      description={preview.description}
+      eyebrow={preview.eyebrow}
+      emptyTitle={preview.emptyTitle}
+      emptyDescription={preview.emptyDescription}
     />
   );
 }

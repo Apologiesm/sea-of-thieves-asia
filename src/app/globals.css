@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
 /*
- * Design tokens. Neutral functional fallbacks only.
- * Brand colors, fonts, and logo are REPLACE_BEFORE_LAUNCH — see docs/brand.md.
- * Do not treat these values as the visual identity.
+ * Baseline aesthetic tokens: dark cinematic nautical palette with restrained
+ * Asian-inspired wave ornament. These are functional defaults, not an official
+ * identity. Official colors, type, and logo remain REPLACE_BEFORE_LAUNCH
+ * in docs/brand.md and are replaced only when supplied by the owner.
  */
 @theme {
-  --color-canvas: #0b0d12;
-  --color-surface: #141821;
-  --color-surface-raised: #1b202b;
-  --color-border: #2a3140;
-  --color-content: #e8ebf2;
-  --color-content-muted: #9aa3b5;
-  --color-brand: #64748b;
-  --color-brand-strong: #475569;
+  --color-canvas: #070b12;
+  --color-surface: #0d1420;
+  --color-surface-raised: #141d2b;
+  --color-border: #1e2c3d;
+  --color-content: #e9eef6;
+  --color-content-muted: #9fb0c6;
+  --color-brand: #c9a961;
+  --color-brand-strong: #e0c37a;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
@@ -37,12 +38,12 @@
 
   :focus-visible {
     outline: 2px solid var(--color-brand);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 
   ::selection {
-    background-color: var(--color-brand-strong);
-    color: var(--color-content);
+    background-color: var(--color-brand);
+    color: var(--color-canvas);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -54,7 +55,119 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+/* Decorative sea and sky. Pure CSS, aria-hidden at the call site. */
+.hero-sky {
+  background:
+    radial-gradient(ellipse 80% 60% at 78% 8%, rgba(201, 169, 97, 0.1), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(80, 120, 160, 0.12), transparent 70%),
+    linear-gradient(180deg, #0a1220 0%, #070b12 78%);
+}
+
+.grid-lines {
+  background-image:
+    linear-gradient(to right, rgba(159, 176, 198, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(159, 176, 198, 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
+}
+
+/* Seigaiha-inspired wave bands: original, subtle, never a logo or icon. */
+.hero-waves,
+.wave-field {
+  background-image:
+    radial-gradient(circle at 50% 100%, transparent 58%, rgba(159, 176, 198, 0.16) 59%, rgba(159, 176, 198, 0.16) 61%, transparent 62%),
+    radial-gradient(circle at 50% 100%, transparent 42%, rgba(201, 169, 97, 0.1) 43%, rgba(201, 169, 97, 0.1) 45%, transparent 46%);
+  background-size: 120px 48px, 120px 48px;
+  background-position: 0 100%, 60px 100%;
+  background-repeat: repeat-x;
+  mask-image: linear-gradient(to top, black, transparent);
+}
+
+.hero-waves {
+  animation: tide 36s linear infinite;
+}
+
+@keyframes tide {
+  from { background-position: 0 100%, 60px 100%; }
+  to { background-position: 120px 100%, 180px 100%; }
+}
+
+/* Compass ornament used in empty states and the about panel. */
+.compass-mark {
+  position: relative;
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+}
+
+.compass-mark::before,
+.compass-mark::after {
+  content: "";
+  position: absolute;
+  background: var(--color-border);
+}
+
+.compass-mark::before {
+  left: 50%;
+  top: 15%;
+  width: 1px;
+  height: 70%;
+  transform: translateX(-50%);
+}
+
+.compass-mark::after {
+  top: 50%;
+  left: 15%;
+  height: 1px;
+  width: 70%;
+  transform: translateY(-50%);
+}
+
+.compass-mark__inner {
+  position: absolute;
+  inset: 0.55rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 9999px;
+  opacity: 0.7;
+}
+
+.compass-mark--large {
+  width: 7rem;
+  height: 7rem;
+}
+
+.compass-mark--large .compass-mark__inner {
+  inset: 1.4rem;
+}
+
+/* Small abstract mark beside the wordmark in the header. */
+.brand-glyph {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 9999px;
+  opacity: 0.85;
+}
+
+.brand-glyph span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border: 1px solid var(--color-brand);
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-waves {
+    animation: none;
   }
 }

@@ -1,7 +1,7 @@
 /**
- * Content configuration for the beta build.
- * Source of truth: AGENTS.md, docs/brand.md, docs/content.md, docs/assets.md.
- * No value here may be replaced with a guessed or invented link.
+ * Single source of truth for all public-facing copy.
+ * Source rules: AGENTS.md, docs/brand.md, docs/content.md, docs/assets.md.
+ * Placeholder values are never rendered as real links.
  */
 
 export const PLACEHOLDER = "REPLACE_BEFORE_LAUNCH" as const;
@@ -86,10 +86,184 @@ export const SECTIONS: readonly SectionConfig[] = [
   },
 ] as const;
 
+export function getSection(key: SectionKey): SectionConfig {
+  return SECTIONS.find((section) => section.key === key) ?? SECTIONS[0];
+}
+
+export function getPreview(key: SectionKey): PreviewConfig {
+  return PREVIEWS.find((preview) => preview.key === key) ?? PREVIEWS[0];
+}
+
 export const NAV_LINKS: readonly { href: string; label: string }[] = [
   { href: "/events", label: "Events" },
-  { href: "/announcements", label: "News" },
-  { href: "/guides", label: "Guides" },
-  { href: "/gallery", label: "Gallery" },
   { href: "/crew", label: "Crew" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/guides", label: "Guides" },
+  { href: "/announcements", label: "News" },
 ] as const;
+
+export const HERO = {
+  eyebrow: "Unofficial fan community · Asia region",
+  title: "Set Sail With Sea of Thieves Asia",
+  subtitle: "Find your crew. Conquer the seas.",
+  body: "A place for pirates across the region to gather, share voyages, and build stories on the high seas.",
+  primaryCta: { label: "Explore the community", href: "#community" },
+  secondaryCta: { label: "See what is coming", href: "#sections" },
+  status: "Beta · content is being prepared",
+} as const;
+
+export const ABOUT = {
+  eyebrow: "About the community",
+  title: "A home for Asian pirates",
+  paragraphs: [
+    "Sea of Thieves Asia brings players from across the region together around one shared love of the seas. Whether you are charting your first voyage or chasing a legendary title, there is room here for you.",
+    "This site is being built around the community, not in place of it. Every section will fill with real members, real voyages, and real stories once they are ready to be shared.",
+  ],
+  pillars: [
+    {
+      title: "Across the region",
+      body: "One gathering place for players across Asian time zones and communities.",
+    },
+    {
+      title: "Built together",
+      body: "Guides, events, and crew listings shaped by the people who sail them.",
+    },
+    {
+      title: "Player first",
+      body: "Minimal data, clear controls, and respect for every member's privacy.",
+    },
+  ],
+} as const;
+
+export type FeatureConfig = {
+  key: string;
+  title: string;
+  description: string;
+  size: "large" | "small";
+};
+
+export const FEATURES: readonly FeatureConfig[] = [
+  {
+    key: "crew",
+    title: "Find your crew",
+    description:
+      "Post a voyage or answer one. Crew listings are being prepared for the community.",
+    size: "large",
+  },
+  {
+    key: "events",
+    title: "Sail together",
+    description: "Community events and meetups, published only when confirmed.",
+    size: "small",
+  },
+  {
+    key: "guides",
+    title: "Learn the ropes",
+    description: "A knowledge base written by players, for players.",
+    size: "small",
+  },
+  {
+    key: "gallery",
+    title: "Share the view",
+    description: "A moderated gallery for the moments worth keeping.",
+    size: "small",
+  },
+] as const;
+
+export type PreviewConfig = {
+  key: SectionKey;
+  eyebrow: string;
+  title: string;
+  description: string;
+  emptyTitle: string;
+  emptyDescription: string;
+  reverse: boolean;
+};
+
+export const PREVIEWS: readonly PreviewConfig[] = [
+  {
+    key: "events",
+    eyebrow: "Events",
+    title: "The next voyage starts here",
+    description:
+      "Community voyages, meetups, and seasonal activities will be announced here. Nothing is published until it is real.",
+    emptyTitle: "No voyages on the horizon",
+    emptyDescription: "Events are marked EMPTY_FOR_BETA and will appear when scheduled.",
+    reverse: false,
+  },
+  {
+    key: "crewListings",
+    eyebrow: "Crew finder",
+    title: "No pirate sails alone",
+    description:
+      "Find a crew for a specific run, a weekly session, or a first voyage. Listings open when members start posting them.",
+    emptyTitle: "No crews posted yet",
+    emptyDescription: "Crew listings are marked EMPTY_FOR_BETA.",
+    reverse: true,
+  },
+  {
+    key: "gallery",
+    eyebrow: "Gallery",
+    title: "Stories worth keeping",
+    description:
+      "A moderated collection of screenshots and artwork from the community. Every image gets here through review.",
+    emptyTitle: "The gallery is waiting",
+    emptyDescription: "Gallery entries are marked EMPTY_FOR_BETA.",
+    reverse: false,
+  },
+  {
+    key: "guides",
+    eyebrow: "Guides",
+    title: "Knowledge passed down",
+    description:
+      "Practical guides for new and veteran pirates, built from real experience rather than filler.",
+    emptyTitle: "No guides published yet",
+    emptyDescription: "Guides are marked EMPTY_FOR_BETA.",
+    reverse: true,
+  },
+  {
+    key: "announcements",
+    eyebrow: "News",
+    title: "Signals from the shore",
+    description:
+      "Updates from the community team, posted here once there is something genuine to report.",
+    emptyTitle: "All quiet for now",
+    emptyDescription: "Announcements are marked EMPTY_FOR_BETA.",
+    reverse: false,
+  },
+] as const;
+
+export const JOIN_CTA = {
+  eyebrow: "The community is on Discord",
+  title: "Join the crew on Discord",
+  body: "Conversations, voice channels, and voyage planning live on our Discord server. The invite link will be added once it is ready.",
+  buttonLabel: "Join Discord",
+  linkValue: PLACEHOLDER,
+  note: "The invite is disabled until the real URL is provided.",
+} as const;
+
+export type FooterItem = { label: string; value: string };
+
+export const FOOTER = {
+  tagline: "An unofficial fan community for Sea of Thieves players in Asia.",
+  columns: [
+    { title: "Explore", items: NAV_LINKS.map((l) => ({ label: l.label, value: l.href })) },
+    {
+      title: "Community",
+      items: SOCIAL_LINKS.filter((l) => l.key !== "contact").map((l) => ({
+        label: l.label,
+        value: l.value,
+      })),
+    },
+    {
+      title: "Information",
+      items: [
+        { label: "Rules", value: PLACEHOLDER },
+        { label: "Privacy", value: PLACEHOLDER },
+        { label: "Terms", value: PLACEHOLDER },
+        { label: "Contact", value: PLACEHOLDER },
+        { label: "Credits", value: PLACEHOLDER },
+      ] as FooterItem[],
+    },
+  ],
+} as const;
