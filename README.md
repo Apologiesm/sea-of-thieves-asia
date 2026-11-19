@@ -1,64 +1,71 @@
-# Sea of Thieves Asia — Milestone 1
+# Sea of Thieves Asia — Milestone 3
 
-Beta foundation for an unofficial Sea of Thieves Asia fan-community site.
-Built with Next.js App Router, TypeScript, Tailwind CSS, and a local Supabase
-schema with Row Level Security.
+Local Supabase development setup. The app connects only to the local stack;
+production is not configured.
 
-> This is an unofficial fan community and is not affiliated with, endorsed by,
-> or connected to Rare, Xbox, or Sea of Thieves.
+> Unofficial fan community. Not affiliated with Rare, Xbox, or Sea of Thieves.
 
-## Beta content contract
-
-All community data is placeholder-only. See `AGENTS.md` and `docs/`.
-
-- `DISCORD_INVITE_URL` and all social links: `REPLACE_BEFORE_LAUNCH`
-- `EVENTS`, `GALLERY`, `GUIDES`, `ANNOUNCEMENTS`, `CREW_LISTINGS`: `EMPTY_FOR_BETA`
-- No invented members, events, statistics, testimonials, sponsors, or links.
-- Placeholder links render as non-clickable "Coming soon" labels.
-
-## Requirements
+## Prerequisites
 
 - Node.js 22.19+ / 24.11+ / 26+ and npm
-- Docker for local Supabase (`supabase start`) — optional for the UI itself
+- A running Docker daemon (Docker Desktop, or the native daemon in WSL)
 
-## Commands
+Supabase CLI and the Supabase JS client are **project dependencies** installed
+by `npm install`. Nothing needs a global install.
+
+## Start local Supabase (first time)
 
 ```bash
-npm install       # install dependencies
-npm run dev       # start dev server at http://localhost:3000
-npm run build     # production build
-npm run lint      # ESLint
-npm run typecheck # TypeScript (no emit)
+cd ~/projects/sea-of-thieves-asia
+npm install
+npx supabase init          # already initialised; safe to re-run
+npx supabase start         # pulls images on first run, applies migrations
 ```
 
-## Environment
+`supabase start` prints local URLs and keys. Copy the anon key into `.env.local`:
 
 ```bash
 cp .env.example .env.local
+# set NEXT_PUBLIC_SUPABASE_ANON_KEY from `npx supabase status`
 ```
 
-Fill in values printed by `supabase start`. `.env.local` is gitignored.
-Never commit keys or put them in frontend code.
-
-## Local Supabase
+Then run the app:
 
 ```bash
-supabase start
-supabase db reset
+npm run dev                # http://localhost:3000
+npm run build
+npm run typecheck
+npm run lint
 ```
 
-The seed file is intentionally empty. No sample content is generated.
+Local endpoints (printed by `npx supabase status`):
 
-## Structure
+- Studio: http://127.0.0.1:54323
+- API: http://127.0.0.1:54321
+- DB: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
 
-- `src/app` — App Router pages and route segments
-- `src/components` — reusable UI, layout, and content components
-- `src/lib` — environment, content config, Supabase clients, utilities
-- `src/types` — shared types
-- `supabase/migrations` — schema, functions, RLS, storage
-- `docs` — brand, content, and asset rules
+Verify the app's connection:
 
-## Disclaimer
+```bash
+curl http://localhost:3000/api/health
+```
 
-Sea of Thieves Asia is an unofficial fan community and is not affiliated with,
-endorsed by, or connected to Rare, Xbox, or Sea of Thieves.
+Expected: `{"status":"ok","database":"local","rls":"enforced"}`.
+
+## Stop and reset
+
+```bash
+npx supabase stop          # stop containers, keep data
+npx supabase stop --no-backup  # stop and discard local data
+npx supabase db reset      # reapply all migrations, empty seed
+```
+
+## Database
+
+Migrations live in `supabase/migrations/`. Every table has RLS enabled.
+Roles: `member` (default), `moderator`, `admin`, and `owner` (resource owner).
+The service-role key is server-only and is never imported by client code.
+
+`supabase/seed.sql` is intentionally empty — no invented community content.
+
+See [docs/local-supabase.md](docs/local-supabase.md) for details.

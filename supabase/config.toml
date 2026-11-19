@@ -1,3 +1,4 @@
+#:schema https://supabase.com/schemas/config/v1.json
 project_id = "sea-of-thieves-asia"
 
 [api]
@@ -6,6 +7,9 @@ port = 54321
 schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
+
+[api.tls]
+enabled = false
 
 [db]
 port = 54322
@@ -19,14 +23,19 @@ pool_mode = "transaction"
 default_pool_size = 20
 max_client_conn = 100
 
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
 [realtime]
 enabled = true
 
 [studio]
 enabled = true
 port = 54323
+api_url = "http://127.0.0.1"
 
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 
@@ -37,12 +46,15 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+additional_redirect_urls = [
+  "http://localhost:3000/auth/callback",
+  "http://127.0.0.1:3000/auth/callback",
+]
 jwt_expiry = 3600
 enable_signup = true
 
 [auth.email]
-enable_signup = true
+enabled = true
 double_confirm_changes = true
 enable_confirmations = false
 
