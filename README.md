@@ -1,33 +1,64 @@
-# Sea of Thieves Asia — Beta Site
+# Sea of Thieves Asia — Milestone 1
 
-A dependency-free static site scaffold. Built in beta: **no invented community content**.
+Beta foundation for an unofficial Sea of Thieves Asia fan-community site.
+Built with Next.js App Router, TypeScript, Tailwind CSS, and a local Supabase
+schema with Row Level Security.
 
-## Run locally
-From this directory:
+> This is an unofficial fan community and is not affiliated with, endorsed by,
+> or connected to Rare, Xbox, or Sea of Thieves.
+
+## Beta content contract
+
+All community data is placeholder-only. See `AGENTS.md` and `docs/`.
+
+- `DISCORD_INVITE_URL` and all social links: `REPLACE_BEFORE_LAUNCH`
+- `EVENTS`, `GALLERY`, `GUIDES`, `ANNOUNCEMENTS`, `CREW_LISTINGS`: `EMPTY_FOR_BETA`
+- No invented members, events, statistics, testimonials, sponsors, or links.
+- Placeholder links render as non-clickable "Coming soon" labels.
+
+## Requirements
+
+- Node.js 22.19+ / 24.11+ / 26+ and npm
+- Docker for local Supabase (`supabase start`) — optional for the UI itself
+
+## Commands
+
 ```bash
-python3 -m http.server 8000
+npm install       # install dependencies
+npm run dev       # start dev server at http://localhost:3000
+npm run build     # production build
+npm run lint      # ESLint
+npm run typecheck # TypeScript (no emit)
 ```
-Then open <http://localhost:8000>.
 
-Or simply open `index.html` in a browser.
+## Environment
 
-## Files
-- `index.html` — page structure
-- `styles.css` — neutral baseline styling (NOT brand identity; see `docs/brand.md`)
-- `config.js` — all placeholder values and empty-collection flags
-- `app.js` — renders placeholders safely as "Coming soon"
+```bash
+cp .env.example .env.local
+```
 
-## Placeholder contract
-Source of truth: `docs/content.md`, `AGENTS.md`.
+Fill in values printed by `supabase start`. `.env.local` is gitignored.
+Never commit keys or put them in frontend code.
 
-- Every placeholder value is exactly `REPLACE_BEFORE_LAUNCH`.
-- `app.js` renders these as a **non-clickable** "Coming soon" label — never as
-  a link, so no fake-looking URL can appear.
-- Collections flagged `EMPTY_FOR_BETA` render an empty state. No sample events,
-  members, statistics, testimonials, sponsors, or partnerships are seeded.
+## Local Supabase
 
-## Before launch
-1. Replace values in `config.js` with real URLs supplied by the project owner.
-2. Supply real brand specs (`docs/brand.md`) and replace neutral CSS defaults.
-3. Add real assets and licensing info (`docs/assets.md`).
-4. Populate collections with real data only.
+```bash
+supabase start
+supabase db reset
+```
+
+The seed file is intentionally empty. No sample content is generated.
+
+## Structure
+
+- `src/app` — App Router pages and route segments
+- `src/components` — reusable UI, layout, and content components
+- `src/lib` — environment, content config, Supabase clients, utilities
+- `src/types` — shared types
+- `supabase/migrations` — schema, functions, RLS, storage
+- `docs` — brand, content, and asset rules
+
+## Disclaimer
+
+Sea of Thieves Asia is an unofficial fan community and is not affiliated with,
+endorsed by, or connected to Rare, Xbox, or Sea of Thieves.

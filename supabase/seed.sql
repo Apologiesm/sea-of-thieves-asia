@@ -1,0 +1,2 @@
+-- Intentionally empty. No sample users, events, guides, gallery items,
+-- announcements, or crew listings are created for the beta build.
