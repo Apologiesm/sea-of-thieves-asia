@@ -8,7 +8,7 @@ export function CommunityFeatures() {
     <section aria-labelledby="features-title" className="border-b border-border py-16 sm:py-24">
       <Container>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
+          <div className="max-w-2xl" data-voyage-reveal>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand">
               What this place is for
             </p>
@@ -25,7 +25,7 @@ export function CommunityFeatures() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5" data-voyage-reveal>
           {FEATURES.map((feature, index) => (
             <Card
               key={feature.key}

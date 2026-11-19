@@ -19,7 +19,7 @@ export function PreviewSection({ preview, index }: { preview: PreviewConfig; ind
             preview.reverse && "lg:[&>*:first-child]:order-2",
           )}
         >
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5" data-voyage-reveal>
             <div className="flex items-center gap-3">
               <span className="font-mono text-xs text-brand">
                 {String(index + 1).padStart(2, "0")}
@@ -46,7 +46,7 @@ export function PreviewSection({ preview, index }: { preview: PreviewConfig; ind
               <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7" data-voyage-reveal>
             <EmptyState
               title={preview.emptyTitle}
               description={preview.emptyDescription}

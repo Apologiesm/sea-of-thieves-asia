@@ -1,20 +1,16 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { voyageStore } from "@/lib/scroll/voyage-store";
+import { createOceanGeometry } from "./ocean-geometry";
 
 type OceanSceneProps = {
   active: boolean;
   onReady: () => void;
 };
 
-/* One scene instance owns this mutable geometry; kept at module scope so the
-   per-frame vertex updates are not treated as React hook state mutation. */
-const OCEAN_GEOMETRY = new THREE.PlaneGeometry(140, 140, 48, 48);
-const OCEAN_BASE = Float32Array.from(OCEAN_GEOMETRY.attributes.position.array);
-
-/* Deterministic pseudo-random so the sky is stable between renders. */
 function makeRandom(seed: number) {
   let value = seed;
   return () => {
@@ -23,28 +19,135 @@ function makeRandom(seed: number) {
   };
 }
 
-function Ocean() {
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    const position = OCEAN_GEOMETRY.attributes.position as THREE.BufferAttribute;
+type Keyframe = {
+  p: number;
+  camera: [number, number, number];
+  look: [number, number, number];
+  ship: [number, number, number];
+  shipY: number;
+  fog: [number, number];
+  moon: [number, number, number];
+  light: number;
+  ocean: string;
+};
 
-    for (let index = 0; index < position.count; index += 1) {
-      const x = OCEAN_BASE[index * 3];
-      const y = OCEAN_BASE[index * 3 + 1];
-      const height =
-        Math.sin(x * 0.15 + time * 0.7) * 0.32 +
-        Math.cos(y * 0.12 + time * 0.55) * 0.26 +
-        Math.sin((x + y) * 0.06 + time * 0.35) * 0.16;
-      position.setZ(index, height);
+const KEYFRAMES: readonly Keyframe[] = [
+  {
+    p: 0,
+    camera: [0, 3.1, 12],
+    look: [0, 0, 0],
+    ship: [0.4, -0.2, 0],
+    shipY: -0.22,
+    fog: [20, 72],
+    moon: [-9, 8, -22],
+    light: 0.85,
+    ocean: "#0d3038",
+  },
+  {
+    p: 0.33,
+    camera: [4.5, 2.6, 9.5],
+    look: [-0.5, 0.4, -1],
+    ship: [-1.2, -0.25, -2],
+    shipY: 0.35,
+    fog: [16, 60],
+    moon: [-6, 9, -20],
+    light: 1,
+    ocean: "#0e3540",
+  },
+  {
+    p: 0.66,
+    camera: [-5, 4.2, 8.5],
+    look: [0.5, 0.2, -3],
+    ship: [1.6, -0.2, -5],
+    shipY: -0.5,
+    fog: [14, 55],
+    moon: [2, 10, -18],
+    light: 1.1,
+    ocean: "#103a43",
+  },
+  {
+    p: 1,
+    camera: [0, 2.4, 6.5],
+    look: [0, 0.8, -8],
+    ship: [0, -0.15, -8],
+    shipY: 0,
+    fog: [10, 45],
+    moon: [6, 11, -16],
+    light: 1.2,
+    ocean: "#123d45",
+  },
+];
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function lerpTuple(a: readonly number[], b: readonly number[], t: number): [number, number, number] {
+  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+}
+
+function sample(progress: number) {
+  let index = 0;
+  while (index < KEYFRAMES.length - 2 && progress > KEYFRAMES[index + 1].p) {
+    index += 1;
+  }
+  const from = KEYFRAMES[index];
+  const to = KEYFRAMES[index + 1];
+  const t = Math.min(1, Math.max(0, (progress - from.p) / (to.p - from.p)));
+
+  return {
+    camera: lerpTuple(from.camera, to.camera, t),
+    look: lerpTuple(from.look, to.look, t),
+    ship: lerpTuple(from.ship, to.ship, t),
+    shipY: lerp(from.shipY, to.shipY, t),
+    fog: [lerp(from.fog[0], to.fog[0], t), lerp(from.fog[1], to.fog[1], t)],
+    moon: lerpTuple(from.moon, to.moon, t),
+    light: lerp(from.light, to.light, t),
+    oceanColor: new THREE.Color(from.ocean).lerp(new THREE.Color(to.ocean), t),
+    skyColor: new THREE.Color("#06121a").lerp(new THREE.Color("#08222a"), t),
+  };
+}
+
+function Atmosphere() {
+  const backgroundRef = useRef<THREE.Color>(null);
+  const fogRef = useRef<THREE.Fog>(null);
+
+  useFrame(() => {
+    const sampled = sample(voyageStore.progress);
+    backgroundRef.current?.copy(sampled.skyColor);
+    if (fogRef.current) {
+      fogRef.current.near = sampled.fog[0];
+      fogRef.current.far = sampled.fog[1];
+      fogRef.current.color.copy(sampled.skyColor);
     }
-
-    position.needsUpdate = true;
-    OCEAN_GEOMETRY.computeVertexNormals();
   });
 
   return (
-    <mesh geometry={OCEAN_GEOMETRY} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
+    <>
+      <color ref={backgroundRef} attach="background" args={["#06121a"]} />
+      <fog ref={fogRef} attach="fog" args={["#06121a", 20, 72]} />
+    </>
+  );
+}
+
+function Ocean() {
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const ocean = useMemo(() => createOceanGeometry(), []);
+
+  useEffect(() => () => ocean.dispose(), [ocean]);
+
+  useFrame(({ clock }) => {
+    if (!voyageStore.reducedMotion) {
+      ocean.update(clock.getElapsedTime());
+    }
+    const sampled = sample(voyageStore.progress);
+    if (materialRef.current) materialRef.current.color.copy(sampled.oceanColor);
+  });
+
+  return (
+    <mesh geometry={ocean.geometry} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
       <meshStandardMaterial
+        ref={materialRef}
         color="#0d3038"
         roughness={0.88}
         metalness={0.08}
@@ -59,16 +162,24 @@ function Ship() {
 
   useFrame(({ clock }) => {
     if (!group.current) return;
+    const sampled = sample(voyageStore.progress);
     const time = clock.getElapsedTime();
-    group.current.position.y = Math.sin(time * 0.85) * 0.16;
-    group.current.rotation.z = Math.sin(time * 0.62) * 0.045;
-    group.current.rotation.x = Math.sin(time * 0.48 + 1) * 0.028;
-    group.current.rotation.y = Math.sin(time * 0.22) * 0.09;
+    const motion = voyageStore.reducedMotion ? 0 : 1 - voyageStore.progress * 0.5;
+
+    group.current.position.set(
+      sampled.ship[0],
+      sampled.ship[1] + Math.sin(time * 0.85) * 0.16 * motion,
+      sampled.ship[2],
+    );
+    group.current.rotation.set(
+      Math.sin(time * 0.48 + 1) * 0.028 * motion,
+      sampled.shipY + voyageStore.mouseX * 0.02,
+      Math.sin(time * 0.62) * 0.045 * motion,
+    );
   });
 
   return (
     <group ref={group} position={[0.4, -0.2, 0]} scale={0.82} rotation={[0, -0.22, 0]}>
-      {/* Hull: tapered low-poly bow and simple block body, entirely procedural. */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[3.1, 0.62, 1.12]} />
         <meshStandardMaterial color="#3a2a20" roughness={0.95} flatShading />
@@ -85,29 +196,18 @@ function Ship() {
         <boxGeometry args={[0.82, 0.52, 0.86]} />
         <meshStandardMaterial color="#4a3728" roughness={0.95} flatShading />
       </mesh>
-      {/* Mast and sail */}
       <mesh position={[0.15, 2.0, 0]}>
         <cylinderGeometry args={[0.055, 0.085, 3.3, 6]} />
         <meshStandardMaterial color="#5b4831" roughness={0.9} flatShading />
       </mesh>
       <mesh position={[0.2, 2.12, 0.06]}>
         <planeGeometry args={[1.55, 1.85, 4, 4]} />
-        <meshStandardMaterial
-          color="#c9c4ad"
-          roughness={1}
-          side={THREE.DoubleSide}
-          flatShading
-        />
+        <meshStandardMaterial color="#c9c4ad" roughness={1} side={THREE.DoubleSide} flatShading />
       </mesh>
       <mesh position={[0.62, 3.36, 0.04]}>
         <planeGeometry args={[0.62, 0.34]} />
-        <meshStandardMaterial
-          color="#8fa9a5"
-          roughness={1}
-          side={THREE.DoubleSide}
-        />
+        <meshStandardMaterial color="#8fa9a5" roughness={1} side={THREE.DoubleSide} />
       </mesh>
-      {/* Stern lantern */}
       <mesh position={[-1.42, 0.78, 0]}>
         <sphereGeometry args={[0.1, 8, 6]} />
         <meshBasicMaterial color="#f4c879" />
@@ -123,16 +223,14 @@ function Stars() {
     for (let index = 0; index < 220; index += 1) {
       const angle = random() * Math.PI * 2;
       const radius = 28 + random() * 26;
-      points.push(
-        Math.cos(angle) * radius,
-        5 + random() * 24,
-        Math.sin(angle) * radius - 12,
-      );
+      points.push(Math.cos(angle) * radius, 5 + random() * 24, Math.sin(angle) * radius - 12);
     }
     const result = new THREE.BufferGeometry();
     result.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
     return result;
   }, []);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
 
   return (
     <points geometry={geometry}>
@@ -142,8 +240,16 @@ function Stars() {
 }
 
 function Moon() {
+  const group = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (!group.current) return;
+    const sampled = sample(voyageStore.progress);
+    group.current.position.set(sampled.moon[0], sampled.moon[1], sampled.moon[2]);
+  });
+
   return (
-    <group position={[-9, 8, -22]}>
+    <group ref={group} position={[-9, 8, -22]}>
       <mesh>
         <sphereGeometry args={[1.15, 20, 16]} />
         <meshBasicMaterial color="#dfe9e0" />
@@ -165,7 +271,7 @@ function Moon() {
 function Islands() {
   return (
     <group>
-      <mesh position={[-16, -0.6, -26]} scale={[1, 1, 1]}>
+      <mesh position={[-16, -0.6, -26]}>
         <coneGeometry args={[4.5, 3.4, 5]} />
         <meshStandardMaterial color="#0c2029" roughness={1} flatShading />
       </mesh>
@@ -188,7 +294,7 @@ function Lanterns() {
     if (!group.current) return;
     const time = clock.getElapsedTime();
     group.current.children.forEach((child, index) => {
-      child.position.y = 1.2 + Math.sin(time * 0.6 + index * 1.7) * 0.28;
+      child.position.y = 1.2 + (voyageStore.reducedMotion ? 0 : Math.sin(time * 0.6 + index * 1.7) * 0.28);
     });
   });
 
@@ -204,6 +310,49 @@ function Lanterns() {
   );
 }
 
+function VoyageCamera() {
+  const { camera } = useThree();
+  const smoothed = useRef(0);
+  const lookTarget = useRef(new THREE.Vector3(0, 0, 0));
+  const desired = useRef(new THREE.Vector3());
+
+  useFrame((_, delta) => {
+    const damping = 1 - Math.exp(-Math.min(delta, 0.1) * 4.5);
+    smoothed.current += (voyageStore.progress - smoothed.current) * damping;
+
+    const sampled = sample(smoothed.current);
+    const parallaxX = voyageStore.reducedMotion ? 0 : voyageStore.mouseX * 0.35;
+    const parallaxY = voyageStore.reducedMotion ? 0 : voyageStore.mouseY * 0.22;
+
+    desired.current.set(
+      sampled.camera[0] + parallaxX,
+      sampled.camera[1] + parallaxY,
+      sampled.camera[2],
+    );
+    camera.position.lerp(desired.current, damping);
+    lookTarget.current.lerp(
+      new THREE.Vector3(sampled.look[0], sampled.look[1], sampled.look[2]),
+      damping,
+    );
+    camera.lookAt(lookTarget.current);
+  });
+
+  return null;
+}
+
+function MoonLight() {
+  const light = useRef<THREE.DirectionalLight>(null);
+
+  useFrame(() => {
+    if (!light.current) return;
+    const sampled = sample(voyageStore.progress);
+    light.current.intensity = sampled.light;
+    light.current.position.set(sampled.moon[0], sampled.moon[1], sampled.moon[2] + 14);
+  });
+
+  return <directionalLight ref={light} position={[-9, 8, -6]} intensity={0.85} color="#cfe3ff" />;
+}
+
 export default function OceanScene({ active, onReady }: OceanSceneProps) {
   return (
     <Canvas
@@ -213,16 +362,16 @@ export default function OceanScene({ active, onReady }: OceanSceneProps) {
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       onCreated={onReady}
     >
-      <color attach="background" args={["#06121a"]} />
-      <fog attach="fog" args={["#06121a", 20, 72]} />
+      <Atmosphere />
       <ambientLight intensity={0.65} color="#8fb8c2" />
-      <directionalLight position={[-9, 8, -6]} intensity={0.85} color="#cfe3ff" />
+      <MoonLight />
       <Stars />
       <Moon />
       <Islands />
       <Ocean />
       <Ship />
       <Lanterns />
+      <VoyageCamera />
     </Canvas>
   );
 }

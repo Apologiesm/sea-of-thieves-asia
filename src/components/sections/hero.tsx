@@ -14,8 +14,8 @@ export function Hero() {
       <div className="hero-readability" aria-hidden="true" />
 
       <Container>
-        <div className="relative z-10 py-20 sm:py-28 lg:py-36">
-          <div className="max-w-3xl">
+        <div className="relative z-10 py-20 sm:py-28 lg:py-36" data-voyage-hero>
+          <div className="max-w-3xl" data-voyage-reveal>
             <Badge tone="accent">{HERO.eyebrow}</Badge>
             <h1
               id="hero-title"

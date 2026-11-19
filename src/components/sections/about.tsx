@@ -6,7 +6,7 @@ export function About() {
     <section id="community" aria-labelledby="about-title" className="scroll-mt-20 border-b border-border py-16 sm:py-24">
       <Container>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5" data-voyage-reveal>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand">
               {ABOUT.eyebrow}
             </p>
@@ -27,7 +27,7 @@ export function About() {
               ))}
             </div>
           </div>
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7" data-voyage-reveal>
             <div className="relative h-full rounded-card border border-border bg-surface/40 p-6 sm:p-9">
               <div className="pointer-events-none absolute right-4 top-4 h-32 w-32 opacity-30" aria-hidden="true">
                 <div className="compass-mark compass-mark--large" />

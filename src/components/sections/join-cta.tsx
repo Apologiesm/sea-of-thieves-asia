@@ -10,7 +10,7 @@ export function JoinCta() {
       <div className="pointer-events-none absolute inset-0 hero-sky opacity-70" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 hero-waves" aria-hidden="true" />
       <Container>
-        <div className="relative mx-auto max-w-3xl text-center">
+        <div className="relative mx-auto max-w-3xl text-center" data-voyage-reveal>
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand">
             {JOIN_CTA.eyebrow}
           </p>

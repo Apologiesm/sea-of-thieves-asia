@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { SITE } from "@/lib/content/site-config";
 import { getSiteUrl } from "@/lib/env";
 
@@ -37,7 +38,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className="flex min-h-screen flex-col">
         <a
           href="#main-content"
@@ -45,6 +46,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        <VoyageProgress />
         <SiteHeader />
         <main id="main-content" className="flex-1">
           {children}
