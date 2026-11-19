@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
+import { SceneBackground } from "@/components/three/SceneBackground";
 import { HERO } from "@/lib/content/site-config";
 
 export function Hero() {
@@ -9,12 +10,11 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="relative overflow-hidden border-b border-border"
     >
-      <div className="pointer-events-none absolute inset-0 hero-sky" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 hero-waves" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 grid-lines opacity-30" aria-hidden="true" />
+      <SceneBackground />
+      <div className="hero-readability" aria-hidden="true" />
 
       <Container>
-        <div className="relative py-20 sm:py-28 lg:py-36">
+        <div className="relative z-10 py-20 sm:py-28 lg:py-36">
           <div className="max-w-3xl">
             <Badge tone="accent">{HERO.eyebrow}</Badge>
             <h1
