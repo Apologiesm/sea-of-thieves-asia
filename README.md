@@ -56,6 +56,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 | Home/hero/about text | `src/lib/content/site-config.ts` (`HERO`, `ABOUT`, `FEATURES`, `PREVIEWS`) |
 | Live Seas board | `src/components/live/LiveSeas.tsx`, `src/lib/live/queries.ts`, `LIVE_SEAS` / `EVENT_FORMATS` in `site-config.ts` |
 | Partner SOTAU events | `src/lib/partner/sync.ts`, `src/components/partner/PartnerEvents.tsx`, migration `0014_partner_events.sql` |
+| Official game news | `src/lib/official/sync.ts`, `src/components/official/OfficialUpdates.tsx`, migration `0015_official_updates.sql` |
 | Event calendar + countdown | `src/components/event/EventCalendar.tsx`, `EventCountdown.tsx`, `src/lib/event/time.ts` |
 | Voyage checklist tool | `src/app/tools/page.tsx`, `src/components/content/VoyageChecklist.tsx` |
 | Events | `src/app/(public)/events`, `src/lib/event/*`, Supabase table `events`; authorized hosts use `/events/new` and `/events/manage` |

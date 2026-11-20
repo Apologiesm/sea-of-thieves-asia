@@ -16,3 +16,4 @@ Attribution is shown in the UI.
 | `sotau-community.webp` | https://www.seaofthievesau.com/assets/affiliate_sails.webp |
 | `festival-banner.jpg` | https://www.seaofthievesau.com/assets/festival_official_banner.jpg |
 | `festival-flag.webp` | https://www.seaofthievesau.com/assets/icons/festival_flag.webp |
+| `official-news.jpg` | https://rare-assets.azureedge.net/assets/ea/6d/ea6d5265-0663-4cba-a8b9-47a5b93ae98e.jpg?n=article_desktop_hidpi.jpg |
