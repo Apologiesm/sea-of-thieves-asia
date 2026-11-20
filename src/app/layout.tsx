@@ -55,7 +55,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-dvh flex-col overflow-x-clip">
         <VideoLayer src="/media/sot2-page.mp4" poster="/media/sot2-page.jpg" variant="page" />
         <a
           href="#main-content"

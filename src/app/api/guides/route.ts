@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     title: parsed.data.title,
     slug,
     excerpt: parsed.data.excerpt || null,
+    image_url: parsed.data.imageUrl,
     body: parsed.data.body,
     category: parsed.data.category,
     tags: parseTags(parsed.data.tags),

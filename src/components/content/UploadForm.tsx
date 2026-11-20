@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { GALLERY_ACCEPTED_TYPES } from "@/lib/content/site-config";
+import { MediaPasteUploader } from "@/components/MediaPasteUploader";
 
 export function UploadForm() {
   const router = useRouter();
@@ -43,15 +44,13 @@ export function UploadForm() {
 
   return (
     <form onSubmit={submit} className="grid gap-5">
-      <label>
-        <span className="text-sm font-medium text-content">Image or video</span>
-        <input
-          type="file"
-          accept={GALLERY_ACCEPTED_TYPES.join(",")}
-          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          className="mt-2 block w-full text-sm text-content-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-4 file:py-2 file:text-sm file:text-content"
-        />
-      </label>
+      <MediaPasteUploader
+        label="Image or video file"
+        hint="Paste (Ctrl+V), drag and drop, or pick a file. Images up to 10 MB, videos up to 50 MB. Uploads stay private until a moderator approves them."
+        value={file ? URL.createObjectURL(file) : null}
+        onChange={() => setFile(null)}
+        onFile={(next) => setFile(next)}
+      />
       <label>
         <span className="text-sm font-medium text-content">Caption</span>
         <input

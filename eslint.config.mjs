@@ -11,5 +11,7 @@ export default defineConfig([
     "build/**",
     "node_modules/**",
     "next-env.d.ts",
+    ".agents/**",
+    ".pi/**",
   ]),
 ]);

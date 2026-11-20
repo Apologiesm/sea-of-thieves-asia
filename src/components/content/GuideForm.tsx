@@ -3,10 +3,11 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { GUIDE_CATEGORIES } from "@/lib/content/site-config";
+import { MediaPasteUploader } from "@/components/MediaPasteUploader";
 import type { GuideRecord } from "@/lib/m8/types";
 
-type Values = { title: string; category: string; tags: string; excerpt: string; body: string; status: "draft" | "published" | "archived" };
-const EMPTY: Values = { title: "", category: GUIDE_CATEGORIES[0], tags: "", excerpt: "", body: "", status: "draft" };
+type Values = { title: string; category: string; tags: string; excerpt: string; imageUrl: string | null; body: string; status: "draft" | "published" | "archived" };
+const EMPTY: Values = { title: "", category: GUIDE_CATEGORIES[0], tags: "", excerpt: "", imageUrl: null, body: "", status: "draft" };
 const field = "mt-1.5 w-full rounded-lg border border-border bg-canvas px-3 py-2.5 text-sm text-content";
 const label = "block text-sm font-medium text-content";
 
@@ -17,6 +18,7 @@ export function GuideForm({ guide }: { guide?: GuideRecord }) {
     category: guide.category ?? GUIDE_CATEGORIES[0],
     tags: (guide.tags ?? []).join(", "),
     excerpt: guide.excerpt ?? "",
+    imageUrl: guide.image_url ?? null,
     body: guide.body,
     status: (["draft", "published", "archived"].includes(guide.status) ? guide.status : "draft") as Values["status"],
   } : EMPTY);
@@ -52,6 +54,12 @@ export function GuideForm({ guide }: { guide?: GuideRecord }) {
       <label><span className={label}>Category</span><select className={field} value={values.category} onChange={(e) => set("category", e.target.value)}>{GUIDE_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
       <label><span className={label}>Tags (comma separated)</span><input className={field} value={values.tags} onChange={(e) => set("tags", e.target.value)} /></label>
       <label><span className={label}>Excerpt</span><input className={field} value={values.excerpt} maxLength={240} onChange={(e) => set("excerpt", e.target.value)} /></label>
+      <MediaPasteUploader
+        label="Guide cover"
+        hint="Optional cover image shown on the guide card. JPEG, PNG, WebP or GIF up to 5 MB."
+        value={values.imageUrl}
+        onChange={(url) => set("imageUrl", url)}
+      />
       <label><span className={label}>Body (Markdown)</span><textarea className={field} rows={16} value={values.body} onChange={(e) => set("body", e.target.value)} /></label>
       <label><span className={label}>Status</span><select className={field} value={values.status} onChange={(e) => set("status", e.target.value as Values["status"])}><option value="draft">draft</option><option value="published">published</option><option value="archived">archived</option></select></label>
       <button type="submit" disabled={busy} className="inline-flex min-h-12 items-center rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-canvas disabled:opacity-60">{busy ? "Saving…" : "Save guide"}</button>

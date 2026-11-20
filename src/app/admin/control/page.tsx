@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { requireOwner } from "@/lib/m8/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSiteSettings, type SiteSettings } from "@/lib/site/settings";
-import { ControlPanel, type DeleteItem } from "@/components/admin/ControlPanel";
+import { ControlPanel, type DeleteItem, type OfficialUpdateItem } from "@/components/admin/ControlPanel";
 
 export const metadata: Metadata = { title: "Owner control" };
 
@@ -22,6 +22,7 @@ export default async function ControlPage() {
   const owner = await requireOwner();
   const settings: SiteSettings = await getSiteSettings();
   const items: DeleteItem[] = [];
+  let officialUpdates: OfficialUpdateItem[] = [];
 
   if (owner) {
     const admin = createAdminClient();
@@ -32,6 +33,12 @@ export default async function ControlPage() {
           items.push({ id: row.id, title: row.title || `${source.label} ${row.id.slice(0, 8)}`, type: source.type });
         });
       }
+      const { data: updates } = await admin
+        .from("official_updates")
+        .select("external_id,title,url,featured,hidden")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(15);
+      officialUpdates = updates ?? [];
     }
   }
 
@@ -43,7 +50,7 @@ export default async function ControlPage() {
           {!owner ? (
             <Card><p className="text-sm text-content-muted">Owner access required.</p></Card>
           ) : (
-            <ControlPanel initial={settings} items={items} />
+            <ControlPanel initial={settings} items={items} officialUpdates={officialUpdates} />
           )}
         </div>
       </Container>

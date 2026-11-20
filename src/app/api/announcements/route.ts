@@ -2,8 +2,26 @@ import { NextResponse } from "next/server";
 import { requireModerator, logAudit } from "@/lib/m8/auth";
 import { announcementSchema } from "@/lib/m8/validation";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { getSiteUrl } from "@/lib/env";
+import { postToDiscord } from "@/lib/discord/notify";
 
 export const dynamic = "force-dynamic";
+
+async function announceToDiscord(announcement: {
+  id: string;
+  title: string;
+  body: string;
+  cover_image_url: string | null;
+  published_at: string | null;
+}) {
+  await postToDiscord({
+    title: announcement.title,
+    description: announcement.body.slice(0, 500),
+    url: `${getSiteUrl()}/announcements/${announcement.id}`,
+    image: announcement.cover_image_url ? { url: announcement.cover_image_url } : undefined,
+    timestamp: announcement.published_at ?? new Date().toISOString(),
+  });
+}
 
 export async function POST(request: Request) {
   const context = await requireModerator();
@@ -37,5 +55,8 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   await logAudit(supabase, "announcement_created", "announcement", data.id, { status: data.status });
+  if (data.status === "published") {
+    await announceToDiscord(data);
+  }
   return NextResponse.json({ announcement: data }, { status: 201 });
 }

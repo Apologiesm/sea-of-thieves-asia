@@ -15,6 +15,7 @@ export type CrewListing = {
   status: "open" | "closed" | "hidden" | "removed";
   contact_consent: boolean;
   contact_method: string | null;
+  image_url: string | null;
   expires_at: string | null;
   created_at: string;
   updated_at: string;

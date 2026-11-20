@@ -25,6 +25,7 @@ export async function PATCH(request: Request, { params }: Context) {
   const { data, error } = await supabase.from("guides").update({
     title: parsed.data.title,
     excerpt: parsed.data.excerpt || null,
+    image_url: parsed.data.imageUrl,
     body: parsed.data.body,
     category: parsed.data.category,
     tags: parseTags(parsed.data.tags),

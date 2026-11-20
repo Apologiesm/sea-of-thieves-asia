@@ -47,6 +47,10 @@ export const crewListingSchema = z.object({
     (value) => (typeof value === "string" && value.length > 0 ? value : null),
     z.string().datetime().nullable().default(null),
   ),
+  imageUrl: z.preprocess(
+    (value) => (typeof value === "string" && value.trim().length > 0 ? value.trim() : null),
+    z.string().url().max(2000).nullable(),
+  ),
 });
 
 export type CrewListingInput = z.infer<typeof crewListingSchema>;
@@ -75,6 +79,7 @@ export function toCrewRow(input: CrewListingInput) {
     contact_consent: input.contactConsent,
     contact_method: input.contactConsent && input.contactMethod ? input.contactMethod : null,
     expires_at: input.expiresAt,
+    image_url: input.imageUrl,
   };
 }
 

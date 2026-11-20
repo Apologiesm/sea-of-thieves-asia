@@ -19,6 +19,10 @@ export function CrewCard({ listing }: { listing: CrewListing }) {
         <h3 className="text-lg font-semibold text-content">{listing.title}</h3>
         <Badge tone="accent">{listing.status}</Badge>
       </div>
+      {listing.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={listing.image_url} alt={`${listing.title} banner`} className="media-card-cover mt-3" loading="lazy" />
+      ) : null}
       {listing.description ? (
         <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-content-muted">
           {listing.description}

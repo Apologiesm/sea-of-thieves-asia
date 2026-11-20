@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireModerator, logAudit } from "@/lib/m8/auth";
 import { announcementSchema } from "@/lib/m8/validation";
+import { getSiteUrl } from "@/lib/env";
+import { postToDiscord } from "@/lib/discord/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,12 @@ export async function PATCH(request: Request, { params }: Context) {
   const parsed = announcementSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "invalid_input" }, { status: 400 });
 
+  const { data: previous } = await supabase
+    .from("announcements")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
+
   const { data, error } = await supabase.from("announcements").update({
     title: parsed.data.title,
     body: parsed.data.body,
@@ -29,5 +37,15 @@ export async function PATCH(request: Request, { params }: Context) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   await logAudit(supabase, "announcement_updated", "announcement", id, { status: data.status });
+  // Announce only on the draft -> published transition, never on edits.
+  if (data.status === "published" && previous?.status !== "published") {
+    await postToDiscord({
+      title: data.title,
+      description: data.body.slice(0, 500),
+      url: `${getSiteUrl()}/announcements/${data.id}`,
+      image: data.cover_image_url ? { url: data.cover_image_url } : undefined,
+      timestamp: data.published_at ?? new Date().toISOString(),
+    });
+  }
   return NextResponse.json({ announcement: data });
 }

@@ -24,6 +24,12 @@ const schema = z.object({
       id: z.string().max(100),
       limit: z.coerce.number().int().min(1).max(25),
     })).max(8),
+    outgoingWebhookUrl: z
+      .string()
+      .max(500)
+      .refine((value) => value === "" || value.startsWith("https://discord.com/api/webhooks/"), {
+        message: "Must be a Discord webhook URL",
+      }),
   }),
   home: z.object({
     sectionOrder: z.array(z.string().max(60)).max(12),

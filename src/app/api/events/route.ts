@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { listEvents } from "@/lib/event/queries";
 import { eventFiltersSchema, eventSchema, toEventRow } from "@/lib/event/validation";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { getSiteUrl } from "@/lib/env";
+import { postToDiscord, discordTimestamp } from "@/lib/discord/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -55,5 +57,19 @@ export async function POST(request: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (data.status === "published" && data.starts_at) {
+    await postToDiscord({
+      title: data.title,
+      description: data.description?.slice(0, 400) ?? undefined,
+      url: `${getSiteUrl()}/events/${data.id}`,
+      image: data.image_url ? { url: data.image_url } : undefined,
+      timestamp: data.starts_at,
+      fields: [
+        { name: "Sets sail", value: discordTimestamp(data.starts_at), inline: true },
+        ...(data.region ? [{ name: "Region", value: data.region, inline: true }] : []),
+        ...(data.platform ? [{ name: "Platform", value: data.platform, inline: true }] : []),
+      ],
+    });
+  }
   return NextResponse.json({ event: data }, { status: 201 });
 }

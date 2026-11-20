@@ -10,6 +10,7 @@ import {
   EVENT_TYPES,
 } from "@/lib/content/site-config";
 import { isoToZonedLocal, zonedDateTimeToIso } from "@/lib/event/time";
+import { MediaPasteUploader } from "@/components/MediaPasteUploader";
 import type { EventRecord, EventStatus, EventType } from "@/lib/event/types";
 
 type Values = {
@@ -24,6 +25,7 @@ type Values = {
   location: string;
   discordEventUrl: string;
   maxAttendees: string;
+  imageUrl: string | null;
   status: EventStatus;
 };
 
@@ -39,6 +41,7 @@ const EMPTY: Values = {
   location: "",
   discordEventUrl: "",
   maxAttendees: "",
+  imageUrl: null,
   status: "draft",
 };
 
@@ -55,6 +58,7 @@ function fromEvent(event: EventRecord): Values {
     location: event.location ?? "",
     discordEventUrl: event.discord_event_url ?? "",
     maxAttendees: event.max_attendees ? String(event.max_attendees) : "",
+    imageUrl: event.image_url ?? null,
     status: event.status,
   };
 }
@@ -113,6 +117,14 @@ export function EventForm({ event }: { event?: EventRecord }) {
             <span className={labelClass}>Description</span>
             <textarea className={fieldClass} rows={5} value={values.description} maxLength={800} onChange={(e) => set("description", e.target.value)} />
           </label>
+          <div className="sm:col-span-2">
+            <MediaPasteUploader
+              label="Event image"
+              hint="Optional flyer or banner shown on the event card. JPEG, PNG, WebP or GIF up to 5 MB."
+              value={values.imageUrl}
+              onChange={(url) => set("imageUrl", url)}
+            />
+          </div>
           <label>
             <span className={labelClass}>Event type</span>
             <select className={fieldClass} value={values.eventType} onChange={(e) => set("eventType", e.target.value as EventType)}>

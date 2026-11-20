@@ -11,6 +11,10 @@ export function GuideCard({ guide }: { guide: GuideRecord }) {
         <Badge tone="accent">{guide.status}</Badge>
       </div>
       <h3 className="mt-2 text-lg font-semibold text-content">{guide.title}</h3>
+      {guide.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={guide.image_url} alt={`${guide.title} cover`} className="media-card-cover mt-3" loading="lazy" />
+      ) : null}
       {guide.excerpt ? <p className="mt-2 line-clamp-3 text-sm text-content-muted">{guide.excerpt}</p> : null}
       <div className="mt-5 flex flex-wrap gap-2">
         {(guide.tags ?? []).map((tag) => (

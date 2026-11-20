@@ -34,6 +34,10 @@ export const eventSchema = z
       (v) => (typeof v === "string" && v.trim().length > 0 ? v.trim() : null),
       z.string().url().nullable(),
     ),
+    imageUrl: z.preprocess(
+      (v) => (typeof v === "string" && v.trim().length > 0 ? v.trim() : null),
+      z.string().url().max(2000).nullable(),
+    ),
     maxAttendees: z.preprocess(
       (v) => (v === "" || v === null || v === undefined ? null : v),
       z.coerce.number().int().min(1).max(500).nullable(),
@@ -60,6 +64,7 @@ export function toEventRow(input: EventInput, slug?: string) {
     ends_at: input.endsAt,
     location: input.location || null,
     discord_event_url: input.discordEventUrl,
+    image_url: input.imageUrl,
     max_attendees: input.maxAttendees,
     status: input.status,
   };

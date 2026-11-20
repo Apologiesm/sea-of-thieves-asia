@@ -3,6 +3,7 @@ export type GuideRecord = {
   title: string;
   slug: string;
   excerpt: string | null;
+  image_url: string | null;
   body: string;
   category: string | null;
   tags: string[] | null;

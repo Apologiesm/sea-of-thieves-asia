@@ -8,7 +8,7 @@ type NavLink = { href: string; label: string };
 
 export function SiteFooter({ navLinks }: { navLinks?: readonly NavLink[] } = {}) {
   return (
-    <footer className="mt-auto border-t border-border bg-surface/40">
+    <footer className="relative z-10 mt-auto border-t border-border bg-surface/40">
       <Container>
         <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">

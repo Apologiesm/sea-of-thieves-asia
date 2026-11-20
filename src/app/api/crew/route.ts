@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { listCrewListings } from "@/lib/crew/queries";
 import { crewFiltersSchema, crewListingSchema, toCrewRow } from "@/lib/crew/validation";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { getSiteUrl } from "@/lib/env";
+import { postToDiscord } from "@/lib/discord/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -47,5 +49,18 @@ export async function POST(request: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (data.status === "open") {
+    await postToDiscord({
+      title: `LFG: ${data.title}`,
+      description: data.description?.slice(0, 500) ?? undefined,
+      url: `${getSiteUrl()}/crew/${data.id}`,
+      image: data.image_url ? { url: data.image_url } : undefined,
+      fields: [
+        { name: "Seats", value: `${data.seats_filled}/${data.seats_total}`, inline: true },
+        ...(data.region ? [{ name: "Region", value: data.region, inline: true }] : []),
+        ...(data.platform ? [{ name: "Platform", value: data.platform, inline: true }] : []),
+      ],
+    });
+  }
   return NextResponse.json({ listing: data }, { status: 201 });
 }

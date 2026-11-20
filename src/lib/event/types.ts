@@ -21,6 +21,7 @@ export type EventRecord = {
   ends_at: string | null;
   location: string | null;
   discord_event_url: string | null;
+  image_url: string | null;
   max_attendees: number | null;
   status: EventStatus;
   created_by: string | null;

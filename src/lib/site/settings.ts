@@ -20,6 +20,8 @@ export type DiscordChannel = {
 export type DiscordSettings = {
   enabled: boolean;
   channels: DiscordChannel[];
+  /** Outgoing Discord webhook URL used for website -> Discord notifications. */
+  outgoingWebhookUrl: string;
 };
 
 export type HomeSettings = {
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   discord: {
     enabled: true,
     channels: [],
+    outgoingWebhookUrl: "",
   },
   home: {
     sectionOrder: ["live", "news", "discord", "about", "features", "previews", "join"],

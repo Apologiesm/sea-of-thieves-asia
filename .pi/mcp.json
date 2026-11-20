@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "description": "Up-to-date docs and code examples for this stack: Next.js 16 App Router, React 19, Tailwind CSS 4, Supabase JS/SSR, GSAP, Zod."
+    },
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp",
+      "description": "Official Supabase MCP for the local (127.0.0.1:54321) or hosted database: run SQL, inspect schema/RLS, manage auth. Requires one-time OAuth sign-in via `/mcp login supabase`; no secrets are stored in this file."
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"],
+      "description": "Next.js dev-server diagnostics (runtime errors, routes, dev overlay) while `npm run dev` is running. Requires Linux Node via nvm inside WSL."
+    }
+  }
+}

@@ -26,7 +26,23 @@ const FEATURE_LABELS: Array<{ key: keyof SiteSettings["features"]; label: string
   { key: "discordEvents", label: "Discord event board", desc: "Discord-synced events" },
 ];
 
-export function ControlPanel({ initial, items }: { initial: SiteSettings; items: DeleteItem[] }) {
+export type OfficialUpdateItem = {
+  external_id: string;
+  title: string;
+  url: string;
+  featured: boolean;
+  hidden: boolean;
+};
+
+export function ControlPanel({
+  initial,
+  items,
+  officialUpdates = [],
+}: {
+  initial: SiteSettings;
+  items: DeleteItem[];
+  officialUpdates?: OfficialUpdateItem[];
+}) {
   const router = useRouter();
   const [settings, setSettings] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -38,6 +54,36 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
 
   function setDiscordEnabled(value: boolean) {
     setSettings((current) => ({ ...current, discord: { ...current.discord, enabled: value } }));
+  }
+
+  function setOutgoingWebhook(value: string) {
+    setSettings((current) => ({ ...current, discord: { ...current.discord, outgoingWebhookUrl: value } }));
+  }
+
+  async function syncOfficial() {
+    setBusy(true);
+    setMessage(null);
+    const response = await fetch("/api/sync/official-sot", { method: "POST" });
+    const result = (await response.json().catch(() => ({}))) as { error?: string };
+    setMessage(
+      response.ok
+        ? "Official Sea of Thieves news synced."
+        : `Sync failed: ${result.error ?? "unknown error"}`,
+    );
+    setBusy(false);
+    router.refresh();
+  }
+
+  async function toggleOfficial(id: string, changes: { featured?: boolean; hidden?: boolean }) {
+    setBusy(true);
+    const response = await fetch("/api/admin/official-updates", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...changes }),
+    });
+    setMessage(response.ok ? "Official update updated." : "Could not update that item.");
+    setBusy(false);
+    router.refresh();
   }
 
   function setHomeOrder(sectionOrder: string[]) {
@@ -153,9 +199,67 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
             </div>
           ))}
           <button type="button" onClick={addChannel} className="control-button">Add channel</button>
+          <label className="control-field">
+            <span>Outgoing webhook URL (website → Discord posts)</span>
+            <input
+              value={settings.discord.outgoingWebhookUrl}
+              onChange={(e) => setOutgoingWebhook(e.target.value)}
+              placeholder="https://discord.com/api/webhooks/..."
+              type="url"
+            />
+          </label>
+          <p className="text-xs text-content-muted">
+            When set, published announcements, new events and new crew listings are posted to this
+            Discord channel as rich embeds automatically.
+          </p>
         </div>
         <button type="button" onClick={save} disabled={busy} className="control-button">{busy ? "Saving…" : "Save settings"}</button>
         {message ? <p role="status" className="mt-3 text-sm text-brand">{message}</p> : null}
+      </section>
+
+      <section className="control-section">
+        <h2 className="text-xl font-semibold text-content">Official Sea of Thieves news</h2>
+        <p className="mt-1 text-sm text-content-muted">
+          Pull the latest official news and season updates from seaofthieves.com, then feature or
+          hide individual posts. Custom Asia events can be created from the Events page — owners,
+          admins and moderators are event hosts by default.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" onClick={syncOfficial} disabled={busy} className="control-button">
+            {busy ? "Syncing…" : "Sync Official SoT News Now"}
+          </button>
+          <span className="text-xs text-content-muted">Also runs nightly via the Vercel cron job.</span>
+        </div>
+        <div className="mt-5 grid gap-2">
+          {officialUpdates.length === 0 ? (
+            <p className="text-sm text-content-muted">No official updates synced yet.</p>
+          ) : (
+            officialUpdates.map((update) => (
+              <div key={update.external_id} className="control-row">
+                <span>
+                  <strong>{update.title}</strong>
+                  <small>official · {update.featured ? "featured" : "standard"}{update.hidden ? " · hidden" : ""}</small>
+                </span>
+                <span className="flex gap-2">
+                  <button
+                    type="button"
+                    className="control-delete"
+                    onClick={() => toggleOfficial(update.external_id, { featured: !update.featured })}
+                  >
+                    {update.featured ? "Unfeature" : "Feature"}
+                  </button>
+                  <button
+                    type="button"
+                    className="control-delete"
+                    onClick={() => toggleOfficial(update.external_id, { hidden: !update.hidden })}
+                  >
+                    {update.hidden ? "Show" : "Hide"}
+                  </button>
+                </span>
+              </div>
+            ))
+          )}
+        </div>
       </section>
 
       <section className="control-section">

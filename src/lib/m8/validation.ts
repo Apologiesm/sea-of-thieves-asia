@@ -13,6 +13,10 @@ export const guideSchema = z.object({
   category: z.string().min(1).max(60),
   tags: z.preprocess((v) => (typeof v === "string" ? v : ""), z.string().max(300)),
   excerpt: line(240),
+  imageUrl: z.preprocess(
+    (v) => (typeof v === "string" && v.trim().length > 0 ? v.trim() : null),
+    z.string().url().max(2000).nullable(),
+  ),
   body: markdown(20000),
   status: z.enum(["draft", "published", "archived"]),
 });

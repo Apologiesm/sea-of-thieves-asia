@@ -17,6 +17,10 @@ export function EventCard({ event }: { event: EventRecord }) {
         </div>
         <Badge tone="accent">{event.status}</Badge>
       </div>
+      {event.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={event.image_url} alt={`${event.title} image`} className="media-card-cover mt-3" loading="lazy" />
+      ) : null}
       <p className="mt-3 text-sm font-medium text-content">
         {formatDateTime(event.starts_at, event.timezone)}
       </p>

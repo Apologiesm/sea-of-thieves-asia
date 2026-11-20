@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CREW_OPTIONS } from "@/lib/content/site-config";
+import { MediaPasteUploader } from "@/components/MediaPasteUploader";
 import type { CrewListing } from "@/lib/crew/types";
 
 type Values = {
@@ -20,6 +21,7 @@ type Values = {
   contactConsent: boolean;
   contactMethod: string;
   expiresAt: string;
+  imageUrl: string | null;
 };
 
 const EMPTY: Values = {
@@ -37,6 +39,7 @@ const EMPTY: Values = {
   contactConsent: false,
   contactMethod: "",
   expiresAt: "",
+  imageUrl: null,
 };
 
 function fromListing(listing: CrewListing): Values {
@@ -55,6 +58,7 @@ function fromListing(listing: CrewListing): Values {
     contactConsent: listing.contact_consent,
     contactMethod: listing.contact_method ?? "",
     expiresAt: listing.expires_at ? listing.expires_at.slice(0, 10) : "",
+    imageUrl: listing.image_url ?? null,
   };
 }
 
@@ -143,6 +147,14 @@ export function CrewForm({ listing }: { listing?: CrewListing }) {
               onChange={(event) => set("description", event.target.value)}
             />
           </label>
+          <div className="sm:col-span-2">
+            <MediaPasteUploader
+              label="Crew banner"
+              hint="Optional banner shown on the tavern board card. JPEG, PNG, WebP or GIF up to 5 MB."
+              value={values.imageUrl}
+              onChange={(url) => set("imageUrl", url)}
+            />
+          </div>
           {select("Region", "region", CREW_OPTIONS.regions)}
           {select("Platform", "platform", CREW_OPTIONS.platforms)}
           <label>
