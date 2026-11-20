@@ -192,26 +192,26 @@ export const FEATURES: readonly FeatureConfig[] = [
     key: "crew",
     title: "Find your crew",
     description:
-      "Post a voyage or answer one. Crew listings are being prepared for the community.",
+      "Post the run you want to sail, or answer someone else's call. Crews appear here only when real players post them.",
     size: "large",
   },
   {
     key: "events",
     title: "Sail together",
-    description: "Community events and meetups, published only when confirmed.",
+    description: "Fleet nights, Fight Nights and community voyages — with times shown in your region.",
     size: "small",
   },
   {
     key: "guides",
     title: "Learn the ropes",
-    description: "A knowledge base written by players, for players.",
+    description: "Short, practical notes from players who have already made the mistakes for you.",
     size: "small",
   },
   {
     key: "gallery",
     title: "Share the view",
-    description: "A moderated gallery for the moments worth keeping.",
-    size: "small",
+    description: "A moderated place for the screenshots, clips and strange sea stories worth keeping.",
+    size: "large",
   },
 ] as const;
 
@@ -349,3 +349,35 @@ export const ADMIN_PRIVACY_NOTICE =
   "Moderation actions are private. Only authorized moderators and admins can view reports or change content status. Every sensitive action is written to an audit log.";
 
 export const SECURITY_CONTACT_EMAIL = PLACEHOLDER;
+
+export const LIVE_SEAS = {
+  eyebrow: "Live seas",
+  title: "What's sailing right now",
+  description: "Real event status and regional timings. Nothing is shown as live until a host publishes it.",
+  liveLabel: "Live now",
+  nextLabel: "Next on the horizon",
+  noLive: "No event is live right now",
+  noLiveDetail: "Hosts publish events through the events system. When one starts, it appears here automatically.",
+  noNext: "Next event timing: " + PLACEHOLDER,
+  updatesTitle: "In-game updates",
+  updatesDetail: "Community-curated notes only. Official news is never reproduced without permission.",
+  noUpdates: "No in-game updates published yet",
+  formatsTitle: "Event formats we run",
+  formatsDetail: "Timings are shown only when a host confirms them. Until then they stay marked for replacement.",
+} as const;
+
+export const EVENT_FORMATS = [
+  { key: "fight_nights", label: "Fight Nights", note: "Open PvP evenings", timing: PLACEHOLDER },
+  { key: "last_ship_standing", label: "Last Ship Standing", note: "Fleet elimination", timing: PLACEHOLDER },
+  { key: "fleet_night", label: "Fleet Night", note: "Casual group sailing", timing: PLACEHOLDER },
+  { key: "treasure_hunt", label: "Treasure Hunt", note: "Region-wide goal", timing: PLACEHOLDER },
+  { key: "stream_night", label: "Stream Night", note: "Community creators", timing: PLACEHOLDER },
+  { key: "community_challenge", label: "Community Challenge", note: "Seasonal objective", timing: PLACEHOLDER },
+] as const;
+
+export const QUICK_ACTIONS = [
+  { label: "Discord invite", href: "https://discord.com/invite/dSX5FNy6sB", external: true },
+  { label: "Events calendar", href: "/events", external: false },
+  { label: "Find a crew", href: "/crew", external: false },
+  { label: "Report an issue", href: "/report", external: false },
+] as const;

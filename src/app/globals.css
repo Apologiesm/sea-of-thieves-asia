@@ -514,3 +514,299 @@
     display: none;
   }
 }
+
+/* --- Live seas board ----------------------------------------------------- */
+.live-seas {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(168, 182, 201, 0.035) 0 1px,
+    transparent 1px 64px
+  );
+}
+
+.live-board,
+.live-side {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1.4rem;
+}
+
+.live-board::after,
+.live-side::after {
+  content: "";
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-right: 1px solid var(--color-brand);
+  border-bottom: 1px solid var(--color-brand);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.live-board__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.live-board__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+}
+
+.live-board__divider {
+  margin: 1.4rem 0;
+  border-top: 1px dashed var(--color-border);
+}
+
+.live-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.35rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  flex: none;
+}
+
+.live-dot--on {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 164, 92, 0.35); }
+  50% { box-shadow: 0 0 0 7px rgba(200, 164, 92, 0); }
+}
+
+.region-clock label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-content-muted);
+}
+
+.region-clock__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+
+.region-clock select {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  color: var(--color-content);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.region-clock time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-content);
+}
+
+.format-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.format-row:last-child { border-bottom: 0; }
+
+.format-row__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-content);
+}
+
+.format-row__note {
+  grid-column: 1;
+  font-size: 0.75rem;
+  color: var(--color-content-muted);
+}
+
+.format-row__time {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.66rem;
+  color: var(--color-brand);
+  text-align: right;
+}
+
+.quick-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  color: var(--color-content-muted);
+  transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.quick-action:hover,
+.quick-action:focus-visible {
+  border-color: var(--color-brand);
+  color: var(--color-content);
+  transform: translateY(-2px);
+}
+
+/* --- Human-made feature board -------------------------------------------- */
+.features-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.voyage-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  grid-column: span 12;
+  min-height: 19rem;
+  padding: 1.4rem 1.4rem 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background:
+    repeating-linear-gradient(135deg, rgba(168, 182, 201, 0.025) 0 1px, transparent 1px 11px),
+    var(--color-surface);
+  overflow: hidden;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.voyage-card--wide { grid-column: span 12; }
+
+@media (min-width: 640px) {
+  .voyage-card { grid-column: span 6; }
+  .voyage-card--wide { grid-column: span 6; }
+}
+
+@media (min-width: 1024px) {
+  .voyage-card { grid-column: span 5; }
+  .voyage-card--wide { grid-column: span 7; }
+}
+
+.voyage-card:hover,
+.voyage-card:focus-within {
+  transform: translateY(-4px);
+  border-color: var(--color-brand);
+  box-shadow: 0 16px 40px rgba(3, 8, 13, 0.35);
+}
+
+.voyage-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.voyage-card__index {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--color-brand);
+}
+
+.voyage-card__tag {
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-content-muted);
+}
+
+.voyage-card__art {
+  display: grid;
+  place-items: center;
+  height: 7.5rem;
+  margin: 1.2rem 0;
+  color: var(--color-brand);
+  opacity: 0.85;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.voyage-card__art svg {
+  width: min(13rem, 85%);
+  height: 100%;
+}
+
+.voyage-card:hover .voyage-card__art,
+.voyage-card:focus-within .voyage-card__art {
+  transform: translateY(-4px) rotate(-1.5deg);
+  opacity: 1;
+}
+
+.voyage-card__body {
+  margin-top: auto;
+}
+
+.voyage-card__body h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-content);
+}
+
+.voyage-card__body p {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--color-content-muted);
+}
+
+.voyage-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-content);
+}
+
+.voyage-card__link span {
+  color: var(--color-brand);
+  transition: transform 180ms ease;
+}
+
+.voyage-card:hover .voyage-card__link span,
+.voyage-card:focus-within .voyage-card__link span {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot--on { animation: none; }
+  .voyage-card,
+  .voyage-card__art,
+  .quick-action,
+  .voyage-card__link span { transition: none; transform: none; }
+}
