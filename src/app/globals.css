@@ -36,6 +36,76 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Two distinct video layers: hero clip only in the hero, page clip below. */
+  .video-layer {
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .video-layer video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-layer--hero {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+  }
+
+  .video-layer--page {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+  }
+
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(11, 17, 32, 0.9) 0%,
+        rgba(11, 17, 32, 0.62) 45%,
+        rgba(11, 17, 32, 0.12) 100%
+      ),
+      linear-gradient(0deg, rgba(11, 17, 32, 0.72) 0%, transparent 48%);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  main section:not(.hero-section) {
+    background-color: rgba(11, 17, 32, 0.86);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .video-layer video {
+      display: none;
+    }
+
+    .video-layer--hero {
+      background-image: url("/media/sot1-hero.jpg");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .video-layer--page {
+      background-image: url("/media/sot2-page.jpg");
+      background-size: cover;
+      background-position: center;
+      opacity: 0.5;
+    }
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-brand);
     outline-offset: 3px;

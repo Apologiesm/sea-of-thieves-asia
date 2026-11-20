@@ -21,6 +21,8 @@ function setupVoyage(): () => void {
 
   const reveals = gsap.utils.toArray<HTMLElement>("[data-voyage-reveal]");
   const sections = gsap.utils.toArray<HTMLElement>("main section");
+  const heroVideo = document.querySelector<HTMLElement>('[data-video-layer="hero"]');
+  const pageVideo = document.querySelector<HTMLElement>('[data-video-layer="page"]');
 
   if (reveals.length > 0) {
     gsap.set(reveals, { opacity: 0.9, y: 16 });
@@ -35,8 +37,19 @@ function setupVoyage(): () => void {
       scrub: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        voyageStore.raw = self.progress;
-        voyageStore.progress = heldProgress(self.progress);
+        const raw = self.progress;
+        voyageStore.raw = raw;
+        voyageStore.progress = heldProgress(raw);
+
+        // Clean crossfade: hero clip fades out as it leaves, page clip fades in.
+        if (heroVideo) {
+          heroVideo.style.opacity = String(Math.max(0, Math.min(1, 1 - raw / 0.13)));
+        }
+        if (pageVideo) {
+          pageVideo.style.opacity = String(
+            Math.max(0, Math.min(1, (raw - 0.05) / 0.09)),
+          );
+        }
       },
     },
   });
@@ -74,6 +87,8 @@ function setupVoyage(): () => void {
       gsap.killTweensOf(reveals);
       gsap.set(reveals, { clearProps: "opacity,transform" });
     }
+    if (heroVideo) heroVideo.style.opacity = "";
+    if (pageVideo) pageVideo.style.opacity = "";
     voyageStore.raw = 0;
     voyageStore.progress = 0;
     voyageStore.mouseX = 0;

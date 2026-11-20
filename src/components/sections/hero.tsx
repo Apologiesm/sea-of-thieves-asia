@@ -1,17 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
-import { SceneBackground } from "@/components/three/SceneBackground";
+import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { HERO } from "@/lib/content/site-config";
 
 export function Hero() {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative overflow-hidden border-b border-border"
+      className="hero-section relative min-h-[88vh] overflow-hidden border-b border-border"
     >
-      <SceneBackground />
-      <div className="hero-readability" aria-hidden="true" />
+      <VideoLayer src="/media/sot1-hero.mp4" poster="/media/sot1-hero.jpg" variant="hero" />
+      <div className="hero-scrim" aria-hidden="true" />
 
       <Container>
         <div className="relative z-10 py-20 sm:py-28 lg:py-36" data-voyage-hero>
