@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { VoyageArt } from "@/components/content/VoyageArt";
 import { FEATURES } from "@/lib/content/site-config";
+import { getSiteSettings } from "@/lib/site/settings";
 
 const LINKS: Record<string, { href: string; label: string }> = {
   crew: { href: "/crew", label: "Open crew finder" },
@@ -17,7 +18,19 @@ const TAGS: Record<string, string> = {
   gallery: "Screens & clips",
 };
 
-export function CommunityFeatures() {
+export async function CommunityFeatures() {
+  const settings = await getSiteSettings();
+  const flagByKey: Record<string, keyof typeof settings.features> = {
+    crew: "crew",
+    events: "events",
+    guides: "guides",
+    gallery: "gallery",
+  };
+  const features = FEATURES.filter((feature) => {
+    const flag = flagByKey[feature.key];
+    return !flag || settings.features[flag];
+  });
+
   return (
     <section aria-labelledby="features-title" className="features-section border-b border-border py-16 sm:py-24">
       <Container>
@@ -37,7 +50,7 @@ export function CommunityFeatures() {
         </div>
 
         <div className="features-grid" data-voyage-reveal>
-          {FEATURES.map((feature, index) => {
+          {features.map((feature, index) => {
             const link = LINKS[feature.key];
             return (
               <article

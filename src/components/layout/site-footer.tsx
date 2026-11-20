@@ -4,7 +4,9 @@ import { Container } from "@/components/ui/container";
 import { FOOTER, SITE } from "@/lib/content/site-config";
 import { safeHref } from "@/lib/content/placeholders";
 
-export function SiteFooter() {
+type NavLink = { href: string; label: string };
+
+export function SiteFooter({ navLinks }: { navLinks?: readonly NavLink[] } = {}) {
   return (
     <footer className="mt-auto border-t border-border bg-surface/40">
       <Container>
@@ -17,13 +19,17 @@ export function SiteFooter() {
             <div className="mt-6 h-px w-16 bg-brand" aria-hidden="true" />
           </div>
 
-          {FOOTER.columns.map((column) => (
+          {FOOTER.columns.map((column) => {
+            const items = column.title === "Explore" && navLinks
+              ? navLinks.map((link) => ({ label: link.label, value: link.href }))
+              : column.items;
+            return (
             <div key={column.title} className="lg:col-span-2 lg:col-start-auto">
               <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-content">
                 {column.title}
               </h2>
               <ul className="mt-5 space-y-3">
-                {column.items.map((item) => {
+                {items.map((item) => {
                   const internal = item.value.startsWith("/");
                   const href = internal ? item.value : safeHref(item.value);
                   return (
@@ -57,7 +63,8 @@ export function SiteFooter() {
                 })}
               </ul>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="border-t border-border py-7">

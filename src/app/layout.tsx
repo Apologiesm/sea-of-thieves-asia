@@ -66,7 +66,7 @@ export default async function RootLayout({
         <main id="main-content" className="flex-1">
           {children}
         </main>
-        <SiteFooter />
+        <SiteFooter navLinks={navLinks} />
         <BackToTop />
       </body>
     </html>

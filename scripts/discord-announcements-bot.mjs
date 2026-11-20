@@ -6,6 +6,7 @@ import {
   Routes,
   SlashCommandBuilder,
   ChannelType,
+  MessageFlags,
 } from "discord.js";
 
 if (typeof process.loadEnvFile === "function") {
@@ -172,7 +173,7 @@ client.once(Events.ClientReady, (ready) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand() || interaction.commandName !== "sotafeed") return;
   if (!await canConfigure(interaction)) {
-    await interaction.reply({ content: "Owner or Admin Discord role required.", ephemeral: true });
+    await interaction.reply({ content: "Owner or Admin Discord role required.", flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -189,14 +190,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const limit = interaction.options.getInteger("limit") || 4;
       const url = `https://discord.com/channels/${interaction.guildId}/${id}`;
       if (!existing && settings.channels.length >= 8) {
-        await interaction.reply({ content: "Maximum 8 channels. Remove one first.", ephemeral: true });
+        await interaction.reply({ content: "Maximum 8 channels. Remove one first.", flags: MessageFlags.Ephemeral });
         return;
       }
       if (existing) Object.assign(existing, { label, limit, url });
       else settings.channels.push({ key: `channel-${id}`, label, url, id, limit });
       settings.enabled = true;
       await saveDiscordSettings(settings);
-      await interaction.reply({ content: `Added **${label}** to the website feed.`, ephemeral: true });
+      await interaction.reply({ content: `Added **${label}** to the website feed.`, flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -204,7 +205,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const channel = interaction.options.getChannel("channel", true);
       settings.channels = settings.channels.filter((item) => item.id !== channel.id);
       await saveDiscordSettings(settings);
-      await interaction.reply({ content: `Removed ${channel.name} from the feed.`, ephemeral: true });
+      await interaction.reply({ content: `Removed ${channel.name} from the feed.`, flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -213,12 +214,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const value = interaction.options.getInteger("value", true);
       const item = settings.channels.find((entry) => entry.id === channel.id);
       if (!item) {
-        await interaction.reply({ content: "That channel is not configured.", ephemeral: true });
+        await interaction.reply({ content: "That channel is not configured.", flags: MessageFlags.Ephemeral });
         return;
       }
       item.limit = value;
       await saveDiscordSettings(settings);
-      await interaction.reply({ content: `${item.label} now shows ${value} posts.`, ephemeral: true });
+      await interaction.reply({ content: `${item.label} now shows ${value} posts.`, flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -226,15 +227,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const lines = settings.channels.length
         ? settings.channels.map((item) => `• ${item.label}: ${item.id} (${item.limit} posts)`).join("\n")
         : "No channels configured.";
-      await interaction.reply({ content: `Feed: ${settings.enabled ? "on" : "off"}\n${lines}`, ephemeral: true });
+      await interaction.reply({ content: `Feed: ${settings.enabled ? "on" : "off"}\n${lines}`, flags: MessageFlags.Ephemeral });
       return;
     }
 
     settings.enabled = subcommand === "enable";
     await saveDiscordSettings(settings);
-    await interaction.reply({ content: `Discord feed ${settings.enabled ? "enabled" : "disabled"}.`, ephemeral: true });
+    await interaction.reply({ content: `Discord feed ${settings.enabled ? "enabled" : "disabled"}.`, flags: MessageFlags.Ephemeral });
   } catch (error) {
-    await interaction.reply({ content: `Failed: ${error instanceof Error ? error.message : "unknown"}`, ephemeral: true });
+    await interaction.reply({ content: `Failed: ${error instanceof Error ? error.message : "unknown"}`, flags: MessageFlags.Ephemeral });
   }
 });
 

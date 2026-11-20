@@ -62,3 +62,19 @@
 - 360px mobile menu and 1920px reduced-motion keyboard pass: no page errors, full accessibility tree.
 - Privacy: no trackers, no raw HTML, no service-role key in client bundle, no public-page cookies.
 - Docs: assets licences/sources recorded, placeholders marked `REPLACE_BEFORE_LAUNCH`, footer disclaimer present in rendered output, README contains all required sections.
+
+## Full re-verification after owner control and Discord channels
+- Commands: install, typecheck, lint, production build and DB tests all pass.
+- 25 routes checked in a real browser: no exceptions, no console errors, no failed network requests, no broken images, no empty anchors.
+- Progress rail verified homepage-only.
+- Scroll voyage verified both directions (hero 1→0→1, page 0→1→0).
+- Internal links all 200; external Discord/Instagram/Facebook 200; official news URLs 403 to bot HEAD requests because of their WAF, expected.
+- Fixed: feature flags now also hide footer links, the static feature card and the Live Seas section. Disabled sections disappear from header, footer and homepage.
+- Verified owner roles: `is_admin()` and `is_moderator()` both include `owner`; the test account has `owner` and `member`.
+- Owner control APIs return 403 when unauthenticated.
+- Image upload, Discord announcement, Discord event and role-command endpoints return 401/403 when unauthenticated.
+- Discord provider enabled; official news sync returns 11 articles.
+- Discord bot is running as `SOTA#8038`; `/sotafeed` command registered; no channels are hard-coded after migration 0025.
+- Fixed deprecated Discord.js `ephemeral` option by using `MessageFlags.Ephemeral`; bot starts without warnings.
+- Privacy: no trackers, no raw HTML, no service-role key in client bundle, no public-page cookies, security headers present.
+- 360px mobile menu and 1920px reduced-motion keyboard navigation pass with no page errors.

@@ -28,8 +28,8 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
-      <LiveSeas />
-      <OfficialUpdates limit={6} />
+      {settings.features.events ? <LiveSeas /> : null}
+      {settings.features.news ? <OfficialUpdates limit={6} /> : null}
       {settings.features.discordEvents ? <DiscordEvents limit={6} /> : null}
       <About />
       <CommunityFeatures />
