@@ -2,6 +2,10 @@ import {
   Client,
   GatewayIntentBits,
   Events,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  ChannelType,
 } from "discord.js";
 
 if (typeof process.loadEnvFile === "function") {
@@ -9,13 +13,17 @@ if (typeof process.loadEnvFile === "function") {
 }
 
 const token = process.env.DISCORD_BOT_TOKEN;
+const applicationId = process.env.DISCORD_CLIENT_ID;
+const guildId = process.env.DISCORD_GUILD_ID;
+const ownerRoleId = process.env.DISCORD_OWNER_ROLE_ID;
+const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const commandSecret = process.env.DISCORD_EVENTS_SECRET;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!token || !commandSecret || !supabaseUrl || !serviceKey) {
-  throw new Error("Missing DISCORD_BOT_TOKEN, DISCORD_EVENTS_SECRET, NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+if (!token || !applicationId || !commandSecret || !supabaseUrl || !serviceKey) {
+  throw new Error("Missing Discord bot settings, site URL or Supabase service key");
 }
 
 function channelIdFrom(channel) {
@@ -23,17 +31,40 @@ function channelIdFrom(channel) {
   return channel.url?.match(/\/channels\/\d+\/(\d+)/)?.[1] ?? "";
 }
 
+const supabaseHeaders = {
+  apikey: serviceKey,
+  Authorization: `Bearer ${serviceKey}`,
+};
+
 async function getDiscordSettings() {
   const response = await fetch(
     `${supabaseUrl}/rest/v1/site_settings?key=eq.discord&select=value`,
-    {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
-      cache: "no-store",
-    },
+    { headers: supabaseHeaders, cache: "no-store" },
   );
   if (!response.ok) throw new Error(`settings_${response.status}`);
   const rows = await response.json();
-  return rows[0]?.value ?? { enabled: false, channels: [] };
+  const value = rows[0]?.value ?? {};
+  return { enabled: Boolean(value.enabled), channels: Array.isArray(value.channels) ? value.channels : [] };
+}
+
+async function saveDiscordSettings(value) {
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/site_settings?key=eq.discord`,
+    {
+      method: "PATCH",
+      headers: { ...supabaseHeaders, "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ value, updated_at: new Date().toISOString() }),
+    },
+  );
+  if (!response.ok) throw new Error(`save_settings_${response.status}`);
+}
+
+async function canConfigure(interaction) {
+  if (!ownerRoleId && !adminRoleId) return true;
+  const roles = interaction.member?.roles?.cache
+    ? [...interaction.member.roles.cache.keys()]
+    : (interaction.member?.roles ?? []);
+  return Boolean(roles.includes(ownerRoleId) || roles.includes(adminRoleId));
 }
 
 async function syncChannel(channel) {
@@ -44,7 +75,6 @@ async function syncChannel(channel) {
     `https://discord.com/api/v10/channels/${id}/messages?limit=${Math.min(25, channel.limit || 4)}`,
     { headers: { Authorization: `Bot ${token}` }, cache: "no-store" },
   );
-
   if (!response.ok) {
     console.error(`CHANNEL_${id}_STATUS=${response.status}`);
     return;
@@ -53,7 +83,6 @@ async function syncChannel(channel) {
   const messages = await response.json();
   for (const message of messages) {
     if (message.author?.bot) continue;
-
     const payload = {
       external_id: message.id,
       channel_id: id,
@@ -87,10 +116,7 @@ async function syncChannel(channel) {
 
     const post = await fetch(`${siteUrl}/api/discord/announcements`, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${commandSecret}`,
-      },
+      headers: { "content-type": "application/json", authorization: `Bearer ${commandSecret}` },
       body: JSON.stringify(payload),
     });
     if (!post.ok) console.error(`POST_${message.id}_STATUS=${post.status}`);
@@ -99,20 +125,122 @@ async function syncChannel(channel) {
 
 async function syncAll() {
   const settings = await getDiscordSettings();
-  if (!settings.enabled) {
-    console.log("DISCORD_FEED_DISABLED");
+  if (!settings.enabled || settings.channels.length === 0) return;
+  for (const channel of settings.channels) await syncChannel(channel);
+}
+
+const feedCommand = new SlashCommandBuilder()
+  .setName("sotafeed")
+  .setDescription("Configure which Discord channels appear on the website")
+  .addSubcommand((sub) => sub
+    .setName("add")
+    .setDescription("Add a channel to the website feed")
+    .addChannelOption((option) => option
+      .setName("channel")
+      .setDescription("Channel to sync")
+      .setRequired(true)
+      .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement))
+    .addStringOption((option) => option.setName("label").setDescription("Display label").setMaxLength(100))
+    .addIntegerOption((option) => option.setName("limit").setDescription("Recent posts to show (1-25)").setMinValue(1).setMaxValue(25)))
+  .addSubcommand((sub) => sub
+    .setName("remove")
+    .setDescription("Remove a channel from the website feed")
+    .addChannelOption((option) => option.setName("channel").setDescription("Channel to remove").setRequired(true)))
+  .addSubcommand((sub) => sub
+    .setName("limit")
+    .setDescription("Set how many posts a channel shows")
+    .addChannelOption((option) => option.setName("channel").setDescription("Channel").setRequired(true))
+    .addIntegerOption((option) => option.setName("value").setDescription("Posts to show (1-25)").setRequired(true).setMinValue(1).setMaxValue(25)))
+  .addSubcommand((sub) => sub.setName("list").setDescription("List configured channels"))
+  .addSubcommand((sub) => sub.setName("enable").setDescription("Enable the Discord feed"))
+  .addSubcommand((sub) => sub.setName("disable").setDescription("Disable the Discord feed"));
+
+const rest = new REST({ version: "10" }).setToken(token);
+const route = guildId
+  ? Routes.applicationGuildCommands(applicationId, guildId)
+  : Routes.applicationCommands(applicationId);
+await rest.put(route, { body: [feedCommand.toJSON()] });
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+});
+
+client.once(Events.ClientReady, (ready) => {
+  console.log(`FEED_BOT_READY as ${ready.user.tag}`);
+});
+
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand() || interaction.commandName !== "sotafeed") return;
+  if (!await canConfigure(interaction)) {
+    await interaction.reply({ content: "Owner or Admin Discord role required.", ephemeral: true });
     return;
   }
-  for (const channel of settings.channels ?? []) await syncChannel(channel);
-}
+
+  try {
+    const settings = await getDiscordSettings();
+    settings.channels = Array.isArray(settings.channels) ? settings.channels : [];
+    const subcommand = interaction.options.getSubcommand();
+
+    if (subcommand === "add") {
+      const channel = interaction.options.getChannel("channel", true);
+      const id = channel.id;
+      const existing = settings.channels.find((item) => item.id === id);
+      const label = interaction.options.getString("label") || channel.name;
+      const limit = interaction.options.getInteger("limit") || 4;
+      const url = `https://discord.com/channels/${interaction.guildId}/${id}`;
+      if (!existing && settings.channels.length >= 8) {
+        await interaction.reply({ content: "Maximum 8 channels. Remove one first.", ephemeral: true });
+        return;
+      }
+      if (existing) Object.assign(existing, { label, limit, url });
+      else settings.channels.push({ key: `channel-${id}`, label, url, id, limit });
+      settings.enabled = true;
+      await saveDiscordSettings(settings);
+      await interaction.reply({ content: `Added **${label}** to the website feed.`, ephemeral: true });
+      return;
+    }
+
+    if (subcommand === "remove") {
+      const channel = interaction.options.getChannel("channel", true);
+      settings.channels = settings.channels.filter((item) => item.id !== channel.id);
+      await saveDiscordSettings(settings);
+      await interaction.reply({ content: `Removed ${channel.name} from the feed.`, ephemeral: true });
+      return;
+    }
+
+    if (subcommand === "limit") {
+      const channel = interaction.options.getChannel("channel", true);
+      const value = interaction.options.getInteger("value", true);
+      const item = settings.channels.find((entry) => entry.id === channel.id);
+      if (!item) {
+        await interaction.reply({ content: "That channel is not configured.", ephemeral: true });
+        return;
+      }
+      item.limit = value;
+      await saveDiscordSettings(settings);
+      await interaction.reply({ content: `${item.label} now shows ${value} posts.`, ephemeral: true });
+      return;
+    }
+
+    if (subcommand === "list") {
+      const lines = settings.channels.length
+        ? settings.channels.map((item) => `• ${item.label}: ${item.id} (${item.limit} posts)`).join("\n")
+        : "No channels configured.";
+      await interaction.reply({ content: `Feed: ${settings.enabled ? "on" : "off"}\n${lines}`, ephemeral: true });
+      return;
+    }
+
+    settings.enabled = subcommand === "enable";
+    await saveDiscordSettings(settings);
+    await interaction.reply({ content: `Discord feed ${settings.enabled ? "enabled" : "disabled"}.`, ephemeral: true });
+  } catch (error) {
+    await interaction.reply({ content: `Failed: ${error instanceof Error ? error.message : "unknown"}`, ephemeral: true });
+  }
+});
 
 await syncAll();
 setInterval(() => {
   syncAll().catch((error) => console.error(error instanceof Error ? error.message : "sync_failed"));
 }, 60_000);
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-client.once(Events.ClientReady, (ready) => {
-  console.log(`ANNOUNCEMENTS_BOT_READY as ${ready.user.tag}`);
-});
 await client.login(token);

@@ -31,22 +31,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   features: { events: true, crew: true, guides: true, gallery: true, news: true, discordEvents: true },
   discord: {
     enabled: true,
-    channels: [
-      {
-        key: "game_updates",
-        label: "Game updates",
-        url: "https://discord.com/channels/902102549144948746/1296814423159345162",
-        id: "1296814423159345162",
-        limit: 4,
-      },
-      {
-        key: "game_events",
-        label: "Game events",
-        url: "https://discord.com/channels/902102549144948746/1296814661651529749",
-        id: "1296814661651529749",
-        limit: 4,
-      },
-    ],
+    channels: [],
   },
 };
 
