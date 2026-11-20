@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { createClient } from "@/lib/supabase/server";
 
 type OfficialUpdate = {
@@ -60,24 +61,26 @@ export async function OfficialUpdates({ limit = 6 }: { limit?: number }) {
         ) : (
           <div className="official-grid">
             {updates.map((update, index) => (
-              <a key={update.external_id} href={update.url} target="_blank" rel="noopener noreferrer" className="official-card">
-                {index === 0 ? (
-                  <Image
-                    src="/news/official-news.jpg"
-                    alt="Featured Sea of Thieves official news artwork"
-                    width={640}
-                    height={360}
-                    priority
-                    className="official-card__image"
-                  />
-                ) : null}
-                <div className="official-card__body">
-                  <time>{formatDate(update.published_at)}</time>
-                  <h3>{update.title}</h3>
-                  {update.summary ? <p>{update.summary}</p> : null}
-                  <span>Read on official site ↗</span>
-                </div>
-              </a>
+              <TiltCard key={update.external_id}>
+                <a href={update.url} target="_blank" rel="noopener noreferrer" className="official-card">
+                  {index === 0 ? (
+                    <Image
+                      src="/news/official-news.jpg"
+                      alt="Featured Sea of Thieves official news artwork"
+                      width={640}
+                      height={360}
+                      priority
+                      className="official-card__image"
+                    />
+                  ) : null}
+                  <div className="official-card__body">
+                    <time>{formatDate(update.published_at)}</time>
+                    <h3>{update.title}</h3>
+                    {update.summary ? <p>{update.summary}</p> : null}
+                    <span>Read on official site ↗</span>
+                  </div>
+                </a>
+              </TiltCard>
             ))}
           </div>
         )}

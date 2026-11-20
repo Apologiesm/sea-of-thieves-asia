@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { GalleryItem } from "@/lib/m8/types";
@@ -27,30 +28,31 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setActive(item)}
-            className="group overflow-hidden rounded-card border border-border bg-surface text-left"
-          >
-            <div className="relative aspect-video overflow-hidden bg-canvas">
-              {item.publicUrl && !isVideo(item.storage_path) ? (
-                <Image
-                  src={item.publicUrl}
-                  alt={item.alt_text ?? item.caption ?? "Community gallery image"}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                />
-              ) : item.publicUrl ? (
-                <video src={item.publicUrl} muted playsInline preload="metadata" className="h-full w-full object-cover" />
-              ) : null}
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-content">{item.caption ?? "Community submission"}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-content-muted">{item.alt_text}</p>
-            </div>
-          </button>
+          <TiltCard key={item.id}>
+            <button
+              type="button"
+              onClick={() => setActive(item)}
+              className="group overflow-hidden rounded-card border border-border bg-surface text-left"
+            >
+              <div className="relative aspect-video overflow-hidden bg-canvas">
+                {item.publicUrl && !isVideo(item.storage_path) ? (
+                  <Image
+                    src={item.publicUrl}
+                    alt={item.alt_text ?? item.caption ?? "Community gallery image"}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                ) : item.publicUrl ? (
+                  <video src={item.publicUrl} muted playsInline preload="metadata" className="h-full w-full object-cover" />
+                ) : null}
+              </div>
+              <div className="p-4">
+                <p className="text-sm text-content">{item.caption ?? "Community submission"}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-content-muted">{item.alt_text}</p>
+              </div>
+            </button>
+          </TiltCard>
         ))}
       </div>
 

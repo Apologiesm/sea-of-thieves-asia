@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { MarkdownView } from "@/components/content/MarkdownView";
 import type { AnnouncementRecord } from "@/lib/m8/types";
 
 export function AnnouncementCard({ announcement }: { announcement: AnnouncementRecord }) {
   return (
-    <Card>
+    <TiltCard>
+      <Card>
       {announcement.cover_image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={announcement.cover_image_url} alt={`${announcement.title} cover`} className="announcement-card__cover" loading="lazy" />
@@ -27,6 +29,7 @@ export function AnnouncementCard({ announcement }: { announcement: AnnouncementR
       <Link href={`/announcements/${announcement.id}`} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-content underline decoration-border underline-offset-4">
         Read announcement →
       </Link>
-    </Card>
+      </Card>
+    </TiltCard>
   );
 }

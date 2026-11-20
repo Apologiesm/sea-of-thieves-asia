@@ -717,7 +717,6 @@
 
 .voyage-card:hover,
 .voyage-card:focus-within {
-  transform: translateY(-4px);
   border-color: var(--color-brand);
   box-shadow: 0 16px 40px rgba(3, 8, 13, 0.35);
 }
@@ -1343,7 +1342,6 @@ h2 {
 .official-card:hover,
 .official-card:focus-visible {
   border-color: var(--color-brand);
-  transform: translateY(-3px);
 }
 
 .official-card__image {
@@ -1586,15 +1584,13 @@ h2 {
 .official-card,
 .discord-card,
 .partner-card {
-  transform-style: preserve-3d;
-  transition: transform 320ms cubic-bezier(.2,.7,.2,1), border-color 220ms ease, box-shadow 320ms ease;
+  transition: border-color 220ms ease, box-shadow 320ms ease;
 }
 
 .voyage-card:hover,
 .official-card:hover,
 .discord-card:hover,
 .partner-card:hover {
-  transform: perspective(900px) rotateX(1.2deg) rotateY(-1.2deg) translateY(-5px);
   box-shadow: 0 18px 40px rgba(3, 8, 13, 0.34);
 }
 
@@ -1670,4 +1666,85 @@ h2 {
   font-size: 1rem;
   font-weight: 700;
   color: var(--color-content);
+}
+
+/* --- True 3D tilt cards -------------------------------------------------- */
+:root {
+  --ui-surface: var(--color-surface);
+  --ui-text: var(--color-content);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --ui-surface: #ffffff;
+    --ui-text: #0b1120;
+  }
+}
+
+.tilt {
+  perspective: 1000px;
+}
+
+.tilt__card {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in srgb, var(--ui-text) 15%, transparent);
+  background: color-mix(in srgb, var(--ui-text) 5%, var(--ui-surface));
+}
+
+.tilt__content {
+  position: relative;
+  z-index: 1;
+}
+
+.tilt__spot {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+.tilt__card.is-lit .tilt__spot {
+  opacity: 1;
+}
+
+.tilt__spot--large {
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--color-brand) 32%, transparent),
+    transparent 65%
+  );
+}
+
+.tilt__spot--small {
+  background: radial-gradient(
+    170px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--color-brand) 42%, transparent),
+    transparent 62%
+  );
+}
+
+.features-tilt { grid-column: span 12; }
+@media (min-width: 640px) {
+  .features-tilt { grid-column: span 6; }
+  .features-tilt--wide { grid-column: span 6; }
+}
+@media (min-width: 1024px) {
+  .features-tilt { grid-column: span 5; }
+  .features-tilt--wide { grid-column: span 7; }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .tilt__spot { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt__card { transform: none !important; will-change: auto; }
+  .tilt__spot { transition: none; opacity: 0 !important; }
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/event/time";
 import { DISCORD_EVENTS } from "@/lib/content/site-config";
@@ -48,30 +49,32 @@ export async function DiscordEvents({ limit = 6 }: { limit?: number }) {
         ) : (
           <div className="partner-grid">
             {events.map((event) => (
-              <article key={event.external_id} className="partner-card">
-                {event.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={event.image_url}
-                    alt={`${event.title} event artwork`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : null}
-                <div className="partner-card__body">
-                  <div className="partner-card__meta">
-                    <span>Live event</span>
-                    <span>{formatDateTime(event.starts_at, "Asia/Singapore")}</span>
-                  </div>
-                  <h3>{event.title}</h3>
-                  {event.description ? <p>{event.description}</p> : null}
-                  {event.event_url ? (
-                    <Link href={event.event_url} className="partner-card__link" target="_blank" rel="noopener noreferrer">
-                      Event details ↗
-                    </Link>
+              <TiltCard key={event.external_id}>
+                <article className="partner-card">
+                  {event.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={event.image_url}
+                      alt={`${event.title} event artwork`}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : null}
-                </div>
-              </article>
+                  <div className="partner-card__body">
+                    <div className="partner-card__meta">
+                      <span>Live event</span>
+                      <span>{formatDateTime(event.starts_at, "Asia/Singapore")}</span>
+                    </div>
+                    <h3>{event.title}</h3>
+                    {event.description ? <p>{event.description}</p> : null}
+                    {event.event_url ? (
+                      <Link href={event.event_url} className="partner-card__link" target="_blank" rel="noopener noreferrer">
+                        Event details ↗
+                      </Link>
+                    ) : null}
+                  </div>
+                </article>
+              </TiltCard>
             ))}
           </div>
         )}

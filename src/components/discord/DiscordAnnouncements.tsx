@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings, type DiscordChannel } from "@/lib/site/settings";
 
@@ -126,7 +127,11 @@ export async function DiscordAnnouncements() {
                 <p className="partner-empty">No posts in this channel yet.</p>
               ) : (
                 <div className="discord-grid">
-                  {items.map((item) => <AnnouncementItem key={item.external_id} item={item} />)}
+                  {items.map((item) => (
+                    <TiltCard key={item.external_id}>
+                      <AnnouncementItem item={item} />
+                    </TiltCard>
+                  ))}
                 </div>
               )}
             </div>

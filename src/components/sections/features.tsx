@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { VoyageArt } from "@/components/content/VoyageArt";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { FEATURES } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
 
@@ -53,25 +54,27 @@ export async function CommunityFeatures() {
           {features.map((feature, index) => {
             const link = LINKS[feature.key];
             return (
-              <article
+              <TiltCard
                 key={feature.key}
-                className={`voyage-card voyage-card--${feature.key} ${feature.size === "large" ? "voyage-card--wide" : ""}`}
+                className={`features-tilt ${feature.size === "large" ? "features-tilt--wide" : ""}`}
               >
-                <div className="voyage-card__top">
-                  <span className="voyage-card__index">{String(index + 1).padStart(2, "0")} / 04</span>
-                  <span className="voyage-card__tag">{TAGS[feature.key]}</span>
-                </div>
-                <div className="voyage-card__art">
-                  <VoyageArt kind={feature.key} />
-                </div>
-                <div className="voyage-card__body">
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </div>
-                <Link href={link.href} className="voyage-card__link">
-                  {link.label} <span aria-hidden="true">→</span>
-                </Link>
-              </article>
+                <article className={`voyage-card voyage-card--${feature.key}`}>
+                  <div className="voyage-card__top">
+                    <span className="voyage-card__index">{String(index + 1).padStart(2, "0")} / 04</span>
+                    <span className="voyage-card__tag">{TAGS[feature.key]}</span>
+                  </div>
+                  <div className="voyage-card__art">
+                    <VoyageArt kind={feature.key} />
+                  </div>
+                  <div className="voyage-card__body">
+                    <h3>{feature.title}</h3>
+                    <p>{feature.description}</p>
+                  </div>
+                  <Link href={link.href} className="voyage-card__link">
+                    {link.label} <span aria-hidden="true">→</span>
+                  </Link>
+                </article>
+              </TiltCard>
             );
           })}
         </div>
