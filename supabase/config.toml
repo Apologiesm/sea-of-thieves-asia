@@ -61,10 +61,10 @@ enable_confirmations = false
 # Discord sign-in. Set real values in .env.local (never in Git) and uncomment
 # to enable locally. Supabase requests only identity scopes by default;
 # guilds, connections, and message contents are never requested.
-# [auth.external.discord]
-# enabled = true
-# client_id = "env(DISCORD_CLIENT_ID)"
-# secret = "env(DISCORD_CLIENT_SECRET)"
+[auth.external.discord]
+enabled = true
+client_id = "env(DISCORD_CLIENT_ID)"
+secret = "env(DISCORD_CLIENT_SECRET)"
 
 [analytics]
 enabled = false
