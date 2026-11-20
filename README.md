@@ -38,7 +38,6 @@ install is required.
 All public links live in **`src/lib/content/site-config.ts`**:
 - `SOCIAL_LINKS` — Discord, YouTube, Twitch, X, Instagram, Facebook, TikTok, contact
 - `JOIN_CTA.linkValue` — the Discord invite CTA
-- `DISCORD_CHANNELS` — game updates, live events and moments channel links
 - `LIVE_SEAS` / `EVENT_FORMATS` — live board copy and event-format timings
 - `FOOTER.columns` — footer links including policy pages and Discord channels
 
@@ -55,7 +54,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 |---|---|
 | Home/hero/about text | `src/lib/content/site-config.ts` (`HERO`, `ABOUT`, `FEATURES`, `PREVIEWS`) |
 | Live Seas board | `src/components/live/LiveSeas.tsx`, `src/lib/live/queries.ts`, `LIVE_SEAS` / `EVENT_FORMATS` in `site-config.ts` |
-| Partner SOTAU events | `src/lib/partner/sync.ts`, `src/components/partner/PartnerEvents.tsx`, migration `0014_partner_events.sql` |
+| Discord event board | `src/app/api/discord/events/route.ts`, `src/components/discord/DiscordEvents.tsx` |
 | Official game news | `src/lib/official/sync.ts`, `src/components/official/OfficialUpdates.tsx`, migration `0015_official_updates.sql` |
 | Event calendar + countdown | `src/components/event/EventCalendar.tsx`, `EventCountdown.tsx`, `src/lib/event/time.ts` |
 | Voyage checklist tool | `src/app/tools/page.tsx`, `src/components/content/VoyageChecklist.tsx` |
@@ -67,6 +66,26 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 | Policies | `src/app/privacy`, `/terms`, `/conduct`, `/security`, `/data-request` |
 
 No fake content is seeded. `supabase/seed.sql` is intentionally empty.
+
+### Discord event bot
+A Discord *incoming webhook URL cannot read messages*. To display events, run a
+bot with permission to read the chosen channels and have it POST JSON to
+`/api/discord/events` with `Authorization: Bearer DISCORD_EVENTS_SECRET`:
+
+```json
+{
+  "events": [{
+    "external_id": "unique-message-id",
+    "title": "Friday Fleet Night",
+    "description": "Short description",
+    "image_url": "https://cdn.discordapp.com/...",
+    "starts_at": "2026-11-27T10:00:00.000Z",
+    "ends_at": "2026-11-27T13:00:00.000Z"
+  }]
+}
+```
+
+The widget renders these events natively with images and regional times.
 
 ## Images, video and 3D assets
 
@@ -90,11 +109,12 @@ No fake content is seeded. `supabase/seed.sql` is intentionally empty.
 2. Set Vercel environment variables from `.env.example`:
    `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
    `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only),
-   `CRON_SECRET` (protects the partner sync route), and Discord OAuth variables
+   `CRON_SECRET` (protects the official news sync route),
+   `DISCORD_EVENTS_SECRET` (protects the Discord event receiver), and Discord OAuth variables
    once configured.
 3. Deploy with `vercel --prod` or connect the Git repository. `vercel.json`
    contains the security headers and a 15-minute cron that calls
-   `/api/cron/sync-partner`.
+   `/api/cron/sync-partner` to refresh official news.
 4. Register the Discord OAuth redirect URL in the Discord Developer Portal.
 5. Run `npm run build` locally before deploying; verify `/api/health`.
 

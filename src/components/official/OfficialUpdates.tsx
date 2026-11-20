@@ -63,7 +63,7 @@ export async function OfficialUpdates({ limit = 6 }: { limit?: number }) {
               <a key={update.external_id} href={update.url} target="_blank" rel="noopener noreferrer" className="official-card">
                 {index === 0 ? (
                   <Image
-                    src="/partner/official-news.jpg"
+                    src="/news/official-news.jpg"
                     alt="Featured Sea of Thieves official news artwork"
                     width={640}
                     height={360}

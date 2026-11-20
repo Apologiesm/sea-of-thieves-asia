@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { requireModerator } from "@/lib/m8/auth";
-import { syncPartnerEvents } from "@/lib/partner/sync";
 import { syncOfficialUpdates } from "@/lib/official/sync";
 
 export const dynamic = "force-dynamic";
@@ -16,15 +15,8 @@ async function run(request: Request) {
     if (!context) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const [events, updates] = await Promise.all([
-    syncPartnerEvents(),
-    syncOfficialUpdates(),
-  ]);
-  const ok = Boolean(events.ok && updates.ok);
-  return NextResponse.json(
-    { ok, events, updates },
-    { status: ok ? 200 : 502 },
-  );
+  const updates = await syncOfficialUpdates();
+  return NextResponse.json(updates, { status: updates.ok ? 200 : 502 });
 }
 
 export const GET = run;

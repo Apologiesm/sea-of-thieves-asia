@@ -55,16 +55,9 @@ right to publish them is required**, or they must be replaced with licensed or
 original footage. Until then they should be treated as beta-only placeholders.
 No Sea of Thieves logo, model, texture, or font is used.
 
-### Partner community feed (SOTAU)
-The event calendar and event artwork are synced from
-`https://www.seaofthievesau.com/events` and its public script
-`js/calendar-events.25d3474e.js`. The site owner has stated that partner
-permission covers use of these updates, events and images. Frequently used event
-artwork is cached locally in `public/partner/` for reliability, with the SOTAU /
-Sea of Thieves Calendar S3 source recorded in the download manifest. Images are
-displayed with visible source attribution and the SOTAU affiliate-alliance
-notice. No SOTAU logo or code is copied into this repository. All feature-board illustrations remain
-original hand-authored SVG line art in `src/components/content/VoyageArt.tsx`.
+All feature-board illustrations remain original hand-authored SVG line art in
+`src/components/content/VoyageArt.tsx`. No partner-site links, logos, artwork or
+widgets are used.
 
 ### Official Sea of Thieves news
 Official news headlines, dates and links are synced from the public official
@@ -72,7 +65,7 @@ RSS/news pages at `https://www.seaofthieves.com/news` and
 `https://www.seaofthieves.com/news.rss` via a reader proxy (the official site is
 behind an Azure WAF for automated requests). Only headlines, dates, summaries
 and links are displayed; full article text is not copied. The featured article
-image is cached at `public/partner/official-news.jpg` from
+image is cached at `public/news/official-news.jpg` from
 `https://rare-assets.azureedge.net/assets/ea/6d/ea6d5265-0663-4cba-a8b9-47a5b93ae98e.jpg`.
 Sea of Thieves and related marks are trademarks of the Microsoft group of
 companies.
