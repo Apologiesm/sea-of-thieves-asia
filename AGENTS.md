@@ -253,7 +253,7 @@ community logbook and live tactical companion — never a generic SaaS template.
 
 ## 5. Mandatory git & build safety gate
 
-**Before any major edit:** create a local checkpoint and never push unless asked.
+**Before any major edit:** create a local checkpoint.
 
 ```bash
 git status                      # confirm .env / .env.local / node_modules ignored
@@ -261,7 +261,7 @@ git add -A && git commit -m "checkpoint: <short description>"
 ```
 
 Never commit secrets. `.gitignore` must keep ignoring `.env`, `.env*.local`,
-`node_modules/`, `.next/`, `*.tsbuildinfo`.
+`.vercel`, `node_modules/`, `.next/`, `*.tsbuildinfo`.
 
 **Before finishing any task** (inside WSL; Node comes from nvm, loaded by
 `~/.profile` in non-interactive shells):
@@ -275,6 +275,41 @@ boot the app (`npm run dev`, with `npx supabase start` running) and verify the
 affected pages/APIs return 200 and behave correctly. After migrations or RLS
 changes run `npx supabase db reset && npm run supabase:test`. Never finish with
 a failing build, skipped type errors, or untested "should work" claims.
+
+---
+
+## 6. Live deployment (auto-publish)
+
+Production: **https://sea-of-thieves-asia.vercel.app**
+(project `sea-of-thieves-asia`, Vercel org `kohi6`; private GitHub repo
+`Apologiesm/sea-of-thieves-asia`, branch `main`).
+
+**When the user says "publish" or "update live site", do this automatically —
+no further confirmation needed:**
+
+```bash
+npx tsc --noEmit && npm run build     # must pass first
+git add -A
+git commit -m "deploy: <what changed>"
+git push origin main
+```
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which rebuilds and
+deploys to `https://sea-of-thieves-asia.vercel.app` automatically. Then verify:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://sea-of-thieves-asia.vercel.app/
+```
+
+Rules:
+- Never push if the type-check or build fails.
+- Never commit `.env.local`, `.vercel`, or any secret.
+- Commit author must stay `Sea of Thieves Asia <akib.islam20071@gmail.com>`
+  (the Vercel team member). A different author email makes Vercel block the
+  deployment with `TEAM_ACCESS_REQUIRED`.
+- Manual deploy if Actions is unavailable: `npx vercel@latest --prod --yes`.
+- Cron schedules in `vercel.json` must stay **daily** on the Vercel Hobby plan
+  (sub-daily expressions fail the build).
 
 ---
 
