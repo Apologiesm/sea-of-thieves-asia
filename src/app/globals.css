@@ -1398,3 +1398,128 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   .official-card { transition: none; transform: none; }
 }
+
+/* --- Announcement covers and Discord embeds ------------------------------- */
+.cover-input {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cover-input__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cover-input input[type="file"] {
+  max-width: 100%;
+  font-size: 0.8rem;
+}
+
+.cover-input__preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.announcement-card__cover {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  background: var(--color-canvas);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.discord-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.discord-card {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid #5865f2;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.discord-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--color-content-muted);
+}
+
+.discord-card__content {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-content);
+  white-space: pre-wrap;
+}
+
+.discord-card > img,
+.discord-embed > img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 0.4rem;
+  background: var(--color-canvas);
+}
+
+.discord-embed {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border-left: 2px solid #5865f2;
+  background: var(--color-canvas);
+  border-radius: 0.4rem;
+}
+
+.discord-embed h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-content);
+}
+
+.discord-embed p {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--color-content-muted);
+}
+
+.discord-embed__author,
+.discord-embed small {
+  font-size: 0.7rem;
+  color: var(--color-brand);
+}
+
+.discord-embed__fields {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.discord-embed__fields div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.discord-embed__fields strong {
+  font-size: 0.75rem;
+  color: var(--color-content);
+}
+
+.discord-embed__fields span {
+  font-size: 0.78rem;
+  color: var(--color-content-muted);
+}

@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     slug,
     body: parsed.data.body,
     category: parsed.data.category,
+    cover_image_url: parsed.data.coverImageUrl,
     author_id: user.id,
     author_name: profile?.display_name ?? "Community team",
     pinned: parsed.data.pinned,

@@ -20,6 +20,10 @@ export const guideSchema = z.object({
 export const announcementSchema = z.object({
   title: requiredLine(140),
   category: z.string().min(1).max(60),
+  coverImageUrl: z.preprocess(
+    (v) => (typeof v === "string" && v.trim().length > 0 ? v.trim() : null),
+    z.string().url().max(2000).nullable(),
+  ),
   body: markdown(10000),
   pinned: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]),

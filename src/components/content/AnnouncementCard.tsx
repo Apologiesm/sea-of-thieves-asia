@@ -7,6 +7,10 @@ import type { AnnouncementRecord } from "@/lib/m8/types";
 export function AnnouncementCard({ announcement }: { announcement: AnnouncementRecord }) {
   return (
     <Card>
+      {announcement.cover_image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={announcement.cover_image_url} alt={`${announcement.title} cover`} className="announcement-card__cover" loading="lazy" />
+      ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <p className="text-xs uppercase tracking-[0.14em] text-brand">{announcement.category ?? "News"}</p>

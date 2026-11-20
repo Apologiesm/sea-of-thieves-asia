@@ -21,6 +21,7 @@ export type AnnouncementRecord = {
   slug: string;
   body: string;
   category: string | null;
+  cover_image_url: string | null;
   author_name: string | null;
   pinned: boolean;
   status: string;

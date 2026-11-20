@@ -21,6 +21,7 @@ export async function PATCH(request: Request, { params }: Context) {
     title: parsed.data.title,
     body: parsed.data.body,
     category: parsed.data.category,
+    cover_image_url: parsed.data.coverImageUrl,
     pinned: parsed.data.pinned,
     status: parsed.data.status,
     updated_at: new Date().toISOString(),

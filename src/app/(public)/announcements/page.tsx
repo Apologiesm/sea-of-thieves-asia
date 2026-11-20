@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/content/empty-state";
 import { AnnouncementCard } from "@/components/content/AnnouncementCard";
 import { OfficialUpdates } from "@/components/official/OfficialUpdates";
+import { DiscordAnnouncements } from "@/components/discord/DiscordAnnouncements";
 import { listAnnouncements } from "@/lib/m8/queries";
 import { requireModerator } from "@/lib/m8/auth";
 
@@ -16,6 +17,7 @@ export default async function AnnouncementsPage() {
     <>
       <PageHeader eyebrow="News" title="Announcements" description="Official community news, events, rules and opportunities." />
       <OfficialUpdates limit={6} />
+      <DiscordAnnouncements limit={12} />
       <Container>
         <div className="py-10 sm:py-14">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">

@@ -62,7 +62,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 | Crew listings | `src/app/(public)/crew`, `src/lib/crew/*`, Supabase table `crew_listings` |
 | Guides | Moderators use `/guides/new` and `/guides/[id]/edit`; markdown stored in `guides.body` |
 | Gallery | Members use `/gallery/upload`; moderators approve in `/admin/gallery`; files in Supabase Storage bucket `gallery` |
-| Announcements | Moderators use `/announcements/new` and `/announcements/[id]/edit` |
+| Announcements | Moderators use `/announcements/new` and `/announcements/[id]/edit`; optional cover image uploads to the public `covers` bucket |
 | Policies | `src/app/privacy`, `/terms`, `/conduct`, `/security`, `/data-request` |
 
 No fake content is seeded. `supabase/seed.sql` is intentionally empty.
@@ -86,6 +86,13 @@ bot with permission to read the chosen channels and have it POST JSON to
 ```
 
 The widget renders these events natively with images and regional times.
+
+### Discord announcements and embeds
+A bot can POST Discord messages, attachments and embeds to
+`/api/discord/announcements` with `Authorization: Bearer DISCORD_EVENTS_SECRET`.
+The website renders them as native cards on `/announcements` with title,
+description, fields, images and a link back to the message. No external embed
+script is loaded.
 
 ### Manual Discord role control
 Website roles are assigned manually from Discord using:
