@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteSettings } from "@/lib/site/settings";
 
 type Embed = {
   title?: string | null;
@@ -15,6 +16,7 @@ type Embed = {
 
 type DiscordAnnouncement = {
   external_id: string;
+  channel_id: string;
   author_name: string | null;
   content: string | null;
   posted_at: string | null;
@@ -35,16 +37,27 @@ function formatDate(iso: string | null) {
   }
 }
 
+function channelIdFrom(value: string, explicit: string): string {
+  if (explicit.trim()) return explicit.trim();
+  const match = value.match(/\/channels\/\d+\/(\d+)/);
+  return match?.[1] ?? "";
+}
+
 export async function DiscordAnnouncements({ limit = 12 }: { limit?: number }) {
+  const settings = await getSiteSettings();
+  if (!settings.discord.enabled) return null;
+
   const supabase = await createClient();
   if (!supabase) return null;
 
-  const { data } = await supabase
+  const channelId = channelIdFrom(settings.discord.channelUrl, settings.discord.channelId);
+  let query = supabase
     .from("discord_announcements")
     .select("*")
-    .order("posted_at", { ascending: false, nullsFirst: false })
-    .limit(limit);
+    .order("posted_at", { ascending: false, nullsFirst: false });
+  if (channelId) query = query.eq("channel_id", channelId);
 
+  const { data } = await query.limit(settings.discord.announcementLimit || limit);
   const items = (data ?? []) as DiscordAnnouncement[];
 
   return (

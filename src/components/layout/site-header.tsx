@@ -6,6 +6,8 @@ import Link from "next/link";
 import { BrandLockup } from "@/components/layout/BrandLockup";
 import { Container } from "@/components/ui/container";
 import { NAV_LINKS } from "@/lib/content/site-config";
+
+type NavLink = { href: string; label: string };
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +41,7 @@ function AccountLinks({ user, mobile }: { user: User | null; mobile: boolean }) 
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ navLinks = NAV_LINKS }: { navLinks?: readonly NavLink[] } = {}) {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -91,7 +93,7 @@ export function SiteHeader() {
 
           <nav aria-label="Primary" className="hidden md:block">
             <ul className="flex items-center gap-1 lg:gap-2">
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -134,7 +136,7 @@ export function SiteHeader() {
         <Container>
           <nav aria-label="Mobile" className="py-3">
             <ul className="flex flex-col">
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

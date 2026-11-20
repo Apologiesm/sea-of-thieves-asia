@@ -26,6 +26,14 @@ export async function requireAdmin() {
   return context;
 }
 
+export async function requireOwner() {
+  const context = await requireUser();
+  if (!context) return null;
+  const { data } = await context.supabase.rpc("is_owner_role");
+  if (!data) return null;
+  return context;
+}
+
 export async function logAudit(
   supabase: Awaited<ReturnType<typeof createClient>>,
   action: string,

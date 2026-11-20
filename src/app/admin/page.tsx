@@ -15,6 +15,7 @@ const SECTIONS = [
   { href: "/admin/reports", title: "Reports", description: "Review private moderation reports." },
   { href: "/admin/users", title: "Users and roles", description: "Manage member, moderator, admin and owner roles." },
   { href: "/admin/settings", title: "Settings and audit", description: "Privacy controls and sensitive-action audit log." },
+  { href: "/admin/control", title: "Master control", description: "Owner-only feature switches, Discord feed settings and global delete." },
 ];
 
 export default async function AdminPage() {

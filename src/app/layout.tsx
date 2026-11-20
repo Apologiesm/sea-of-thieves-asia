@@ -5,7 +5,8 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { BackToTop } from "@/components/content/BackToTop";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
-import { SITE } from "@/lib/content/site-config";
+import { NAV_LINKS, SITE } from "@/lib/content/site-config";
+import { getSiteSettings } from "@/lib/site/settings";
 import { getSiteUrl } from "@/lib/env";
 
 const siteUrl = getSiteUrl();
@@ -35,9 +36,22 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const settings = await getSiteSettings();
+  const flagByHref: Record<string, keyof typeof settings.features> = {
+    "/events": "events",
+    "/crew": "crew",
+    "/guides": "guides",
+    "/gallery": "gallery",
+    "/announcements": "news",
+  };
+  const navLinks = NAV_LINKS.filter((link) => {
+    const flag = flagByHref[link.href];
+    return !flag || settings.features[flag];
+  });
+
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col">
@@ -48,7 +62,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
+        <SiteHeader navLinks={navLinks} />
         <main id="main-content" className="flex-1">
           {children}
         </main>
