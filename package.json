@@ -15,21 +15,22 @@
     "supabase:test": "supabase db test"
   },
   "dependencies": {
+    "@react-three/fiber": "9.8.2",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.119.2",
-    "@react-three/fiber": "9.8.2",
     "gsap": "3.15.1",
     "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "three": "0.187.0"
+    "three": "0.187.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.5",
-    "@types/three": "0.187.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.6",
     "supabase": "3.2.0",

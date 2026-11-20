@@ -86,6 +86,18 @@ export default function PrivacyPage() {
           </section>
 
           <section>
+            <h2 className="text-xl font-semibold text-content">Crew finder listings</h2>
+            <p className="mt-4">
+              Crew listings are public. They show the profile fields you chose to make
+              visible and the listing details you entered. Your Discord identity,
+              email, and private contact details are never public. Contact details
+              appear on a listing only if you explicitly consent when creating or
+              editing it. Only you can edit or delete your listing; moderators can
+              hide or remove listings through authorized server-side actions.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-xl font-semibold text-content">Unofficial status</h2>
             <p className="mt-4">
               This is an unofficial fan community. It is not affiliated with,

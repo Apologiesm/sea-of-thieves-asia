@@ -136,6 +136,19 @@ export const ABOUT = {
   ],
 } as const;
 
+export const CREW_OPTIONS = {
+  regions: ["Southeast Asia", "East Asia", "South Asia", "Oceania", "Central Asia", "Middle East"],
+  platforms: ["PC", "Xbox", "PlayStation", "Cross-platform"],
+  languages: ["English", "Bahasa Indonesia", "Mandarin", "Cantonese", "Japanese", "Korean", "Thai", "Vietnamese", "Tagalog", "Hindi", "Arabic"],
+  playstyles: ["Casual", "Competitive", "Roleplay", "Exploration", "PvP", "PvE", "Mixed"],
+  shipPreferences: ["Sloop", "Brigantine", "Galleon", "Any ship"],
+  rolePreferences: ["Captain", "Helm", "Cannoneer", "Navigator", "Support", "Any role"],
+  availability: ["Weekdays", "Weekends", "Evenings (Asia time)", "Mornings (Asia time)", "Flexible"],
+} as const;
+
+export const CREW_PRIVACY_NOTICE =
+  "Crew listings show the profile fields you chose to make visible, plus the listing details you enter. Your Discord identity, email and private contact details are never public. Contact details appear only if you explicitly consent on the listing.";
+
 export type FeatureConfig = {
   key: string;
   title: string;
