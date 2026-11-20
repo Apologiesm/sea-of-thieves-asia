@@ -28,7 +28,8 @@ export const SOCIAL_LINKS: readonly SocialLink[] = [
   { key: "youtube", label: "YouTube", value: PLACEHOLDER },
   { key: "twitch", label: "Twitch", value: PLACEHOLDER },
   { key: "x", label: "X", value: PLACEHOLDER },
-  { key: "instagram", label: "Instagram", value: PLACEHOLDER },
+  { key: "instagram", label: "Instagram", value: "https://instagram.com/seaofthievesasia" },
+  { key: "facebook", label: "Facebook", value: "https://facebook.com/SeaOfThievesAsia" },
   { key: "tiktok", label: "TikTok", value: PLACEHOLDER },
   { key: "contact", label: "Contact email", value: PLACEHOLDER },
 ] as const;

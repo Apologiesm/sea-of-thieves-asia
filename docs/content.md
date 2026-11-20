@@ -1,12 +1,13 @@
 # Sea of Thieves Asia — Beta Content
 
-Most links and community details are placeholders for local beta development. The Discord invite below was supplied by the project owner and is the only live link.
+Most links and community details are placeholders for local beta development. The Discord invite, Instagram and Facebook links below were supplied by the project owner and are the only live links.
 
 DISCORD_INVITE_URL=https://discord.com/invite/dSX5FNy6sB
 YOUTUBE_URL=REPLACE_BEFORE_LAUNCH
 TWITCH_URL=REPLACE_BEFORE_LAUNCH
 X_URL=REPLACE_BEFORE_LAUNCH
-INSTAGRAM_URL=REPLACE_BEFORE_LAUNCH
+INSTAGRAM_URL=https://instagram.com/seaofthievesasia
+FACEBOOK_URL=https://facebook.com/SeaOfThievesAsia
 TIKTOK_URL=REPLACE_BEFORE_LAUNCH
 CONTACT_EMAIL=REPLACE_BEFORE_LAUNCH
 
