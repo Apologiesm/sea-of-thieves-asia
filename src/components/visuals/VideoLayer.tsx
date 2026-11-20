@@ -31,8 +31,11 @@ export function VideoLayer({ src, poster, variant }: Props) {
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         poster={poster}
+        onCanPlay={() => {
+          void videoRef.current?.play().catch(() => {});
+        }}
       >
         <source src={src} type="video/mp4" />
       </video>

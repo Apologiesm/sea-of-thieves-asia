@@ -31,7 +31,7 @@ export default function TermsPage() {
           </Card>
           <Card>
             <h2 className="text-lg font-semibold text-content">5. Availability and liability</h2>
-            <p className="mt-3">This is a beta community project provided as-is. We do not guarantee uninterrupted availability and are not liable for losses arising from use of the site.</p>
+            <p className="mt-3">This community project is provided as-is. We do not guarantee uninterrupted availability and are not liable for losses arising from use of the site.</p>
           </Card>
           <Card>
             <h2 className="text-lg font-semibold text-content">6. Changes and deletion</h2>

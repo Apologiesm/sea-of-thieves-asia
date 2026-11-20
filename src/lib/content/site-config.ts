@@ -233,7 +233,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Community voyages, meetups, and seasonal activities will be announced here. Nothing is published until it is real.",
     emptyTitle: "No voyages on the horizon",
-    emptyDescription: "Events are marked EMPTY_FOR_BETA and will appear when scheduled.",
+    emptyDescription: "No events have been published yet. Scheduled voyages will appear here.",
     reverse: false,
   },
   {
@@ -243,7 +243,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Find a crew for a specific run, a weekly session, or a first voyage. Listings open when members start posting them.",
     emptyTitle: "No crews posted yet",
-    emptyDescription: "Crew listings are marked EMPTY_FOR_BETA.",
+    emptyDescription: "No crew listings have been posted yet.",
     reverse: true,
   },
   {
@@ -253,7 +253,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "A moderated collection of screenshots and artwork from the community. Every image gets here through review.",
     emptyTitle: "The gallery is waiting",
-    emptyDescription: "Gallery entries are marked EMPTY_FOR_BETA.",
+    emptyDescription: "No media has been approved yet.",
     reverse: false,
   },
   {
@@ -263,7 +263,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Practical guides for new and veteran pirates, built from real experience rather than filler.",
     emptyTitle: "No guides published yet",
-    emptyDescription: "Guides are marked EMPTY_FOR_BETA.",
+    emptyDescription: "No guides have been published yet.",
     reverse: true,
   },
   {
@@ -273,7 +273,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Updates from the community team, posted here once there is something genuine to report.",
     emptyTitle: "All quiet for now",
-    emptyDescription: "Announcements are marked EMPTY_FOR_BETA.",
+    emptyDescription: "No announcements have been published yet.",
     reverse: false,
   },
 ] as const;

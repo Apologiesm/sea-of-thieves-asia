@@ -62,7 +62,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
             {events.length === 0 ? (
               <EmptyState
                 title="No events scheduled yet"
-                description="Events are empty for beta. Hosts will publish real voyages here."
+                description="No events have been published yet. Hosts will add real voyages here."
               />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

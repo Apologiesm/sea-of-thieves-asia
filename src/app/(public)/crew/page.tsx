@@ -34,7 +34,7 @@ export default async function CrewPage({ searchParams }: { searchParams: SearchP
       <PageHeader
         eyebrow="Crew finder"
         title="Find your crew"
-        description="Post a voyage or answer one. This beta area fills only when real members create listings."
+        description="Post a voyage or answer one. Listings appear when real members create them."
       />
       <Container>
         <div className="py-10 sm:py-14">
@@ -51,7 +51,7 @@ export default async function CrewPage({ searchParams }: { searchParams: SearchP
             {listings.length === 0 ? (
               <EmptyState
                 title="No crews posted yet"
-                description="Crew listings are empty for beta. Be the first to post a real voyage."
+                description="No crew listings have been posted yet. Be the first to post a real voyage."
               />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

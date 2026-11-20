@@ -1,4 +1,4 @@
-# Sea of Thieves Asia — Beta
+# Sea of Thieves Asia — Community Platform
 
 Unofficial fan community platform for Sea of Thieves players across Asia.
 Built with Next.js 16 App Router, TypeScript, Tailwind CSS, Supabase, GSAP,

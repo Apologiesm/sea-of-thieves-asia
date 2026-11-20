@@ -47,7 +47,7 @@ export default async function GuidesPage({ searchParams }: { searchParams: Searc
 
           <div className="mt-8">
             {guides.length === 0 ? (
-              <EmptyState title="No guides published yet" description="Guides are empty for beta. Moderators will publish real guides here." />
+              <EmptyState title="No guides published yet" description="No guides have been published yet. Moderators will add real guides here." />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{guides.map((guide) => <GuideCard key={guide.id} guide={guide} />)}</div>
             )}

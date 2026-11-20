@@ -14,7 +14,7 @@ type SectionPageProps = {
 export function SectionPage({
   title,
   description,
-  eyebrow = "BETA",
+  eyebrow = "COMMUNITY",
   emptyTitle,
   emptyDescription,
 }: SectionPageProps) {

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -92,7 +91,6 @@ export function SiteHeader() {
             <span className="text-sm font-bold tracking-tight text-content sm:text-base">
               {SITE.name}
             </span>
-            <Badge>BETA</Badge>
           </Link>
 
           <nav aria-label="Primary" className="hidden md:block">
