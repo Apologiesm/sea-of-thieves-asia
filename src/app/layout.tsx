@@ -39,7 +39,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en">
       <body className="flex min-h-screen flex-col">
         <VideoLayer src="/media/sot2-page.mp4" poster="/media/sot2-page.jpg" variant="page" />
         <a
