@@ -23,10 +23,11 @@ export function SiteFooter() {
               </h2>
               <ul className="mt-5 space-y-3">
                 {column.items.map((item) => {
-                  const href = safeHref(item.value);
+                  const internal = item.value.startsWith("/");
+                  const href = internal ? item.value : safeHref(item.value);
                   return (
                     <li key={item.label}>
-                      {href && !item.value.startsWith("/") ? (
+                      {href && !internal ? (
                         <a
                           href={href}
                           target="_blank"

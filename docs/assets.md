@@ -36,3 +36,21 @@ assets/
 - `EMPTY_FOR_BETA` directories render an empty state; never seed fake images.
 - Every unknown value stays `REPLACE_BEFORE_LAUNCH`.
 - No invented assets, and no placeholder images styled to look real.
+
+## Current asset register (Milestone 10 audit)
+
+| File | Use | Source | License / status |
+|---|---|---|---|
+| `public/media/sot1-hero.mp4` | Hero background loop | Provided by the project owner from a Sea of Thieves trailer (`reference/sot1.mp4`) | **Rights not documented.** Owner must confirm permission before public launch. |
+| `public/media/sot1-hero.jpg` | Poster for hero loop | Frame extracted from the same owner-provided clip | Same status as above. |
+| `public/media/sot2-page.mp4` | Page background loop | Provided by the project owner from a Sea of Thieves trailer (`reference/sot2.mp4`) | **Rights not documented.** Owner must confirm permission before public launch. |
+| `public/media/sot2-page.jpg` | Poster for page loop | Frame extracted from the same owner-provided clip | Same status as above. |
+| `public/backgrounds/night-ocean.png` | Unused fallback image | Wikimedia Commons, "Moonlight Glints off the Barents Sea (CIRA 2024-03-18)" | Public domain. Source recorded in `public/backgrounds/SOURCE.md`. |
+| `public/backgrounds/trailer-loop.mp4`, `trailer-poster.jpg` | Unused earlier loop | Derived from the downloaded official trailer | Rights not documented. |
+
+### Required action before launch
+The two video loops currently drive the background. Because their source is
+copyrighted game footage supplied by the owner, **written confirmation of the
+right to publish them is required**, or they must be replaced with licensed or
+original footage. Until then they should be treated as beta-only placeholders.
+No Sea of Thieves logo, model, texture, or font is used.
