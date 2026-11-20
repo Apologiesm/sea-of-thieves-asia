@@ -28,10 +28,3 @@ export function getSupabasePublicEnv(): SupabasePublicEnv | null {
   return { url, anonKey };
 }
 
-/**
- * Server-only service role key access. Call this only from server code.
- * It is never included in a client bundle because it has no NEXT_PUBLIC_ prefix.
- */
-export function getSupabaseServiceRoleKey(): string | null {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY ?? null;
-}

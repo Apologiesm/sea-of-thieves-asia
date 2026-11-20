@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { normalizeProfile, type EditableProfile } from "@/lib/profile";
+import { editableProfileSchema, normalizeProfile } from "@/lib/profile";
 
 export const dynamic = "force-dynamic";
 
@@ -42,16 +42,21 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  let payload: EditableProfile;
+  let raw: unknown;
   try {
-    payload = (await request.json()) as EditableProfile;
+    raw = await request.json();
   } catch {
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }
 
+  const parsed = editableProfileSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+  }
+
   let updates;
   try {
-    updates = normalizeProfile(payload);
+    updates = normalizeProfile(parsed.data);
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "invalid_input" },

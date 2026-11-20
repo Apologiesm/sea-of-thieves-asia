@@ -48,6 +48,6 @@ export async function DELETE(_request: Request, { params }: Context) {
 
   const { error } = await supabase.from("gallery_items").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  await logAudit(supabase, "gallery_deleted", "gallery_item", id);
+  if (isAdmin) await logAudit(supabase, "gallery_deleted", "gallery_item", id);
   return NextResponse.json({ ok: true });
 }

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const VISIBILITIES = ["private", "members", "public"] as const;
 export type Visibility = (typeof VISIBILITIES)[number];
 
@@ -33,6 +35,21 @@ export type EditableProfile = {
   crewRole: string;
   visibility: Visibility;
 };
+
+export const editableProfileSchema = z.object({
+  display_name: z.string().max(64),
+  region: z.string().max(80),
+  languages: z.string().max(200),
+  platform: z.string().max(80),
+  playstyle: z.string().max(80),
+  bio: z.string().max(500),
+  socialWebsite: z.string().max(300),
+  socialX: z.string().max(300),
+  socialYoutube: z.string().max(300),
+  crewName: z.string().max(80),
+  crewRole: z.string().max(80),
+  visibility: z.enum(VISIBILITIES),
+});
 
 export const EMPTY_EDITABLE_PROFILE: EditableProfile = {
   display_name: "",

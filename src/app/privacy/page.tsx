@@ -46,9 +46,15 @@ export default function PrivacyPage() {
             <p className="mt-4">
               We do not use analytics, advertising cookies, trackers, or
               third-party scripts. The only cookies set are the essential,
-              httpOnly session cookies required by Supabase Auth to keep you
-              signed in. Blocking them prevents sign-in but does not affect
+              httpOnly, SameSite cookies required by Supabase Auth to keep you
+              signed in. We do not use browser local storage for personal data.
+              Blocking these cookies prevents sign-in but does not affect
               public pages.
+            </p>
+            <p className="mt-4">
+              Service providers are limited to Supabase (authentication and
+              database), Discord (sign-in only, if you choose to sign in), and
+              the site host. No data is sold or shared for advertising.
             </p>
           </section>
 

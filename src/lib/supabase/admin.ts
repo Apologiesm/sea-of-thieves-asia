@@ -1,13 +1,13 @@
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
-import { getSupabaseServiceRoleKey } from "@/lib/env";
 
 /**
- * SERVER ONLY. This client uses the service-role key and must never be
- * imported by a Client Component or any module in a client bundle.
+ * SERVER ONLY. Importing this module from a Client Component fails the build.
+ * The service-role key is read only here and never via a NEXT_PUBLIC_ variable.
  */
 export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = getSupabaseServiceRoleKey();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceRoleKey) return null;
 

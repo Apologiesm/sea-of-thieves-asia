@@ -303,9 +303,11 @@ export const FOOTER = {
     {
       title: "Information",
       items: [
-        { label: "Rules", value: PLACEHOLDER },
+        { label: "Rules", value: "/conduct" },
         { label: "Privacy", value: "/privacy" },
-        { label: "Terms", value: PLACEHOLDER },
+        { label: "Terms", value: "/terms" },
+        { label: "Security", value: "/security" },
+        { label: "Data request", value: "/data-request" },
         { label: "Contact", value: PLACEHOLDER },
         { label: "Credits", value: PLACEHOLDER },
       ] as FooterItem[],
@@ -345,3 +347,5 @@ export const ROLE_LABELS = {
 
 export const ADMIN_PRIVACY_NOTICE =
   "Moderation actions are private. Only authorized moderators and admins can view reports or change content status. Every sensitive action is written to an audit log.";
+
+export const SECURITY_CONTACT_EMAIL = PLACEHOLDER;

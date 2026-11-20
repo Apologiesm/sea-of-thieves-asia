@@ -10,6 +10,17 @@ import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+/** Check file signatures, not just the client-supplied MIME type. */
+function validSignature(buffer: Uint8Array, mime: string): boolean {
+  const at = (offset: number, bytes: number[]) => bytes.every((byte, index) => buffer[offset + index] === byte);
+  if (mime === "image/jpeg") return at(0, [0xff, 0xd8, 0xff]);
+  if (mime === "image/png") return at(0, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (mime === "image/webp") return at(0, [0x52, 0x49, 0x46, 0x46]) && at(8, [0x57, 0x45, 0x42, 0x50]);
+  if (mime === "video/mp4") return at(4, [0x66, 0x74, 0x79, 0x70]);
+  if (mime === "video/webm") return at(0, [0x1a, 0x45, 0xdf, 0xa3]);
+  return false;
+}
+
 export async function GET(request: NextRequest) {
   const all = request.nextUrl.searchParams.get("all") === "1";
   if (all) {
@@ -43,6 +54,11 @@ export async function POST(request: Request) {
   }
   const max = file.type.startsWith("video/") ? GALLERY_MAX_VIDEO_BYTES : GALLERY_MAX_IMAGE_BYTES;
   if (file.size > max) return NextResponse.json({ error: "file_too_large" }, { status: 400 });
+
+  const signature = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+  if (!validSignature(signature, file.type)) {
+    return NextResponse.json({ error: "file_signature_mismatch" }, { status: 400 });
+  }
 
   const meta = galleryMetaSchema.safeParse({
     caption: form.get("caption") ?? "",
