@@ -803,10 +803,47 @@
   transform: translateX(4px);
 }
 
+.channel-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.2rem 0.7rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  color: var(--color-content-muted);
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.channel-row:hover,
+.channel-row:focus-visible {
+  border-color: var(--color-brand);
+  color: var(--color-content);
+}
+
+.channel-row__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-content);
+}
+
+.channel-row__note {
+  grid-column: 1;
+  font-size: 0.72rem;
+  color: var(--color-content-muted);
+}
+
+.channel-row > span:last-child {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--color-brand);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .live-dot--on { animation: none; }
   .voyage-card,
   .voyage-card__art,
   .quick-action,
+  .channel-row,
   .voyage-card__link span { transition: none; transform: none; }
 }

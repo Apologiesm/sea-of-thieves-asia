@@ -5,6 +5,7 @@ import { RegionClock } from "@/components/content/RegionClock";
 import { getLiveSnapshot } from "@/lib/live/queries";
 import { formatDateTime } from "@/lib/event/time";
 import {
+  DISCORD_CHANNELS,
   EVENT_FORMATS,
   LIVE_SEAS,
   PLACEHOLDER,
@@ -108,6 +109,27 @@ export async function LiveSeas() {
                     </li>
                   ))}
                 </ul>
+              </div>
+              <div className="mt-6">
+                <p className="text-sm font-semibold text-content">Discord channels</p>
+                <p className="mt-1 text-xs leading-relaxed text-content-muted">
+                  These open in Discord. Server membership may be required.
+                </p>
+                <div className="mt-3 grid gap-2">
+                  {DISCORD_CHANNELS.map((channel) => (
+                    <a
+                      key={channel.key}
+                      href={channel.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="channel-row"
+                    >
+                      <span className="channel-row__label">{channel.label}</span>
+                      <span className="channel-row__note">{channel.note}</span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </div>
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 {QUICK_ACTIONS.map((action) =>

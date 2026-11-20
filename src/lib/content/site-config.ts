@@ -301,6 +301,14 @@ export const FOOTER = {
       })),
     },
     {
+      title: "Discord channels",
+      items: [
+        { label: "Game updates", value: "https://discord.com/channels/902102549144948746/1296814423159345162" },
+        { label: "Live events", value: "https://discord.com/channels/902102549144948746/1296814661651529749" },
+        { label: "Moments", value: "https://discord.com/channels/902102549144948746/1573050632842248232" },
+      ] as FooterItem[],
+    },
+    {
       title: "Information",
       items: [
         { label: "Rules", value: "/conduct" },
@@ -380,4 +388,25 @@ export const QUICK_ACTIONS = [
   { label: "Events calendar", href: "/events", external: false },
   { label: "Find a crew", href: "/crew", external: false },
   { label: "Report an issue", href: "/report", external: false },
+] as const;
+
+export const DISCORD_CHANNELS = [
+  {
+    key: "game_updates",
+    label: "Game updates",
+    note: "Official update discussion channel",
+    href: "https://discord.com/channels/902102549144948746/1296814423159345162",
+  },
+  {
+    key: "live_events",
+    label: "Live events",
+    note: "Event announcements and sign-ups",
+    href: "https://discord.com/channels/902102549144948746/1296814661651529749",
+  },
+  {
+    key: "moments",
+    label: "Sea of Thieves moments",
+    note: "Screenshots, clips and stories",
+    href: "https://discord.com/channels/902102549144948746/1573050632842248232",
+  },
 ] as const;
