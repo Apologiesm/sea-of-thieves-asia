@@ -54,3 +54,9 @@ copyrighted game footage supplied by the owner, **written confirmation of the
 right to publish them is required**, or they must be replaced with licensed or
 original footage. Until then they should be treated as beta-only placeholders.
 No Sea of Thieves logo, model, texture, or font is used.
+
+### Reference site note
+The community site `https://www.seaofthievesau.com/` was reviewed for **layout
+and feature ideas only**. No images, logos, fonts, copy, event data, or code from
+that site were copied into this project. All illustrations in the feature board
+are original hand-authored SVG line art in `src/components/content/VoyageArt.tsx`.

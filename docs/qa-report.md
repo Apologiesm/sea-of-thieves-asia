@@ -8,11 +8,14 @@
 - `npx supabase db test` — passed, 2 files / 6 tests
 
 ## Browser QA
-- Desktop 1440px: all primary nav links clicked (Events, Crew, Gallery, Guides, News) — all navigated, no page errors, no failed network requests.
-- Mobile 360px: menu opened, mobile Events link navigated, accessibility tree captured successfully.
-- Internal links: every `href="/..."` on public pages returned HTTP 200. External Discord/Instagram/Facebook links returned HTTP 200.
+- Desktop 1440px: primary nav links clicked (Events, Crew, Gallery, Guides, News) — all navigated, no page errors, no failed network requests.
+- Event date filter filled and submitted — URL updated with `?date=2026-11-20`; no errors.
+- Mobile 360px: menu opened, mobile Crew link navigated, accessibility tree captured successfully.
+- 1920px / reduced-motion: Tab keyboard navigation captured, accessibility tree complete, no page errors.
+- Internal links: every `href="/..."` on public pages returned HTTP 200. External Discord/Instagram/Facebook and all three Discord channel links returned HTTP 200.
 - Scroll down: hero video opacity 0, page video opacity 1, progress indicator "Join" active.
 - Scroll up: hero video opacity 1, page video opacity 0, progress indicator reset.
+- Live Seas board verified in accessibility tree: live status, next event, regional clock, event formats, Discord channels and quick actions all present.
 - No tracking scripts found; no `set-cookie` on public pages; security headers present.
 
 ## Fixes made during QA

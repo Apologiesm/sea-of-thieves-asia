@@ -38,7 +38,9 @@ install is required.
 All public links live in **`src/lib/content/site-config.ts`**:
 - `SOCIAL_LINKS` — Discord, YouTube, Twitch, X, Instagram, Facebook, TikTok, contact
 - `JOIN_CTA.linkValue` — the Discord invite CTA
-- `FOOTER.columns` — footer links including policy pages
+- `DISCORD_CHANNELS` — game updates, live events and moments channel links
+- `LIVE_SEAS` / `EVENT_FORMATS` — live board copy and event-format timings
+- `FOOTER.columns` — footer links including policy pages and Discord channels
 
 The content contract is **`docs/content.md`**. Any value not supplied by the
 owner must remain `REPLACE_BEFORE_LAUNCH`. Missing community links render as
@@ -52,6 +54,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 | Content | Where |
 |---|---|
 | Home/hero/about text | `src/lib/content/site-config.ts` (`HERO`, `ABOUT`, `FEATURES`, `PREVIEWS`) |
+| Live Seas board | `src/components/live/LiveSeas.tsx`, `src/lib/live/queries.ts`, `LIVE_SEAS` / `EVENT_FORMATS` in `site-config.ts` |
 | Events | `src/app/(public)/events`, `src/lib/event/*`, Supabase table `events`; authorized hosts use `/events/new` and `/events/manage` |
 | Crew listings | `src/app/(public)/crew`, `src/lib/crew/*`, Supabase table `crew_listings` |
 | Guides | Moderators use `/guides/new` and `/guides/[id]/edit`; markdown stored in `guides.body` |
