@@ -87,6 +87,21 @@ bot with permission to read the chosen channels and have it POST JSON to
 
 The widget renders these events natively with images and regional times.
 
+### Discord role sync
+Website roles can follow Discord roles without hard-coded users. Set:
+
+```env
+DISCORD_BOT_TOKEN=
+DISCORD_GUILD_ID=
+DISCORD_ADMIN_ROLE_ID=
+DISCORD_OWNER_ROLE_ID=
+```
+
+Then call `/api/cron/sync-discord-roles` with `Authorization: Bearer CRON_SECRET`.
+Members with the owner role become website `owner`, members with the admin role
+become `admin`, everyone else becomes `member`. The last owner is never removed
+automatically. Vercel runs this every 15 minutes.
+
 ## Images, video and 3D assets
 
 - Current background loops: `public/media/sot1-hero.mp4` (hero only) and
