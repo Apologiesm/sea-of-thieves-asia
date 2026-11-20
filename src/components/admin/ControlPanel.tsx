@@ -3,8 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SiteSettings } from "@/lib/site/settings";
+import { SortableList, type SortableItem } from "@/components/admin/SortableList";
 
 export type DeleteItem = { id: string; title: string; type: string };
+
+const SECTION_ITEMS: SortableItem[] = [
+  { id: "live", title: "Live seas", subtitle: "Current and upcoming events", avatar: "LS" },
+  { id: "news", title: "Official updates", subtitle: "News from Sea of Thieves", avatar: "ON" },
+  { id: "discord", title: "Discord feed", subtitle: "Community announcements", avatar: "DF" },
+  { id: "about", title: "About", subtitle: "What this community is for", avatar: "AB" },
+  { id: "features", title: "Voyage features", subtitle: "Crew, events, guides, gallery", avatar: "VF" },
+  { id: "previews", title: "Section previews", subtitle: "Public section empty states", avatar: "SP" },
+  { id: "join", title: "Join CTA", subtitle: "Discord invite", avatar: "JC" },
+];
 
 const FEATURE_LABELS: Array<{ key: keyof SiteSettings["features"]; label: string; desc: string }> = [
   { key: "events", label: "Events", desc: "Event calendar, RSVP and hosts" },
@@ -27,6 +38,10 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
 
   function setDiscordEnabled(value: boolean) {
     setSettings((current) => ({ ...current, discord: { ...current.discord, enabled: value } }));
+  }
+
+  function setHomeOrder(sectionOrder: string[]) {
+    setSettings((current) => ({ ...current, home: { ...current.home, sectionOrder } }));
   }
 
   function setChannel(index: number, key: "label" | "url" | "id" | "limit", value: string | number) {
@@ -86,7 +101,20 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-6">
+      <section className="control-section">
+        <h2 className="text-xl font-semibold text-content">Homepage section order</h2>
+        <p className="mt-1 text-sm text-content-muted">Drag a card to reorder the homepage. Keyboard: Alt + Up / Down.</p>
+        <div className="mt-5">
+          <SortableList
+            items={SECTION_ITEMS}
+            order={settings.home.sectionOrder}
+            onChange={setHomeOrder}
+          />
+        </div>
+      </section>
+
+      <div className="grid gap-6 lg:grid-cols-2">
       <section className="control-section">
         <h2 className="text-xl font-semibold text-content">Features</h2>
         <p className="mt-1 text-sm text-content-muted">Turn sections off for maintenance. Navigation and homepage sections follow these switches.</p>
@@ -142,6 +170,7 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }

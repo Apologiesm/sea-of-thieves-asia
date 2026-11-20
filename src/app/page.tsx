@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { About } from "@/components/sections/about";
 import { CommunityFeatures } from "@/components/sections/features";
 import { Hero } from "@/components/sections/hero";
@@ -10,6 +11,8 @@ import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { VoyageScrollController } from "@/components/scroll/VoyageScrollController";
 import { PREVIEWS } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
+
+const DEFAULT_ORDER = ["live", "news", "discord", "about", "features", "previews", "join"];
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
@@ -25,20 +28,31 @@ export default async function HomePage() {
     return !flag || settings.features[flag];
   });
 
-  return (
-    <>
-      <Hero />
-      {settings.features.events ? <LiveSeas /> : null}
-      {settings.features.news ? <OfficialUpdates limit={6} /> : null}
-      {settings.features.discordEvents ? <DiscordEvents limit={6} /> : null}
-      <About />
-      <CommunityFeatures />
+  const sections: Record<string, ReactNode> = {
+    live: settings.features.events ? <LiveSeas /> : null,
+    news: settings.features.news ? <OfficialUpdates limit={6} /> : null,
+    discord: settings.features.discordEvents ? <DiscordEvents limit={6} /> : null,
+    about: <About />,
+    features: <CommunityFeatures />,
+    previews: (
       <div id="sections">
         {previews.map((preview, index) => (
           <PreviewSection key={preview.key} preview={preview} index={index} />
         ))}
       </div>
-      <JoinCta />
+    ),
+    join: <JoinCta />,
+  };
+
+  const order = settings.home.sectionOrder?.length ? settings.home.sectionOrder : DEFAULT_ORDER;
+  const finalOrder = [...order, ...DEFAULT_ORDER.filter((key) => !order.includes(key))];
+
+  return (
+    <>
+      <Hero />
+      {finalOrder.map((key) => (
+        <div key={key} data-section={key}>{sections[key]}</div>
+      ))}
       <VoyageProgress />
       <VoyageScrollController />
     </>

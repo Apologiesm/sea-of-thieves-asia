@@ -22,9 +22,14 @@ export type DiscordSettings = {
   channels: DiscordChannel[];
 };
 
+export type HomeSettings = {
+  sectionOrder: string[];
+};
+
 export type SiteSettings = {
   features: FeatureFlags;
   discord: DiscordSettings;
+  home: HomeSettings;
 };
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -32,6 +37,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   discord: {
     enabled: true,
     channels: [],
+  },
+  home: {
+    sectionOrder: ["live", "news", "discord", "about", "features", "previews", "join"],
   },
 };
 
@@ -48,5 +56,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return {
     features: { ...DEFAULT_SETTINGS.features, ...(values.features as Partial<FeatureFlags> ?? {}) },
     discord: { ...DEFAULT_SETTINGS.discord, ...(values.discord as Partial<DiscordSettings> ?? {}) },
+    home: { ...DEFAULT_SETTINGS.home, ...(values.home as Partial<HomeSettings> ?? {}) },
   };
 }

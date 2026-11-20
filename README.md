@@ -170,6 +170,7 @@ Owner-only at `/admin/control`:
 
 - Switch sections on/off for maintenance (events, crew, guides, gallery, news, Discord event board)
 - Set the Discord announcement channel URL or ID and choose how many recent posts to display
+- Drag-and-drop reorder homepage sections; keyboard users can use Alt + Up / Down
 - Delete content globally: announcements, events, guides, gallery items, reports and Discord announcements
 
 Settings are stored in `public.site_settings`; every change is audit-logged.

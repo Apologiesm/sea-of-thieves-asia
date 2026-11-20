@@ -25,6 +25,9 @@ const schema = z.object({
       limit: z.coerce.number().int().min(1).max(25),
     })).max(8),
   }),
+  home: z.object({
+    sectionOrder: z.array(z.string().max(60)).max(12),
+  }),
 });
 
 export async function GET() {
@@ -37,6 +40,7 @@ export async function GET() {
   return NextResponse.json({
     features: { ...DEFAULT_SETTINGS.features, ...(values.features as object ?? {}) },
     discord: { ...DEFAULT_SETTINGS.discord, ...(values.discord as object ?? {}) },
+    home: { ...DEFAULT_SETTINGS.home, ...(values.home as object ?? {}) },
   });
 }
 
@@ -53,6 +57,7 @@ export async function PUT(request: Request) {
   const rows = [
     { key: "features", value: parsed.data.features, updated_at: new Date().toISOString() },
     { key: "discord", value: parsed.data.discord, updated_at: new Date().toISOString() },
+    { key: "home", value: parsed.data.home, updated_at: new Date().toISOString() },
   ];
   const { error } = await admin.from("site_settings").upsert(rows, { onConflict: "key" });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
