@@ -104,7 +104,7 @@ export const NAV_LINKS: readonly { href: string; label: string }[] = [
 ] as const;
 
 export const HERO = {
-  eyebrow: "Unofficial fan community · Asia region",
+  eyebrow: "Sea of Thieves Asia · Asia region",
   title: "Set Sail With Sea of Thieves Asia",
   subtitle: "Find your crew. Conquer the seas.",
   body: "A place for pirates across the region to gather, share voyages, and build stories on the high seas.",

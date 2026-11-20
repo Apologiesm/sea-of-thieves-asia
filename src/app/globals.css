@@ -1123,3 +1123,68 @@ h2 {
   .calendar__grid { grid-template-columns: repeat(7, minmax(72px, 1fr)); }
   .calendar__cell { min-height: 5rem; padding: 0.4rem; }
 }
+
+/* --- SOT Asia typographic identity --------------------------------------- */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  line-height: 1;
+}
+
+.brand-lockup__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 9999px;
+  flex: none;
+}
+
+.brand-lockup__mark span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--color-brand);
+  transform: rotate(45deg);
+}
+
+.brand-lockup__text {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.brand-lockup__top {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-content-muted);
+}
+
+.brand-lockup__bottom {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--color-content);
+}
+
+.brand-lockup--lg .brand-lockup__mark { width: 2.8rem; height: 2.8rem; }
+.brand-lockup--lg .brand-lockup__top { font-size: 0.68rem; }
+.brand-lockup--lg .brand-lockup__bottom { font-size: 1.6rem; }
+
+.hero-brand {
+  color: var(--color-brand);
+  white-space: nowrap;
+}
+
+.page-brand {
+  margin-bottom: 0.9rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+}

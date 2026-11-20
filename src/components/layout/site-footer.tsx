@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLockup } from "@/components/layout/BrandLockup";
 import { Container } from "@/components/ui/container";
 import { FOOTER, SITE } from "@/lib/content/site-config";
 import { safeHref } from "@/lib/content/placeholders";
@@ -9,7 +10,7 @@ export function SiteFooter() {
       <Container>
         <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">
-            <p className="text-base font-bold text-content">{SITE.name}</p>
+            <BrandLockup size="lg" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-content-muted">
               {FOOTER.tagline}
             </p>

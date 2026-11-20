@@ -2,9 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
-import { HERO } from "@/lib/content/site-config";
+import { HERO, SITE } from "@/lib/content/site-config";
 
 export function Hero() {
+  const brandIndex = HERO.title.indexOf(SITE.name);
+
   return (
     <section
       aria-labelledby="hero-title"
@@ -21,7 +23,15 @@ export function Hero() {
               id="hero-title"
               className="mt-7 text-balance text-4xl font-bold leading-[1.08] tracking-tight text-content sm:text-5xl lg:text-6xl xl:text-7xl"
             >
-              {HERO.title}
+              {brandIndex >= 0 ? (
+                <>
+                  {HERO.title.slice(0, brandIndex)}
+                  <span className="hero-brand">{SITE.name}</span>
+                  {HERO.title.slice(brandIndex + SITE.name.length)}
+                </>
+              ) : (
+                HERO.title
+              )}
             </h1>
             <p className="mt-5 text-xl font-medium text-brand sm:text-2xl">
               {HERO.subtitle}
