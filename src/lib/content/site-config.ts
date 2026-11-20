@@ -292,7 +292,13 @@ export type FooterItem = { label: string; value: string };
 export const FOOTER = {
   tagline: "An unofficial fan community for Sea of Thieves players in Asia.",
   columns: [
-    { title: "Explore", items: NAV_LINKS.map((l) => ({ label: l.label, value: l.href })) },
+    {
+      title: "Explore",
+      items: [
+        ...NAV_LINKS.map((l) => ({ label: l.label, value: l.href })),
+        { label: "Voyage tools", value: "/tools" },
+      ],
+    },
     {
       title: "Community",
       items: SOCIAL_LINKS.filter((l) => l.key !== "contact").map((l) => ({
@@ -388,6 +394,7 @@ export const QUICK_ACTIONS = [
   { label: "Events calendar", href: "/events", external: false },
   { label: "Find a crew", href: "/crew", external: false },
   { label: "Report an issue", href: "/report", external: false },
+  { label: "Voyage checklist", href: "/tools", external: false },
 ] as const;
 
 export const DISCORD_CHANNELS = [

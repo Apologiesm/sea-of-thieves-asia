@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/content/empty-state";
 import { EventCard } from "@/components/event/EventCard";
+import { EventCalendar } from "@/components/event/EventCalendar";
+import { EventCountdown } from "@/components/event/EventCountdown";
 import { EventFilters } from "@/components/event/EventFilters";
-import { listEvents } from "@/lib/event/queries";
+import { getNextEvent, listEvents } from "@/lib/event/queries";
 import { eventFiltersSchema } from "@/lib/event/validation";
 import { createClient } from "@/lib/supabase/server";
 import { EVENT_PRIVACY_NOTICE } from "@/lib/content/site-config";
@@ -14,18 +17,29 @@ export const metadata: Metadata = { title: "Events", description: "Community eve
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-function flatten(params: Record<string, string | string[] | undefined>) {
-  const result: Record<string, string> = {};
-  for (const [key, value] of Object.entries(params)) {
-    result[key] = Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
-  }
-  return result;
+function one(value: string | string[] | undefined) {
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
+function currentMonth() {
+  const now = new Date();
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
 export default async function EventsPage({ searchParams }: { searchParams: SearchParams }) {
-  const parsed = eventFiltersSchema.safeParse(flatten(await searchParams));
-  const filters = parsed.success ? parsed.data : eventFiltersSchema.parse({});
-  const events = await listEvents(filters);
+  const params = await searchParams;
+  const filters = eventFiltersSchema.safeParse({
+    q: one(params.q), region: one(params.region), platform: one(params.platform),
+    language: one(params.language), playstyle: one(params.playstyle),
+    shipPreference: one(params.shipPreference), rolePreference: one(params.rolePreference),
+    availability: one(params.availability), date: one(params.date), status: one(params.status) || "published",
+  });
+  const values = filters.success ? filters.data : eventFiltersSchema.parse({});
+  const events = await listEvents(values);
+  const view = one(params.view) === "calendar" ? "calendar" : "list";
+  const month = /^\d{4}-\d{2}$/.test(one(params.month)) ? one(params.month) : currentMonth();
+
+  const next = getNextEvent(events);
 
   let canManage = false;
   const supabase = await createClient();
@@ -36,6 +50,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
       canManage = Boolean(data);
     }
   }
+
+  const query = new URLSearchParams();
+  Object.entries(values).forEach(([key, value]) => {
+    if (value) query.set(key, String(value));
+  });
 
   return (
     <>
@@ -48,15 +67,29 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         <div className="py-10 sm:py-14">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-content-muted">{events.length} published {events.length === 1 ? "event" : "events"}</p>
-            {canManage ? (
-              <div className="flex flex-wrap gap-3">
-                <ButtonLink href="/events/new">Create event</ButtonLink>
-                <ButtonLink href="/events/manage" variant="secondary">Manage events</ButtonLink>
-              </div>
-            ) : null}
+            <div className="flex flex-wrap gap-3">
+              <Link href={`/events?${query.toString()}`} className={view === "list" ? "view-toggle view-toggle--active" : "view-toggle"}>List</Link>
+              <Link href={`/events?${query.toString()}&view=calendar&month=${month}`} className={view === "calendar" ? "view-toggle view-toggle--active" : "view-toggle"}>Calendar</Link>
+              {canManage ? (
+                <>
+                  <ButtonLink href="/events/new">Create event</ButtonLink>
+                  <ButtonLink href="/events/manage" variant="secondary">Manage events</ButtonLink>
+                </>
+              ) : null}
+            </div>
           </div>
 
-          <EventFilters filters={filters} />
+          {next && next.starts_at ? (
+            <div className="next-event-strip">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-brand">Next event</p>
+                <Link href={`/events/${next.id}`} className="mt-1 block text-lg font-semibold text-content hover:underline">{next.title}</Link>
+              </div>
+              <EventCountdown startsAt={next.starts_at} timeZone={next.timezone} />
+            </div>
+          ) : null}
+
+          <EventFilters filters={values} />
 
           <div className="mt-8">
             {events.length === 0 ? (
@@ -64,6 +97,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
                 title="No events scheduled yet"
                 description="No events have been published yet. Hosts will add real voyages here."
               />
+            ) : view === "calendar" ? (
+              <EventCalendar events={events} month={month} />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {events.map((event) => <EventCard key={event.id} event={event} />)}

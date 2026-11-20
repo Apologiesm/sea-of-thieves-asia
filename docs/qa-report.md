@@ -42,3 +42,10 @@
 3. The supplied Sea of Thieves video footage has no documented publishing
    rights. `docs/assets.md` records this; confirm rights or replace before launch.
 4. Rate limiting is in-memory per process; use Postgres/Redis for multi-instance production.
+
+## Usefulness upgrade verification
+- `/tools` voyage checklist clicked in a real browser; progress updated to `1 of 7 ready · 14%` with no errors.
+- Event calendar view verified with a temporary test event; the calendar grid and event title rendered, then the test event was deleted and the empty state confirmed.
+- Next-event countdown component mounted on Live Seas and the events page; shows live days/hours/minutes/seconds for real events only.
+- Back-to-top control added globally and appears after scrolling.
+- Editorial serif display font and hand-drawn header ornament added using system fonts only — no external font requests.

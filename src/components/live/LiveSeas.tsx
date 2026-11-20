@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { RegionClock } from "@/components/content/RegionClock";
+import { EventCountdown } from "@/components/event/EventCountdown";
 import { getLiveSnapshot } from "@/lib/live/queries";
 import { formatDateTime } from "@/lib/event/time";
 import {
@@ -47,14 +48,19 @@ export async function LiveSeas() {
               <div className="mt-5">
                 <p className="live-board__eyebrow">{LIVE_SEAS.nextLabel}</p>
                 {next ? (
-                  <div className="mt-2 flex flex-wrap items-baseline justify-between gap-3">
-                    <Link href={`/events/${next.id}`} className="text-base font-semibold text-content underline decoration-border underline-offset-4 hover:decoration-brand">
-                      {next.title}
-                    </Link>
-                    <span className="text-xs text-content-muted">
-                      {formatDateTime(next.starts_at, next.timezone)}
-                    </span>
-                  </div>
+                  <>
+                    <div className="mt-2 flex flex-wrap items-baseline justify-between gap-3">
+                      <Link href={`/events/${next.id}`} className="text-base font-semibold text-content underline decoration-border underline-offset-4 hover:decoration-brand">
+                        {next.title}
+                      </Link>
+                      <span className="text-xs text-content-muted">
+                        {formatDateTime(next.starts_at, next.timezone)}
+                      </span>
+                    </div>
+                    {next.starts_at ? (
+                      <EventCountdown startsAt={next.starts_at} timeZone={next.timezone} />
+                    ) : null}
+                  </>
                 ) : (
                   <p className="mt-2 text-sm text-content-muted" aria-label={`${LIVE_SEAS.nextLabel}: ${LIVE_SEAS.noNext}`}>
                     {LIVE_SEAS.noNext}

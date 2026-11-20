@@ -35,6 +35,13 @@ export function timezoneLabel(timeZone: string | null): string {
   return timeZone ?? FALLBACK;
 }
 
+/** YYYY-MM-DD key in the event's own timezone, for calendar grouping. */
+export function eventDateKey(iso: string | null, timeZone: string | null): string {
+  if (!iso) return "";
+  const parts = partsInZone(new Date(iso), timeZone ?? FALLBACK);
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
 type Parts = Record<string, string>;
 
 function partsInZone(date: Date, timeZone: string): Parts {

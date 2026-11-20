@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { VoyageProgress } from "@/components/scroll/VoyageProgress";
+import { BackToTop } from "@/components/content/BackToTop";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { SITE } from "@/lib/content/site-config";
 import { getSiteUrl } from "@/lib/env";
@@ -54,6 +55,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <BackToTop />
       </body>
     </html>
   );

@@ -12,6 +12,7 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
         <p className="mt-4 max-w-2xl text-base text-content-muted sm:text-lg">
           {description}
         </p>
+        <div className="header-ornament" aria-hidden="true"><span /></div>
       </div>
     </header>
   );

@@ -30,6 +30,13 @@ export async function listEvents(filters: EventFilters, includeAll = false): Pro
   return (data ?? []) as EventRecord[];
 }
 
+export function getNextEvent(events: EventRecord[]): EventRecord | null {
+  const now = Date.now();
+  return events.find(
+    (event) => event.starts_at && new Date(event.starts_at).getTime() > now,
+  ) ?? null;
+}
+
 export async function getEvent(id: string): Promise<EventRecord | null> {
   const supabase = await createClient();
   if (!supabase) return null;
