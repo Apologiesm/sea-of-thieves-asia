@@ -25,4 +25,7 @@ export const LIMITS = {
   edit: { limit: 20, windowMs: 60 * 60 * 1000 },
   report: { limit: 5, windowMs: 60 * 60 * 1000 },
   moderate: { limit: 30, windowMs: 60 * 60 * 1000 },
+  eventCreate: { limit: 10, windowMs: 60 * 60 * 1000 },
+  eventEdit: { limit: 30, windowMs: 60 * 60 * 1000 },
+  rsvp: { limit: 30, windowMs: 60 * 60 * 1000 },
 } as const;

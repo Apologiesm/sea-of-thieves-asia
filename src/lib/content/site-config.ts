@@ -136,6 +136,37 @@ export const ABOUT = {
   ],
 } as const;
 
+export const EVENT_TYPES = [
+  { value: "fleet_night", label: "Fleet Night" },
+  { value: "pvp_tournament", label: "PvP Tournament" },
+  { value: "treasure_hunt", label: "Treasure Hunt" },
+  { value: "new_captain_orientation", label: "New Captain Orientation" },
+  { value: "stream_night", label: "Stream Night" },
+  { value: "community_challenge", label: "Community Challenge" },
+] as const;
+
+export const EVENT_STATUSES = ["draft", "published", "cancelled", "completed"] as const;
+export const EVENT_REGIONS = ["Southeast Asia", "East Asia", "South Asia", "Oceania", "Central Asia", "Middle East"] as const;
+export const EVENT_PLATFORMS = ["PC", "Xbox", "PlayStation", "Cross-platform"] as const;
+export const ASIAN_TIMEZONES = [
+  "Asia/Singapore",
+  "Asia/Kuala_Lumpur",
+  "Asia/Bangkok",
+  "Asia/Jakarta",
+  "Asia/Manila",
+  "Asia/Ho_Chi_Minh",
+  "Asia/Shanghai",
+  "Asia/Hong_Kong",
+  "Asia/Taipei",
+  "Asia/Seoul",
+  "Asia/Tokyo",
+  "Asia/Kolkata",
+  "Asia/Dubai",
+] as const;
+
+export const EVENT_PRIVACY_NOTICE =
+  "Events show the details the host publishes. RSVPs are visible only to the event host and moderators; other members see aggregate counts, not who attended.";
+
 export const CREW_OPTIONS = {
   regions: ["Southeast Asia", "East Asia", "South Asia", "Oceania", "Central Asia", "Middle East"],
   platforms: ["PC", "Xbox", "PlayStation", "Cross-platform"],
