@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 /*
- * Baseline aesthetic tokens: dark cinematic nautical palette with restrained
- * Asian-inspired wave ornament. These are functional defaults, not an official
- * identity. Official colors, type, and logo remain REPLACE_BEFORE_LAUNCH
- * in docs/brand.md and are replaced only when supplied by the owner.
+ * Palette derived from the reference trailer's measured frames: deep teal,
+ * moonlit parchment, warm brass and a restrained rust accent. Original to this
+ * fan project — no game assets, logos, fonts or official colours are copied.
  */
 @theme {
-  --color-canvas: #070b12;
-  --color-surface: #0d1420;
-  --color-surface-raised: #141d2b;
-  --color-border: #1e2c3d;
-  --color-content: #e9eef6;
-  --color-content-muted: #9fb0c6;
-  --color-brand: #c9a961;
-  --color-brand-strong: #e0c37a;
+  --color-canvas: #071a1c;
+  --color-surface: #0d2628;
+  --color-surface-raised: #123437;
+  --color-border: #1d4a4c;
+  --color-content: #f1ead9;
+  --color-content-muted: #a9c0bd;
+  --color-brand: #d9a441;
+  --color-brand-strong: #e8c374;
+  --color-ember: #d98b5f;
+  --color-nutmeg: #86372b;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
@@ -34,6 +35,26 @@
     color: var(--color-content);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Public-domain moonlit sea photograph used as the real background picture. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("/backgrounds/night-ocean.png");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.42;
+    filter: hue-rotate(-12deg) saturate(1.2) contrast(1.05);
+  }
+
+  #main-content,
+  .site-footer {
+    position: relative;
+    z-index: 1;
   }
 
   :focus-visible {
@@ -64,9 +85,9 @@
 /* Decorative sea and sky. Pure CSS, aria-hidden at the call site. */
 .hero-sky {
   background:
-    radial-gradient(ellipse 80% 60% at 78% 8%, rgba(201, 169, 97, 0.1), transparent 70%),
-    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(80, 120, 160, 0.12), transparent 70%),
-    linear-gradient(180deg, #0a1220 0%, #070b12 78%);
+    radial-gradient(ellipse 80% 60% at 78% 8%, rgba(217, 164, 65, 0.14), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(79, 145, 146, 0.16), transparent 70%),
+    linear-gradient(180deg, #0b2a2c 0%, #071a1c 78%);
 }
 
 .grid-lines {
@@ -184,6 +205,7 @@
 
 .scene-layer canvas {
   display: block;
+  opacity: 0.62;
 }
 
 .scene-layer--placeholder {
@@ -201,11 +223,11 @@
   background:
     linear-gradient(
       90deg,
-      rgba(6, 18, 26, 0.94) 0%,
-      rgba(6, 18, 26, 0.74) 42%,
-      rgba(6, 18, 26, 0.3) 100%
+      rgba(7, 26, 28, 0.92) 0%,
+      rgba(7, 26, 28, 0.72) 42%,
+      rgba(7, 26, 28, 0.32) 100%
     ),
-    linear-gradient(0deg, rgba(6, 18, 26, 0.82) 0%, transparent 55%);
+    linear-gradient(0deg, rgba(7, 26, 28, 0.82) 0%, transparent 55%);
 }
 
 /* Loading overlay with progress */
