@@ -87,20 +87,36 @@ bot with permission to read the chosen channels and have it POST JSON to
 
 The widget renders these events natively with images and regional times.
 
-### Discord role sync
-Website roles can follow Discord roles without hard-coded users. Set:
+### Manual Discord role control
+Website roles are assigned manually from Discord using:
+
+```bash
+npm run bot:webrole
+```
+
+The bot registers `/webrole`:
+
+```text
+/webrole set @member owner
+```
+
+Only Discord members with the configured owner role can grant `owner`; members
+with the admin or owner role can grant `admin` or `member`. The server verifies
+the requester's Discord roles before changing anything. No users are hard-coded.
+
+Set:
 
 ```env
 DISCORD_BOT_TOKEN=
 DISCORD_GUILD_ID=
 DISCORD_ADMIN_ROLE_ID=
 DISCORD_OWNER_ROLE_ID=
+DISCORD_COMMAND_SECRET=
 ```
 
-Then call `/api/cron/sync-discord-roles` with `Authorization: Bearer CRON_SECRET`.
-Members with the owner role become website `owner`, members with the admin role
-become `admin`, everyone else becomes `member`. The last owner is never removed
-automatically. Vercel runs this every 15 minutes.
+The automatic 15-minute role sync is disabled. The old
+`/api/cron/sync-discord-roles` endpoint remains available for manual bulk sync
+but is not scheduled.
 
 ## Images, video and 3D assets
 

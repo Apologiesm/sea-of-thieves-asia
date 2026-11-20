@@ -12,7 +12,8 @@
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
-    "supabase:test": "supabase db test"
+    "supabase:test": "supabase db test",
+    "bot:webrole": "node scripts/discord-webrole-bot.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.5",
+    "discord.js": "^14.22.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
