@@ -1668,7 +1668,7 @@ h2 {
   color: var(--color-content);
 }
 
-/* --- 3D tilt + pointer glow cards ---------------------------------------- */
+/* --- Pointer glow cards -------------------------------------------------- */
 :root {
   --ui-surface: var(--color-surface);
   --ui-surface-2: var(--color-surface-raised);
@@ -1690,13 +1690,11 @@ h2 {
 }
 
 .tilt {
-  perspective: 1000px;
+  position: relative;
 }
 
 .tilt__card {
   position: relative;
-  transform-style: preserve-3d;
-  will-change: transform;
   border-radius: var(--radius-card);
   border: 1px solid color-mix(in srgb, var(--ui-text) 15%, transparent);
   background: color-mix(in srgb, var(--ui-text) 5%, var(--ui-surface));
