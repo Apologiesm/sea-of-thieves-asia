@@ -1,14 +1,11 @@
 import { Container } from "@/components/ui/container";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteSettings } from "@/lib/site/settings";
+import { getSiteSettings, type DiscordChannel } from "@/lib/site/settings";
 
 type Embed = {
   title?: string | null;
   description?: string | null;
-  url?: string | null;
-  color?: number | null;
   image?: { url: string } | null;
-  thumbnail?: { url: string } | null;
   author?: { name: string } | null;
   footer?: { text: string } | null;
   fields?: Array<{ name: string; value: string; inline?: boolean }>;
@@ -37,28 +34,72 @@ function formatDate(iso: string | null) {
   }
 }
 
-function channelIdFrom(value: string, explicit: string): string {
-  if (explicit.trim()) return explicit.trim();
-  const match = value.match(/\/channels\/\d+\/(\d+)/);
-  return match?.[1] ?? "";
+function channelIdFrom(channel: DiscordChannel): string {
+  if (channel.id.trim()) return channel.id.trim();
+  return channel.url.match(/\/channels\/\d+\/(\d+)/)?.[1] ?? "";
 }
 
-export async function DiscordAnnouncements({ limit = 12 }: { limit?: number }) {
+function AnnouncementItem({ item }: { item: DiscordAnnouncement }) {
+  return (
+    <article className="discord-card">
+      <div className="discord-card__meta">
+        <span>{item.author_name ?? "Community team"}</span>
+        <time>{formatDate(item.posted_at)}</time>
+      </div>
+      {item.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={item.image_url} alt={`${item.author_name ?? "Discord"} announcement image`} loading="lazy" />
+      ) : null}
+      {item.content ? <p className="discord-card__content">{item.content}</p> : null}
+      {item.embeds.map((embed, index) => (
+        <div key={index} className="discord-embed">
+          {embed.author ? <span className="discord-embed__author">{embed.author.name}</span> : null}
+          {embed.title ? <h3>{embed.title}</h3> : null}
+          {embed.description ? <p>{embed.description}</p> : null}
+          {embed.fields?.length ? (
+            <div className="discord-embed__fields">
+              {embed.fields.map((field, fieldIndex) => (
+                <div key={fieldIndex}>
+                  <strong>{field.name}</strong>
+                  <span>{field.value}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {embed.image?.url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={embed.image.url} alt={embed.title ?? "Discord embed image"} loading="lazy" />
+          ) : null}
+          {embed.footer ? <small>{embed.footer.text}</small> : null}
+        </div>
+      ))}
+      {item.message_url ? (
+        <a href={item.message_url} target="_blank" rel="noopener noreferrer" className="partner-card__link">Open in Discord ↗</a>
+      ) : null}
+    </article>
+  );
+}
+
+export async function DiscordAnnouncements() {
   const settings = await getSiteSettings();
   if (!settings.discord.enabled) return null;
 
   const supabase = await createClient();
   if (!supabase) return null;
 
-  const channelId = channelIdFrom(settings.discord.channelUrl, settings.discord.channelId);
-  let query = supabase
-    .from("discord_announcements")
-    .select("*")
-    .order("posted_at", { ascending: false, nullsFirst: false });
-  if (channelId) query = query.eq("channel_id", channelId);
+  const feeds = await Promise.all(settings.discord.channels.map(async (channel) => {
+    const id = channelIdFrom(channel);
+    let query = supabase
+      .from("discord_announcements")
+      .select("*")
+      .order("posted_at", { ascending: false, nullsFirst: false })
+      .limit(channel.limit || 4);
+    if (id) query = query.eq("channel_id", id);
+    const { data } = await query;
+    return { channel, items: (data ?? []) as DiscordAnnouncement[] };
+  }));
 
-  const { data } = await query.limit(settings.discord.announcementLimit || limit);
-  const items = (data ?? []) as DiscordAnnouncement[];
+  const hasItems = feeds.some((feed) => feed.items.length > 0);
 
   return (
     <section aria-labelledby="discord-announcements-title" className="official-section">
@@ -75,49 +116,21 @@ export async function DiscordAnnouncements({ limit = 12 }: { limit?: number }) {
           </div>
         </div>
 
-        {items.length === 0 ? (
+        {!hasItems ? (
           <p className="partner-empty">No Discord announcements have been synced yet.</p>
         ) : (
-          <div className="discord-grid">
-            {items.map((item) => (
-              <article key={item.external_id} className="discord-card">
-                <div className="discord-card__meta">
-                  <span>{item.author_name ?? "Community team"}</span>
-                  <time>{formatDate(item.posted_at)}</time>
+          feeds.map(({ channel, items }) => (
+            <div key={channel.key} className="discord-feed">
+              <h3 className="discord-feed__title">{channel.label}</h3>
+              {items.length === 0 ? (
+                <p className="partner-empty">No posts in this channel yet.</p>
+              ) : (
+                <div className="discord-grid">
+                  {items.map((item) => <AnnouncementItem key={item.external_id} item={item} />)}
                 </div>
-                {item.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.image_url} alt={`${item.author_name ?? "Discord"} announcement image`} loading="lazy" />
-                ) : null}
-                {item.content ? <p className="discord-card__content">{item.content}</p> : null}
-                {item.embeds.map((embed, index) => (
-                  <div key={index} className="discord-embed">
-                    {embed.author ? <span className="discord-embed__author">{embed.author.name}</span> : null}
-                    {embed.title ? <h3>{embed.title}</h3> : null}
-                    {embed.description ? <p>{embed.description}</p> : null}
-                    {embed.fields?.length ? (
-                      <div className="discord-embed__fields">
-                        {embed.fields.map((field, fieldIndex) => (
-                          <div key={fieldIndex}>
-                            <strong>{field.name}</strong>
-                            <span>{field.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                    {embed.image?.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={embed.image.url} alt={embed.title ?? "Discord embed image"} loading="lazy" />
-                    ) : null}
-                    {embed.footer ? <small>{embed.footer.text}</small> : null}
-                  </div>
-                ))}
-                {item.message_url ? (
-                  <a href={item.message_url} target="_blank" rel="noopener noreferrer" className="partner-card__link">Open in Discord ↗</a>
-                ) : null}
-              </article>
-            ))}
-          </div>
+              )}
+            </div>
+          ))
         )}
       </Container>
     </section>

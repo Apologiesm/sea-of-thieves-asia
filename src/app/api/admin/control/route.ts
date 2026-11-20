@@ -16,10 +16,14 @@ const schema = z.object({
     discordEvents: z.boolean(),
   }),
   discord: z.object({
-    channelUrl: z.string().max(500),
-    channelId: z.string().max(100),
-    announcementLimit: z.coerce.number().int().min(1).max(25),
     enabled: z.boolean(),
+    channels: z.array(z.object({
+      key: z.string().max(60),
+      label: z.string().min(1).max(100),
+      url: z.string().max(500),
+      id: z.string().max(100),
+      limit: z.coerce.number().int().min(1).max(25),
+    })).max(8),
   }),
 });
 

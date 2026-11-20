@@ -25,8 +25,40 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
     setSettings((current) => ({ ...current, features: { ...current.features, [key]: value } }));
   }
 
-  function setDiscord(key: keyof SiteSettings["discord"], value: string | number | boolean) {
-    setSettings((current) => ({ ...current, discord: { ...current.discord, [key]: value } }));
+  function setDiscordEnabled(value: boolean) {
+    setSettings((current) => ({ ...current, discord: { ...current.discord, enabled: value } }));
+  }
+
+  function setChannel(index: number, key: "label" | "url" | "id" | "limit", value: string | number) {
+    setSettings((current) => ({
+      ...current,
+      discord: {
+        ...current.discord,
+        channels: current.discord.channels.map((channel, channelIndex) =>
+          channelIndex === index ? { ...channel, [key]: value } : channel,
+        ),
+      },
+    }));
+  }
+
+  function addChannel() {
+    setSettings((current) => ({
+      ...current,
+      discord: {
+        ...current.discord,
+        channels: [
+          ...current.discord.channels,
+          { key: `channel-${Date.now()}`, label: "New channel", url: "", id: "", limit: 4 },
+        ],
+      },
+    }));
+  }
+
+  function removeChannel(index: number) {
+    setSettings((current) => ({
+      ...current,
+      discord: { ...current.discord, channels: current.discord.channels.filter((_, channelIndex) => channelIndex !== index) },
+    }));
   }
 
   async function save() {
@@ -76,22 +108,23 @@ export function ControlPanel({ initial, items }: { initial: SiteSettings; items:
 
         <h2 className="mt-8 text-xl font-semibold text-content">Discord announcements</h2>
         <div className="mt-4 grid gap-3">
-          <label className="control-field">
-            <span>Channel link or ID</span>
-            <input value={settings.discord.channelUrl} onChange={(e) => setDiscord("channelUrl", e.target.value)} placeholder="https://discord.com/channels/..." />
-          </label>
-          <label className="control-field">
-            <span>Channel ID</span>
-            <input value={settings.discord.channelId} onChange={(e) => setDiscord("channelId", e.target.value)} placeholder="Optional if link is used" />
-          </label>
-          <label className="control-field">
-            <span>Latest posts to show</span>
-            <input type="number" min={1} max={25} value={settings.discord.announcementLimit} onChange={(e) => setDiscord("announcementLimit", Number(e.target.value))} />
-          </label>
           <label className="control-row">
-            <input type="checkbox" checked={settings.discord.enabled} onChange={(e) => setDiscord("enabled", e.target.checked)} />
-            <span><strong>Show Discord feed</strong><small>Render synced Discord announcements on the news page</small></span>
+            <input type="checkbox" checked={settings.discord.enabled} onChange={(e) => setDiscordEnabled(e.target.checked)} />
+            <span><strong>Show Discord feeds</strong><small>Render synced Discord announcements on the news page</small></span>
           </label>
+          {settings.discord.channels.map((channel, index) => (
+            <div key={channel.key} className="control-channel">
+              <div className="control-channel__head">
+                <strong>{channel.label || `Channel ${index + 1}`}</strong>
+                <button type="button" onClick={() => removeChannel(index)} className="control-delete">Remove</button>
+              </div>
+              <label className="control-field"><span>Label</span><input value={channel.label} onChange={(e) => setChannel(index, "label", e.target.value)} /></label>
+              <label className="control-field"><span>Channel link</span><input value={channel.url} onChange={(e) => setChannel(index, "url", e.target.value)} placeholder="https://discord.com/channels/..." /></label>
+              <label className="control-field"><span>Channel ID</span><input value={channel.id} onChange={(e) => setChannel(index, "id", e.target.value)} placeholder="Optional if link is used" /></label>
+              <label className="control-field"><span>Latest posts</span><input type="number" min={1} max={25} value={channel.limit} onChange={(e) => setChannel(index, "limit", Number(e.target.value))} /></label>
+            </div>
+          ))}
+          <button type="button" onClick={addChannel} className="control-button">Add channel</button>
         </div>
         <button type="button" onClick={save} disabled={busy} className="control-button">{busy ? "Saving…" : "Save settings"}</button>
         {message ? <p role="status" className="mt-3 text-sm text-brand">{message}</p> : null}

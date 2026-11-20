@@ -94,6 +94,22 @@ The website renders them as native cards on `/announcements` with title,
 description, fields, images and a link back to the message. No external embed
 script is loaded.
 
+Two channels are configured by default:
+
+- Game updates: `1296814423159345162`
+- Game events: `1296814661651529749`
+
+Each channel has its own label and post limit in `/admin/control`. A reader bot
+is available with:
+
+```bash
+npm run bot:announcements
+```
+
+It polls the configured channels every 60 seconds and posts new messages into
+the native feed. The bot must be invited to the Discord server, with **Message
+Content Intent** enabled so message text is readable.
+
 ### Manual Discord role control
 Website roles are assigned manually from Discord using:
 
