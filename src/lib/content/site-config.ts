@@ -259,7 +259,7 @@ export const FOOTER = {
       title: "Information",
       items: [
         { label: "Rules", value: PLACEHOLDER },
-        { label: "Privacy", value: PLACEHOLDER },
+        { label: "Privacy", value: "/privacy" },
         { label: "Terms", value: PLACEHOLDER },
         { label: "Contact", value: PLACEHOLDER },
         { label: "Credits", value: PLACEHOLDER },

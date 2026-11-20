@@ -1,16 +1,67 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+
+function AccountLinks({ user, mobile }: { user: User | null; mobile: boolean }) {
+  const linkClass = mobile
+    ? "block min-h-12 rounded-lg px-3 py-3 text-base text-content-muted hover:bg-surface-raised hover:text-content"
+    : "inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-content-muted hover:bg-surface-raised hover:text-content";
+
+  if (!user) {
+    return (
+      <Link href="/login" className={linkClass}>
+        Sign in
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <Link href="/profile" className={linkClass}>
+        Profile
+      </Link>
+      <Link href="/settings" className={linkClass}>
+        Settings
+      </Link>
+      <form action="/auth/logout" method="post">
+        <button type="submit" className={linkClass}>
+          Sign out
+        </button>
+      </form>
+    </>
+  );
+}
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) return;
+    let active = true;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (active) setUser(data.user ?? null);
+    });
+    const { data: auth } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      active = false;
+      auth.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -56,6 +107,9 @@ export function SiteHeader() {
                   </Link>
                 </li>
               ))}
+              <li className="ml-2 border-l border-border pl-2">
+                <AccountLinks user={user} mobile={false} />
+              </li>
             </ul>
           </nav>
 
@@ -97,6 +151,9 @@ export function SiteHeader() {
                   </Link>
                 </li>
               ))}
+              <li className="border-t border-border pt-2">
+                <AccountLinks user={user} mobile />
+              </li>
             </ul>
           </nav>
         </Container>
