@@ -3,11 +3,20 @@
  * NEXT_PUBLIC_ prefix and must not be imported by client components.
  */
 
-const DEFAULT_SITE_URL = "http://localhost:3000";
+const LOCAL_SITE_URL = "http://localhost:3000";
 
 export function getSiteUrl(): string {
-  const value = process.env.NEXT_PUBLIC_SITE_URL;
-  return value && value.length > 0 ? value.replace(/\/$/, "") : DEFAULT_SITE_URL;
+  const configured = process.env.NEXT_PUBLIC_SITE_URL;
+  if (configured && configured.length > 0) return configured.replace(/\/$/, "");
+
+  // Vercel provides the deployment host even before NEXT_PUBLIC_SITE_URL is
+  // set, so metadata and OAuth redirects never fall back to localhost in
+  // production. Preview deploys use their own host; production uses the
+  // stable project domain.
+  const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  if (vercelHost) return `https://${vercelHost.replace(/\/$/, "")}`;
+
+  return LOCAL_SITE_URL;
 }
 
 export function isProduction(): boolean {

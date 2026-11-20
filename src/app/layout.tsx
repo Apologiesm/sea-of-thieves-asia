@@ -8,6 +8,7 @@ import { HoverGlowController } from "@/components/ui/HoverGlowController";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
+import { getLayoutConfig } from "@/lib/site/layout";
 import { getSiteUrl } from "@/lib/env";
 
 const siteUrl = getSiteUrl();
@@ -41,6 +42,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   const settings = await getSiteSettings();
+  const layout = await getLayoutConfig();
   const flagByHref: Record<string, keyof typeof settings.features> = {
     "/events": "events",
     "/crew": "crew",
@@ -51,7 +53,17 @@ export default async function RootLayout({
   const navLinks = NAV_LINKS.filter((link) => {
     const flag = flagByHref[link.href];
     return !flag || settings.features[flag];
-  });
+  })
+    .slice()
+    .sort((a, b) => {
+      const order = layout.nav.order;
+      const ai = order.indexOf(a.href);
+      const bi = order.indexOf(b.href);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
 
   return (
     <html lang="en">
@@ -64,6 +76,14 @@ export default async function RootLayout({
           Skip to content
         </a>
         <SiteHeader navLinks={navLinks} />
+        {layout.killSwitches.maintenanceMode ? (
+          <div
+            role="status"
+            className="relative z-20 border-b border-brand/40 bg-surface-raised px-4 py-2.5 text-center text-xs text-content"
+          >
+            Maintenance mode is on — community sections are read-only right now. Admins can still manage content.
+          </div>
+        ) : null}
         <main id="main-content" className="flex-1">
           {children}
         </main>

@@ -9,13 +9,14 @@ import { ADMIN_PRIVACY_NOTICE, ROLE_LABELS } from "@/lib/content/site-config";
 export const metadata: Metadata = { title: "Admin dashboard" };
 
 const SECTIONS = [
+  { href: "/admin/master", title: "Master control", description: "Owner and admin: edit, reassign, pin, hide or delete any content, control layout order and feature switches." },
   { href: "/admin/guides", title: "Guides", description: "Publish, edit and archive guides." },
   { href: "/admin/announcements", title: "Announcements", description: "Publish and pin community news." },
   { href: "/admin/gallery", title: "Gallery moderation", description: "Approve or reject uploads." },
   { href: "/admin/reports", title: "Reports", description: "Review private moderation reports." },
   { href: "/admin/users", title: "Users and roles", description: "Manage member, moderator, admin and owner roles." },
   { href: "/admin/settings", title: "Settings and audit", description: "Privacy controls and sensitive-action audit log." },
-  { href: "/admin/control", title: "Master control", description: "Owner-only feature switches, Discord feed settings and global delete." },
+  { href: "/admin/control", title: "Owner control", description: "Owner-only feature switches, Discord feed settings and global delete." },
 ];
 
 export default async function AdminPage() {

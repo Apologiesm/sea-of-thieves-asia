@@ -5,6 +5,7 @@ import { crewFiltersSchema, crewListingSchema, toCrewRow } from "@/lib/crew/vali
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { getSiteUrl } from "@/lib/env";
 import { postToDiscord } from "@/lib/discord/notify";
+import { getKillSwitches } from "@/lib/site/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,11 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const switches = await getKillSwitches();
+  if (!switches.crewSubmissions || switches.maintenanceMode) {
+    return NextResponse.json({ error: "crew_submissions_disabled" }, { status: 503 });
+  }
 
   if (!rateLimit(`crew:create:${user.id}`, LIMITS.create.limit, LIMITS.create.windowMs).allowed) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

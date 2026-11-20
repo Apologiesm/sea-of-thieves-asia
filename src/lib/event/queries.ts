@@ -9,6 +9,9 @@ export async function listEvents(filters: EventFilters, includeAll = false): Pro
   let query = supabase
     .from("events")
     .select("*")
+    .eq("is_enabled", true)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("starts_at", { ascending: true })
     .limit(100);
 

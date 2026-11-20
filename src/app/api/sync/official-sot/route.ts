@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin, logAudit } from "@/lib/m8/auth";
 import { syncOfficialUpdates } from "@/lib/official/sync";
+import { getKillSwitches } from "@/lib/site/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,12 @@ export async function POST(request: Request) {
     await logAudit(context.supabase, "official_updates_synced", "official_updates", "root", {
       trigger: "admin_button",
     });
+  } else {
+    // Master kill-switch: stop scheduled syncs without blocking a manual run.
+    const switches = await getKillSwitches();
+    if (!switches.officialSync) {
+      return NextResponse.json({ error: "official_sync_disabled" }, { status: 503 });
+    }
   }
 
   const result = await syncOfficialUpdates();

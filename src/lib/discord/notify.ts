@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/env";
+import { getKillSwitches } from "@/lib/site/layout";
 
 /**
  * Website -> Discord outbound notifications.
@@ -40,6 +41,10 @@ export async function getOutgoingWebhookUrl(): Promise<string | null> {
 
 export async function postToDiscord(embed: DiscordEmbed): Promise<boolean> {
   try {
+    // Master kill-switch: the owner/admin can stop all outbound posts live.
+    const switches = await getKillSwitches();
+    if (!switches.discordAutoPost) return false;
+
     const webhookUrl = await getOutgoingWebhookUrl();
     if (!webhookUrl) return false;
 

@@ -5,6 +5,7 @@ import { eventFiltersSchema, eventSchema, toEventRow } from "@/lib/event/validat
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { getSiteUrl } from "@/lib/env";
 import { postToDiscord, discordTimestamp } from "@/lib/discord/notify";
+import { getKillSwitches } from "@/lib/site/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,11 @@ export async function POST(request: Request) {
 
   const { data: allowed } = await supabase.rpc("is_event_host");
   if (!allowed) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
+  const switches = await getKillSwitches();
+  if (switches.maintenanceMode) {
+    return NextResponse.json({ error: "maintenance_mode" }, { status: 503 });
+  }
 
   if (!rateLimit(`event:create:${user.id}`, LIMITS.eventCreate.limit, LIMITS.eventCreate.windowMs).allowed) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

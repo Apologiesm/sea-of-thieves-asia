@@ -9,6 +9,9 @@ export async function listCrewListings(filters: CrewFilters): Promise<CrewListin
     .from("crew_listings")
     .select("*")
     .eq("status", "open")
+    .eq("is_enabled", true)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false })
     .limit(60);
 

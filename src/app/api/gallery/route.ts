@@ -7,6 +7,7 @@ import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { listGallery } from "@/lib/m8/queries";
 import { requireModerator } from "@/lib/m8/auth";
 import type { NextRequest } from "next/server";
+import { getKillSwitches } from "@/lib/site/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,11 @@ export async function POST(request: Request) {
   const context = await requireUser();
   if (!context) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const { user, supabase } = context;
+
+  const switches = await getKillSwitches();
+  if (!switches.galleryUploads || switches.maintenanceMode) {
+    return NextResponse.json({ error: "gallery_uploads_disabled" }, { status: 503 });
+  }
 
   if (!rateLimit(`gallery:upload:${user.id}`, LIMITS.galleryUpload.limit, LIMITS.galleryUpload.windowMs).allowed) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

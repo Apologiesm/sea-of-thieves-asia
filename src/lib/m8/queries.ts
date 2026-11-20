@@ -10,7 +10,12 @@ export async function listGuides(filters: GuideFilters, includeAll = false): Pro
   const supabase = await createClient();
   if (!supabase) return [];
 
-  let query = supabase.from("guides").select("*").order("updated_at", { ascending: false }).limit(100);
+  let query = supabase.from("guides").select("*")
+    .eq("is_enabled", true)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("updated_at", { ascending: false })
+    .limit(100);
   if (!includeAll) query = query.eq("status", "published");
   if (filters.q) query = query.or(`title.ilike.%${filters.q}%,excerpt.ilike.%${filters.q}%`);
   if (filters.category) query = query.ilike("category", `%${filters.category}%`);
@@ -32,7 +37,13 @@ export async function getGuide(id: string): Promise<GuideRecord | null> {
 export async function listAnnouncements(includeAll = false): Promise<AnnouncementRecord[]> {
   const supabase = await createClient();
   if (!supabase) return [];
-  let query = supabase.from("announcements").select("*").order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(100);
+  let query = supabase.from("announcements").select("*")
+    .eq("is_enabled", true)
+    .order("pinned", { ascending: false })
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("published_at", { ascending: false })
+    .limit(100);
   if (!includeAll) query = query.eq("status", "published");
   const { data, error } = await query;
   if (error) return [];
@@ -55,7 +66,12 @@ function publicUrl(path: string): string | null {
 export async function listGallery(status: "approved" | "pending" | "rejected" = "approved", includeAll = false): Promise<GalleryItem[]> {
   const client = includeAll ? createAdminClient() : await createClient();
   if (!client) return [];
-  let query = client.from("gallery_items").select("*").order("created_at", { ascending: false }).limit(100);
+  let query = client.from("gallery_items").select("*")
+    .eq("is_enabled", true)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(100);
   if (!includeAll) query = query.eq("status", status);
   const { data, error } = await query;
   if (error) return [];
