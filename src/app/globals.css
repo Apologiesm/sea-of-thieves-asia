@@ -1668,16 +1668,22 @@ h2 {
   color: var(--color-content);
 }
 
-/* --- True 3D tilt cards -------------------------------------------------- */
+/* --- 3D tilt + pointer glow cards ---------------------------------------- */
 :root {
   --ui-surface: var(--color-surface);
+  --ui-border: var(--color-border);
   --ui-text: var(--color-content);
+  --ui-text-dim: var(--color-content-muted);
+  --ui-brand: var(--color-brand);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --ui-surface: #ffffff;
+    --ui-border: #d9e0ea;
     --ui-text: #0b1120;
+    --ui-text-dim: #52627a;
+    --ui-brand: #9a6b16;
   }
 }
 
@@ -1699,35 +1705,40 @@ h2 {
   z-index: 1;
 }
 
-.tilt__spot {
+[data-glow] {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+[data-glow]::before {
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity 0.4s ease;
   z-index: 0;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--ui-brand) 24%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-.tilt__card.is-lit .tilt__spot {
+[data-glow]:hover::before,
+[data-glow].is-demo::before,
+[data-glow]:active::before,
+[data-glow]:focus-visible::before {
   opacity: 1;
 }
 
-.tilt__spot--large {
-  background: radial-gradient(
-    420px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--color-brand) 32%, transparent),
-    transparent 65%
-  );
-}
-
-.tilt__spot--small {
-  background: radial-gradient(
-    170px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--color-brand) 42%, transparent),
-    transparent 62%
-  );
+[data-glow]:hover,
+[data-glow].is-demo {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--ui-brand) 45%, transparent);
+  box-shadow: 0 14px 34px rgba(3, 8, 13, 0.32);
 }
 
 .features-tilt { grid-column: span 12; }
@@ -1740,11 +1751,7 @@ h2 {
   .features-tilt--wide { grid-column: span 7; }
 }
 
-@media (hover: none), (pointer: coarse) {
-  .tilt__spot { display: none; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .tilt__card { transform: none !important; will-change: auto; }
-  .tilt__spot { transition: none; opacity: 0 !important; }
+  [data-glow] { transform: none !important; transition: none; }
+  [data-glow]::before { transition: none; opacity: 0 !important; }
 }

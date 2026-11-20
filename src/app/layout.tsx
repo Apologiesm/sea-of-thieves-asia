@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { BackToTop } from "@/components/content/BackToTop";
+import { HoverGlowController } from "@/components/ui/HoverGlowController";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
@@ -67,6 +68,7 @@ export default async function RootLayout({
           {children}
         </main>
         <SiteFooter navLinks={navLinks} />
+        <HoverGlowController />
         <BackToTop />
       </body>
     </html>
