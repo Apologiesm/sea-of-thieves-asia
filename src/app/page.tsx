@@ -6,6 +6,7 @@ import { LiveSeas } from "@/components/live/LiveSeas";
 import { OfficialUpdates } from "@/components/official/OfficialUpdates";
 import { DiscordEvents } from "@/components/discord/DiscordEvents";
 import { PreviewSection } from "@/components/sections/preview-section";
+import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { VoyageScrollController } from "@/components/scroll/VoyageScrollController";
 import { PREVIEWS } from "@/lib/content/site-config";
 
@@ -24,6 +25,7 @@ export default function HomePage() {
         ))}
       </div>
       <JoinCta />
+      <VoyageProgress />
       <VoyageScrollController />
     </>
   );

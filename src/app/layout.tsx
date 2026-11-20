@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { BackToTop } from "@/components/content/BackToTop";
 import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { SITE } from "@/lib/content/site-config";
@@ -49,7 +48,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <VoyageProgress />
         <SiteHeader />
         <main id="main-content" className="flex-1">
           {children}
