@@ -24,7 +24,7 @@ export type SocialLink = {
 };
 
 export const SOCIAL_LINKS: readonly SocialLink[] = [
-  { key: "discord", label: "Discord", value: PLACEHOLDER },
+  { key: "discord", label: "Discord", value: "https://discord.com/invite/dSX5FNy6sB" },
   { key: "youtube", label: "YouTube", value: PLACEHOLDER },
   { key: "twitch", label: "Twitch", value: PLACEHOLDER },
   { key: "x", label: "X", value: PLACEHOLDER },
@@ -236,10 +236,10 @@ export const PREVIEWS: readonly PreviewConfig[] = [
 export const JOIN_CTA = {
   eyebrow: "The community is on Discord",
   title: "Join the crew on Discord",
-  body: "Conversations, voice channels, and voyage planning live on our Discord server. The invite link will be added once it is ready.",
+  body: "Conversations, voice channels, and voyage planning live on our Discord server. Join us there to find a crew and stay up to date.",
   buttonLabel: "Join Discord",
-  linkValue: PLACEHOLDER,
-  note: "The invite is disabled until the real URL is provided.",
+  linkValue: "https://discord.com/invite/dSX5FNy6sB",
+  note: "You will be taken to Discord to accept the invite.",
 } as const;
 
 export type FooterItem = { label: string; value: string };
