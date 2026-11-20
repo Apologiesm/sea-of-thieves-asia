@@ -23,7 +23,7 @@ function setupVoyage(): () => void {
   const sections = gsap.utils.toArray<HTMLElement>("main section");
 
   if (reveals.length > 0) {
-    gsap.set(reveals, { opacity: 0.65, y: 22 });
+    gsap.set(reveals, { opacity: 0.9, y: 16 });
   }
 
   const timeline = gsap.timeline({
@@ -44,10 +44,6 @@ function setupVoyage(): () => void {
   timeline.to({}, { duration: HOLD });
 
   const travel = 1 - HOLD;
-  const hero = document.querySelector<HTMLElement>("[data-voyage-hero]");
-  if (hero) {
-    timeline.to(hero, { y: -36, opacity: 0.4, duration: travel * 0.22 }, HOLD);
-  }
 
   sections.forEach((section, index) => {
     const targets = section.querySelectorAll<HTMLElement>("[data-voyage-reveal]");
@@ -55,7 +51,7 @@ function setupVoyage(): () => void {
     const start = HOLD + (index / Math.max(sections.length, 1)) * travel * 0.8;
     timeline.fromTo(
       targets,
-      { opacity: 0.65, y: 22 },
+      { opacity: 0.9, y: 16 },
       { opacity: 1, y: 0, duration: travel * 0.16, stagger: 0.012 },
       start,
     );

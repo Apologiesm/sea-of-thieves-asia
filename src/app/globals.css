@@ -1,21 +1,20 @@
 @import "tailwindcss";
 
 /*
- * Palette derived from the reference trailer's measured frames: deep teal,
- * moonlit parchment, warm brass and a restrained rust accent. Original to this
- * fan project — no game assets, logos, fonts or official colours are copied.
+ * Restrained modern nautical palette: deep slate navy, cool grey-blue text,
+ * and a single warm sand accent. No neon, no heavy colour blending.
  */
 @theme {
-  --color-canvas: #071a1c;
-  --color-surface: #0d2628;
-  --color-surface-raised: #123437;
-  --color-border: #1d4a4c;
-  --color-content: #f1ead9;
-  --color-content-muted: #a9c0bd;
-  --color-brand: #d9a441;
-  --color-brand-strong: #e8c374;
-  --color-ember: #d98b5f;
-  --color-nutmeg: #86372b;
+  --color-canvas: #0b1120;
+  --color-surface: #111c2e;
+  --color-surface-raised: #16243a;
+  --color-border: #24334b;
+  --color-content: #f8fafc;
+  --color-content-muted: #a8b6c9;
+  --color-brand: #c8a45c;
+  --color-brand-strong: #e0c489;
+  --color-ember: #b9734a;
+  --color-nutmeg: #7c4a3a;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
@@ -35,56 +34,6 @@
     color: var(--color-content);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-  }
-
-  /* Full-page muted video backdrop. No audio, no tracking. */
-  .video-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .video-backdrop video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.82;
-    filter: hue-rotate(-8deg) saturate(1.15) contrast(1.05) brightness(0.82);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .video-backdrop video {
-      display: none;
-    }
-
-    .video-backdrop {
-      background-image: url("/backgrounds/trailer-poster.jpg");
-      background-size: cover;
-      background-position: center;
-      opacity: 0.6;
-    }
-  }
-
-  /* Public-domain moonlit sea photograph used as the real background picture. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image: url("/backgrounds/night-ocean.png");
-    background-size: cover;
-    background-position: center;
-    opacity: 0.42;
-    filter: hue-rotate(-12deg) saturate(1.2) contrast(1.05);
-  }
-
-  #main-content,
-  .site-footer {
-    position: relative;
-    z-index: 1;
   }
 
   :focus-visible {
@@ -115,9 +64,9 @@
 /* Decorative sea and sky. Pure CSS, aria-hidden at the call site. */
 .hero-sky {
   background:
-    radial-gradient(ellipse 80% 60% at 78% 8%, rgba(217, 164, 65, 0.14), transparent 70%),
-    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(79, 145, 146, 0.16), transparent 70%),
-    linear-gradient(180deg, #0b2a2c 0%, #071a1c 78%);
+    radial-gradient(ellipse 80% 60% at 78% 8%, rgba(200, 164, 92, 0.10), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(90, 130, 150, 0.12), transparent 70%),
+    linear-gradient(180deg, #101c30 0%, #0b1120 78%);
 }
 
 .grid-lines {
@@ -235,7 +184,7 @@
 
 .scene-layer canvas {
   display: block;
-  opacity: 0.38;
+  opacity: 1;
 }
 
 .scene-layer--placeholder {
@@ -253,11 +202,11 @@
   background:
     linear-gradient(
       90deg,
-      rgba(7, 26, 28, 0.92) 0%,
-      rgba(7, 26, 28, 0.72) 42%,
-      rgba(7, 26, 28, 0.32) 100%
+      rgba(11, 17, 32, 0.92) 0%,
+      rgba(11, 17, 32, 0.72) 42%,
+      rgba(11, 17, 32, 0.28) 100%
     ),
-    linear-gradient(0deg, rgba(7, 26, 28, 0.82) 0%, transparent 55%);
+    linear-gradient(0deg, rgba(11, 17, 32, 0.78) 0%, transparent 55%);
 }
 
 /* Loading overlay with progress */

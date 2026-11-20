@@ -41,7 +41,7 @@ const KEYFRAMES: readonly Keyframe[] = [
     fog: [20, 72],
     moon: [-9, 8, -22],
     light: 0.85,
-    ocean: "#0d3038",
+    ocean: "#12333a",
   },
   {
     p: 0.33,
@@ -52,7 +52,7 @@ const KEYFRAMES: readonly Keyframe[] = [
     fog: [16, 60],
     moon: [-6, 9, -20],
     light: 1,
-    ocean: "#0e3540",
+    ocean: "#153c44",
   },
   {
     p: 0.66,
@@ -63,7 +63,7 @@ const KEYFRAMES: readonly Keyframe[] = [
     fog: [14, 55],
     moon: [2, 10, -18],
     light: 1.1,
-    ocean: "#103a43",
+    ocean: "#17434b",
   },
   {
     p: 1,
@@ -74,7 +74,7 @@ const KEYFRAMES: readonly Keyframe[] = [
     fog: [10, 45],
     moon: [6, 11, -16],
     light: 1.2,
-    ocean: "#123d45",
+    ocean: "#194a52",
   },
 ];
 
@@ -104,7 +104,7 @@ function sample(progress: number) {
     moon: lerpTuple(from.moon, to.moon, t),
     light: lerp(from.light, to.light, t),
     oceanColor: new THREE.Color(from.ocean).lerp(new THREE.Color(to.ocean), t),
-    skyColor: new THREE.Color("#06121a").lerp(new THREE.Color("#08222a"), t),
+    skyColor: new THREE.Color("#0b1120").lerp(new THREE.Color("#101c30"), t),
   };
 }
 
@@ -124,8 +124,8 @@ function Atmosphere() {
 
   return (
     <>
-      <color ref={backgroundRef} attach="background" args={["#06121a"]} />
-      <fog ref={fogRef} attach="fog" args={["#06121a", 20, 72]} />
+      <color ref={backgroundRef} attach="background" args={["#0b1120"]} />
+      <fog ref={fogRef} attach="fog" args={["#0b1120", 20, 72]} />
     </>
   );
 }
@@ -148,7 +148,7 @@ function Ocean() {
     <mesh geometry={ocean.geometry} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
       <meshStandardMaterial
         ref={materialRef}
-        color="#0d3038"
+        color="#12333a"
         roughness={0.88}
         metalness={0.08}
         flatShading
