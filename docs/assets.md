@@ -69,3 +69,6 @@ image is cached at `public/news/official-news.jpg` from
 `https://rare-assets.azureedge.net/assets/ea/6d/ea6d5265-0663-4cba-a8b9-47a5b93ae98e.jpg`.
 Sea of Thieves and related marks are trademarks of the Microsoft group of
 companies.
+
+The site icon `src/app/icon.svg` is an original compass-star drawing created for
+this project and uses no Microsoft or Rare artwork.

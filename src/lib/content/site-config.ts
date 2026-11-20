@@ -110,7 +110,7 @@ export const HERO = {
   body: "A place for pirates across the region to gather, share voyages, and build stories on the high seas.",
   primaryCta: { label: "Explore the community", href: "#community" },
   secondaryCta: { label: "See what is coming", href: "#sections" },
-  status: "Beta · content is being prepared",
+  status: "Built by players, for players · Asia region",
 } as const;
 
 export const ABOUT = {

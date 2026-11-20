@@ -67,6 +67,7 @@ export async function OfficialUpdates({ limit = 6 }: { limit?: number }) {
                     alt="Featured Sea of Thieves official news artwork"
                     width={640}
                     height={360}
+                    priority
                     className="official-card__image"
                   />
                 ) : null}

@@ -49,3 +49,16 @@
 - Next-event countdown component mounted on Live Seas and the events page; shows live days/hours/minutes/seconds for real events only.
 - Back-to-top control added globally and appears after scrolling.
 - Editorial serif display font and hand-drawn header ornament added using system fonts only — no external font requests.
+
+## Final Milestone 10 re-audit
+- All commands passed: `npm install`, typecheck, lint, production build, DB tests.
+- Runtime diagnostics across 17 pages: no exceptions, no console errors, no failed network requests.
+- Fixed: missing favicon (404) via original `src/app/icon.svg`.
+- Fixed: LCP warning by making the official news featured image eager/priority.
+- Fixed: remaining visible "Beta" hero text replaced with "Built by players, for players · Asia region".
+- Progress rail verified homepage-only: present on `/`, absent on all other tested pages.
+- Scroll voyage verified down/up: hero opacity 1→0, page 0→1, then reverses back to 1/0.
+- Internal links: all 200. External social/Discord links: 200. Official site URLs return 403 to automated HEAD requests because their WAF blocks bots, but they open normally in a browser.
+- 360px mobile menu and 1920px reduced-motion keyboard pass: no page errors, full accessibility tree.
+- Privacy: no trackers, no raw HTML, no service-role key in client bundle, no public-page cookies.
+- Docs: assets licences/sources recorded, placeholders marked `REPLACE_BEFORE_LAUNCH`, footer disclaimer present in rendered output, README contains all required sections.
