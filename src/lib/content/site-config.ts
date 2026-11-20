@@ -312,3 +312,36 @@ export const FOOTER = {
     },
   ],
 } as const;
+
+export const GUIDE_CATEGORIES = [
+  "Sailing", "Combat", "PvP", "Trading", "Fishing", "Tall Tales",
+  "Emissary", "Seasonal Content", "New Player Help",
+] as const;
+
+export const ANNOUNCEMENT_CATEGORIES = [
+  "Events", "Updates", "Community News", "Server Rules", "Opportunities",
+] as const;
+
+export const GALLERY_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"] as const;
+export const GALLERY_MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+export const GALLERY_MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+
+export const REPORT_TARGETS = [
+  { value: "profile", label: "Member profile" },
+  { value: "crew_listing", label: "Crew listing" },
+  { value: "event", label: "Event" },
+  { value: "comment", label: "Comment" },
+  { value: "gallery_item", label: "Gallery item" },
+  { value: "guide", label: "Guide" },
+  { value: "announcement", label: "Announcement" },
+] as const;
+
+export const ROLE_LABELS = {
+  member: "Member",
+  moderator: "Moderator",
+  admin: "Admin",
+  owner: "Owner",
+} as const;
+
+export const ADMIN_PRIVACY_NOTICE =
+  "Moderation actions are private. Only authorized moderators and admins can view reports or change content status. Every sensitive action is written to an audit log.";

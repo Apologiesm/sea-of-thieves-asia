@@ -28,4 +28,8 @@ export const LIMITS = {
   eventCreate: { limit: 10, windowMs: 60 * 60 * 1000 },
   eventEdit: { limit: 30, windowMs: 60 * 60 * 1000 },
   rsvp: { limit: 30, windowMs: 60 * 60 * 1000 },
+  guideCreate: { limit: 20, windowMs: 60 * 60 * 1000 },
+  galleryUpload: { limit: 10, windowMs: 60 * 60 * 1000 },
+  reportSubmit: { limit: 8, windowMs: 60 * 60 * 1000 },
+  comment: { limit: 30, windowMs: 60 * 60 * 1000 },
 } as const;
