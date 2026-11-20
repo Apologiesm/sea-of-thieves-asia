@@ -55,8 +55,13 @@ right to publish them is required**, or they must be replaced with licensed or
 original footage. Until then they should be treated as beta-only placeholders.
 No Sea of Thieves logo, model, texture, or font is used.
 
-### Reference site note
-The community site `https://www.seaofthievesau.com/` was reviewed for **layout
-and feature ideas only**. No images, logos, fonts, copy, event data, or code from
-that site were copied into this project. All illustrations in the feature board
-are original hand-authored SVG line art in `src/components/content/VoyageArt.tsx`.
+### Partner community feed (SOTAU)
+The event calendar and event artwork are synced from
+`https://www.seaofthievesau.com/events` and its public script
+`js/calendar-events.25d3474e.js`. The site owner has stated that partner
+permission covers use of these updates, events and images. Frequently used event
+artwork is cached locally in `public/partner/` for reliability, with the SOTAU /
+Sea of Thieves Calendar S3 source recorded in the download manifest. Images are
+displayed with visible source attribution and the SOTAU affiliate-alliance
+notice. No SOTAU logo or code is copied into this repository. All feature-board illustrations remain
+original hand-authored SVG line art in `src/components/content/VoyageArt.tsx`.

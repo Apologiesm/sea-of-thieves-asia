@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/content/empty-state";
 import { EventCard } from "@/components/event/EventCard";
 import { EventCalendar } from "@/components/event/EventCalendar";
 import { EventCountdown } from "@/components/event/EventCountdown";
+import { PartnerEvents } from "@/components/partner/PartnerEvents";
 import { EventFilters } from "@/components/event/EventFilters";
 import { getNextEvent, listEvents } from "@/lib/event/queries";
 import { eventFiltersSchema } from "@/lib/event/validation";
@@ -63,6 +64,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         title="Community events"
         description="Fleet nights, tournaments, treasure hunts and more — published by real hosts."
       />
+      <PartnerEvents limit={12} compact />
       <Container>
         <div className="py-10 sm:py-14">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">

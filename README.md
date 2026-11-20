@@ -55,6 +55,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 |---|---|
 | Home/hero/about text | `src/lib/content/site-config.ts` (`HERO`, `ABOUT`, `FEATURES`, `PREVIEWS`) |
 | Live Seas board | `src/components/live/LiveSeas.tsx`, `src/lib/live/queries.ts`, `LIVE_SEAS` / `EVENT_FORMATS` in `site-config.ts` |
+| Partner SOTAU events | `src/lib/partner/sync.ts`, `src/components/partner/PartnerEvents.tsx`, migration `0014_partner_events.sql` |
 | Event calendar + countdown | `src/components/event/EventCalendar.tsx`, `EventCountdown.tsx`, `src/lib/event/time.ts` |
 | Voyage checklist tool | `src/app/tools/page.tsx`, `src/components/content/VoyageChecklist.tsx` |
 | Events | `src/app/(public)/events`, `src/lib/event/*`, Supabase table `events`; authorized hosts use `/events/new` and `/events/manage` |
@@ -88,9 +89,11 @@ No fake content is seeded. `supabase/seed.sql` is intentionally empty.
 2. Set Vercel environment variables from `.env.example`:
    `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
    `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only),
-   and Discord OAuth variables once configured.
+   `CRON_SECRET` (protects the partner sync route), and Discord OAuth variables
+   once configured.
 3. Deploy with `vercel --prod` or connect the Git repository. `vercel.json`
-   contains the security headers.
+   contains the security headers and a 15-minute cron that calls
+   `/api/cron/sync-partner`.
 4. Register the Discord OAuth redirect URL in the Discord Developer Portal.
 5. Run `npm run build` locally before deploying; verify `/api/health`.
 

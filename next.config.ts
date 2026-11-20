@@ -11,7 +11,7 @@ const csp = [
   "form-action 'self'",
   `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: http://127.0.0.1:54321 https://*.supabase.co https://cdn.discordapp.com",
+  "img-src 'self' data: blob: http://127.0.0.1:54321 https://*.supabase.co https://cdn.discordapp.com https://www.seaofthievesau.com https://sea-of-thieves-calendar.s3.amazonaws.com https://sea-of-thieves-calendar.s3.us-east-1.amazonaws.com",
   "font-src 'self' data:",
   "connect-src 'self' http://127.0.0.1:54321 https://*.supabase.co",
   "media-src 'self' blob: http://127.0.0.1:54321 https://*.supabase.co",
@@ -24,6 +24,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.discordapp.com" },
+      { protocol: "https", hostname: "www.seaofthievesau.com" },
+      { protocol: "https", hostname: "sea-of-thieves-calendar.s3.amazonaws.com" },
+      { protocol: "https", hostname: "sea-of-thieves-calendar.s3.us-east-1.amazonaws.com" },
       { protocol: "http", hostname: "127.0.0.1", port: "54321", pathname: "/storage/v1/object/public/gallery/**" },
       { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/gallery/**" },
     ],
