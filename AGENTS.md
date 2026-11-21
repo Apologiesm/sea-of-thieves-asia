@@ -177,6 +177,16 @@ and must not be added back to `vercel.json` — see §6.
   `/admin/gallery`; `gallery_items`.
 - **Announcements:** native cards, optional cover (`covers` bucket),
   pinned/status; `announcements.cover_image_url`.
+- **Branding:** `public/brand/logo-asia.png` is the owner-supplied gold
+  "Sea of Thieves asia" lockup (644x456, transparent, shadow baked in). It is
+  rendered only through `BrandLockup` (header with `priority`, footer with
+  `size="lg"`), the hero (`hero-logo`) and `/login` (`login-logo`); do not inline
+  a second copy of the path in a new component. `src/app/icon.png`,
+  `apple-icon.png` and `opengraph-image.png` are that same file centred on
+  `#0b1120` — regenerate them from the master rather than drawing new marks.
+  Keep the non-affiliation wording in the hero eyebrow and the footer: the mark
+  names a game this community does not own.
+
 - **Official news:** `src/lib/official/sync.ts` fetches
   seaofthieves.com/news, dedupes by slug, upserts `official_updates`
   (`source`, `featured`, `hidden`). Manual button → `POST /api/sync/official-sot`

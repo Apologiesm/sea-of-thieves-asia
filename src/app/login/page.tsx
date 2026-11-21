@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -40,6 +41,15 @@ export default function LoginPage() {
   return (
     <Container>
       <div className="mx-auto max-w-lg py-16 sm:py-24">
+        <Image
+          src="/brand/logo-asia.png"
+          alt="Sea of Thieves Asia"
+          width={644}
+          height={456}
+          priority
+          sizes="168px"
+          className="login-logo"
+        />
         <Card>
           <h1 className="text-2xl font-bold text-content">Sign in with Discord</h1>
           <p className="mt-4 text-sm leading-relaxed text-content-muted">

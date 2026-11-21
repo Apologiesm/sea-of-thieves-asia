@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
@@ -18,6 +19,17 @@ export function Hero() {
       <Container>
         <div className="relative z-10 py-20 sm:py-28 lg:py-36" data-voyage-hero>
           <div className="max-w-3xl" data-voyage-reveal>
+            {/* Decorative: the h1 below already names the community. */}
+            <Image
+              src="/brand/logo-asia.png"
+              alt=""
+              aria-hidden="true"
+              width={644}
+              height={456}
+              priority
+              sizes="(max-width: 640px) 40vw, 208px"
+              className="hero-logo"
+            />
             <Badge tone="accent">{HERO.eyebrow}</Badge>
             <h1
               id="hero-title"
