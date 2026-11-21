@@ -99,7 +99,9 @@ export function NextOfficialEventCard({ view }: Props) {
     );
   }
 
-  const live = localState === "live";
+  // Trust the server until the first tick, so a running event never flashes
+  // "Next official event" before the client takes over.
+  const live = localState ? localState === "live" : view.state === "live";
   const startingSoon = localState === "starting_soon";
   const endsAt = target.endsAt;
   const countdownTarget = live ? endsAt : target.startsAt;
