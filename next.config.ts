@@ -11,10 +11,11 @@ const csp = [
   "form-action 'self'",
   `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: http://127.0.0.1:54321 https://*.supabase.co https://cdn.discordapp.com",
+  "img-src 'self' data: blob: http://127.0.0.1:54321 https://*.supabase.co https://cdn.discordapp.com https://*.seaofthieves.com https://*.azureedge.net https://i.ytimg.com https://img.youtube.com",
   "font-src 'self' data:",
-  "connect-src 'self' http://127.0.0.1:54321 https://*.supabase.co",
+  "connect-src 'self' http://127.0.0.1:54321 ws://127.0.0.1:54321 ws://localhost:54321 https://*.supabase.co wss://*.supabase.co",
   "media-src 'self' blob: http://127.0.0.1:54321 https://*.supabase.co",
+  "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
   "worker-src 'self' blob:",
 ].join("; ");
 

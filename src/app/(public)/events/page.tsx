@@ -106,7 +106,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
                 <p className="text-xs uppercase tracking-[0.18em] text-brand">Next event</p>
                 <Link href={`/events/${next.id}`} className="mt-1 block text-lg font-semibold text-content hover:underline">{next.title}</Link>
               </div>
-              <EventCountdown startsAt={next.starts_at} timeZone={next.timezone} />
+              <EventCountdown startsAt={next.starts_at} endsAt={next.ends_at} />
             </div>
           ) : null}
 

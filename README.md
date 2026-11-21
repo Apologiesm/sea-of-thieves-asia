@@ -186,8 +186,11 @@ Settings are stored in `public.site_settings`; every change is audit-logged.
    `DISCORD_EVENTS_SECRET` (protects the Discord event receiver), and Discord OAuth variables
    once configured.
 3. Deploy with `vercel --prod` or connect the Git repository. `vercel.json`
-   contains the security headers and a 15-minute cron that calls
-   `/api/cron/sync-partner` to refresh official news.
+   contains the security headers and **one daily cron** (`0 3 * * *`) that calls
+   `/api/cron/official-news` to refresh official news. The Hobby plan rejects
+   sub-daily schedules, so the site shows the last successful sync time instead
+   of implying a live feed. `/api/cron/sync-partner` remains as a manual alias
+   and is no longer scheduled.
 4. Register the Discord OAuth redirect URL in the Discord Developer Portal.
 5. Run `npm run build` locally before deploying; verify `/api/health`.
 

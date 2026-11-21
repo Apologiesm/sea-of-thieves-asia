@@ -34,7 +34,7 @@ export async function LiveSeas() {
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-content-muted">
                     {current ? (
-                      <LocalTime iso={current.starts_at} timeZone={current.timezone} />
+                      <LocalTime iso={current.starts_at} endIso={current.ends_at} timeZone={current.timezone} showZone />
                     ) : (
                       LIVE_SEAS.noLiveDetail
                     )}
@@ -54,11 +54,11 @@ export async function LiveSeas() {
                         {next.title}
                       </Link>
                       <span className="text-xs text-content-muted">
-                        <LocalTime iso={next.starts_at} timeZone={next.timezone} />
+                        <LocalTime iso={next.starts_at} endIso={next.ends_at} timeZone={next.timezone} showZone />
                       </span>
                     </div>
                     {next.starts_at ? (
-                      <EventCountdown startsAt={next.starts_at} timeZone={next.timezone} />
+                      <EventCountdown startsAt={next.starts_at} endsAt={next.ends_at} />
                     ) : null}
                   </>
                 ) : (
@@ -108,10 +108,16 @@ export async function LiveSeas() {
                 <p className="mt-1 text-xs leading-relaxed text-content-muted">{LIVE_SEAS.formatsDetail}</p>
                 <ul className="mt-4 grid gap-2">
                   {EVENT_FORMATS.map((format) => (
-                    <li key={format.key} className="format-row">
-                      <span className="format-row__label">{format.label}</span>
-                      <span className="format-row__note">{format.note}</span>
-                      <span className="format-row__time">{format.timing}</span>
+                    <li key={format.key}>
+                      <Link
+                        href={`/events?type=${format.key}`}
+                        className="format-row format-row--link"
+                        title={`See ${format.label} voyages on the events calendar`}
+                      >
+                        <span className="format-row__label">{format.label}</span>
+                        <span className="format-row__note">{format.note}</span>
+                        <span className="format-row__time">{format.timing} →</span>
+                      </Link>
                     </li>
                   ))}
                 </ul>

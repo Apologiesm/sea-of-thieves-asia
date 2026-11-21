@@ -118,26 +118,45 @@ token or the Supabase-backed feed endpoints.
 
 ## 6. Scheduled jobs (Vercel)
 
-`vercel.json` defines two daily crons (the Hobby plan rejects anything more
-frequent):
+`vercel.json` defines **one** cron (the Hobby plan rejects anything more
+frequent than daily):
 
 | Path | Schedule | Purpose |
 |---|---|---|
-| `/api/cron/sync-partner` | 03:00 UTC | Official Sea of Thieves news sync |
-| `/api/sync/official-sot` | 04:00 UTC | Same sync, safe to call manually |
+| `/api/cron/official-news` | 03:00 UTC daily | Official Sea of Thieves news, images and video metadata |
 
-Both accept `Authorization: Bearer $CRON_SECRET`. Vercel sends this header
-automatically when the environment variable exists.
+It accepts `Authorization: Bearer $CRON_SECRET`, which Vercel sends
+automatically when the environment variable exists. Admins can also run it
+from `/admin/master`, and `POST /api/sync/official-sot` remains available for a
+manual run. `/api/cron/sync-partner` is now only a manual alias — it is no
+longer scheduled, so the same job never runs twice.
 
 To test manually:
 
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" \
-  https://sea-of-thieves-asia.vercel.app/api/sync/official-sot
+  https://sea-of-thieves-asia.vercel.app/api/cron/official-news
 ```
 
-`/admin/master` shows the last successful sync time. If the upstream news page
-changes shape, the sync fails but the previously stored headlines stay visible.
+Every run writes to the `sync_state` table: last attempt, last success, records
+processed, records changed and the last error. The news section on the homepage
+and `/admin/master` show that freshness, so the site never claims to be live
+when it is refreshed once a day. If the upstream page changes shape, the run
+fails loudly in `sync_state` and the previously stored articles stay visible.
+
+---
+
+## 6b. Display time zones
+
+UTC is the default for every visitor; the browser's own zone is never applied
+silently. Visitors pick a zone in the Regional Time panel on the homepage. The
+choice is stored in the `sot_tz` cookie and `localStorage` for anonymous
+visitors, and saved to `profiles.timezone` (endpoint
+`POST /api/profile/timezone`) once signed in, so it follows them to another
+device.
+
+Event hosts enter times in any of the same 14 zones; the value is converted to
+UTC before saving, and `events.timezone` keeps the original zone for reference.
 
 ---
 

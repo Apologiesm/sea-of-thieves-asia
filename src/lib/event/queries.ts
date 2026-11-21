@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { EventFilters, EventRecord, RsvpStatus } from "@/lib/event/types";
+import { getEventStatus } from "@/lib/time/zone";
 
 export async function listEvents(filters: EventFilters, includeAll = false): Promise<EventRecord[]> {
   const supabase = await createClient();
@@ -8,20 +9,16 @@ export async function listEvents(filters: EventFilters, includeAll = false): Pro
 
   // Past events read most-recent-first; upcoming events read soonest-first.
   const ascending = filters.when !== "past";
+  const nowIso = new Date().toISOString();
 
-  let query = supabase
-    .from("events")
-    .select("*")
-    .eq("is_enabled", true)
-    .order("is_featured", { ascending: false })
-    .order("sort_order", { ascending: true })
-    .order("starts_at", { ascending })
-    .limit(100);
+  let query = supabase.from("events").select("*").eq("is_enabled", true);
 
+  // The time window is decided by the END of a voyage, not its start. An event
+  // that started an hour ago is still live, never "past".
   if (filters.when === "upcoming") {
-    query = query.gte("starts_at", new Date().toISOString());
+    query = query.or(`ends_at.gte.${nowIso},and(ends_at.is.null,starts_at.gte.${nowIso})`);
   } else if (filters.when === "past") {
-    query = query.lt("starts_at", new Date().toISOString());
+    query = query.or(`ends_at.lt.${nowIso},and(ends_at.is.null,starts_at.lt.${nowIso})`);
   }
 
   if (!includeAll && filters.status !== "all") query = query.eq("status", filters.status);
@@ -39,16 +36,42 @@ export async function listEvents(filters: EventFilters, includeAll = false): Pro
       .lt("starts_at", next.toISOString());
   }
 
-  const { data, error } = await query;
+  // Public feeds are chronological. Curated order only breaks ties and can
+  // never push a later voyage above an earlier one.
+  if (filters.when === "upcoming" || filters.when === "past") {
+    query = query
+      .order("starts_at", { ascending })
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true });
+  } else {
+    query = query
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("starts_at", { ascending });
+  }
+
+  const { data, error } = await query.limit(100);
   if (error) return [];
   return (data ?? []) as EventRecord[];
 }
 
-export function getNextEvent(events: EventRecord[]): EventRecord | null {
-  const now = Date.now();
-  return events.find(
-    (event) => event.starts_at && new Date(event.starts_at).getTime() > now,
-  ) ?? null;
+/**
+ * The next voyage to promote: the soonest event that has not finished, so a
+ * currently running session is preferred over one later in the week.
+ */
+export function getNextEvent(events: EventRecord[], now: number = Date.now()): EventRecord | null {
+  const candidates = events
+    .filter((event) => {
+      const lifecycle = getEventStatus(event, now);
+      return lifecycle === "scheduled" || lifecycle === "live";
+    })
+    .sort((a, b) => {
+      const aLive = getEventStatus(a, now) === "live" ? 0 : 1;
+      const bLive = getEventStatus(b, now) === "live" ? 0 : 1;
+      if (aLive !== bLive) return aLive - bLive;
+      return new Date(a.starts_at ?? 0).getTime() - new Date(b.starts_at ?? 0).getTime();
+    });
+  return candidates[0] ?? null;
 }
 
 export async function getEvent(id: string): Promise<EventRecord | null> {

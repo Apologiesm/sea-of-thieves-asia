@@ -1,70 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useTimeZone } from "@/components/system/time-zone-provider";
 import {
   DATETIME_OPTIONS,
-  DEFAULT_TIME_ZONE,
-  formatInZone,
-} from "@/lib/time/format";
+  formatInTimeZone,
+  timeZoneLabel,
+} from "@/lib/time/zone";
 
 type Props = {
   /** UTC ISO timestamp from the database. */
   iso: string | null;
-  /** The timezone the event or listing was published in. */
-  timeZone: string | null;
+  /** The timezone the host published the event in (kept for reference). */
+  timeZone?: string | null;
   /** Optional end timestamp; when present the output becomes a range. */
   endIso?: string | null;
-  /** Label appended once the visitor's own clock is used. */
-  suffix?: string;
+  /** Show the zone label after the time. */
+  showZone?: boolean;
   className?: string;
 };
 
 /**
- * Shows a timestamp in the timezone the host published it in during server
- * render, then switches to the visitor's own clock once hydrated.
- *
- * The first client render intentionally matches the server output, so there is
- * no hydration mismatch; the swap happens in an effect. The `title` keeps the
- * published time reachable for anyone comparing schedules.
+ * Renders a timestamp in the visitor's chosen display zone (UTC by default).
+ * Server and first client render agree because both start from the stored
+ * preference, so there is no hydration mismatch when the visitor changes zone.
  */
-export function LocalTime({ iso, timeZone, endIso, suffix = "your time", className }: Props) {
-  const published = formatInZone(iso, timeZone, DATETIME_OPTIONS);
-  const publishedEnd = endIso ? formatInZone(endIso, timeZone, DATETIME_OPTIONS) : null;
+export function LocalTime({ iso, endIso, timeZone, showZone = false, className }: Props) {
+  const { timeZone: viewerZone } = useTimeZone();
 
-  const [local, setLocal] = useState<{ main: string; end: string | null } | null>(null);
-
-  useEffect(() => {
-    // Deferred to the next frame so the effect never triggers a cascading
-    // render during hydration; the server-rendered time stays on screen until
-    // the browser's own timezone is known.
-    const frame = requestAnimationFrame(() => {
-      let zone: string | null = null;
-      try {
-        zone = Intl.DateTimeFormat().resolvedOptions().timeZone || null;
-      } catch {
-        zone = null;
-      }
-      if (!zone || zone === (timeZone ?? DEFAULT_TIME_ZONE)) return;
-      const main = formatInZone(iso, zone, DATETIME_OPTIONS);
-      const end = endIso ? formatInZone(endIso, zone, DATETIME_OPTIONS) : null;
-      // Identical clock time in a different zone needs no second label.
-      if (main === published && end === publishedEnd) return;
-      setLocal({ main, end });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [iso, endIso, timeZone]);
-
-  const main = local?.main ?? published;
-  const end = local ? local.end : publishedEnd;
-  const publishedRange = publishedEnd ? `${published} – ${publishedEnd}` : published;
+  const start = formatInTimeZone(iso, viewerZone, DATETIME_OPTIONS);
+  const end = endIso ? formatInTimeZone(endIso, viewerZone, DATETIME_OPTIONS) : null;
+  const published = timeZone ? formatInTimeZone(iso, timeZone, DATETIME_OPTIONS) : null;
 
   return (
     <span
       className={className}
-      title={`Published as ${publishedRange} (${timeZone ?? DEFAULT_TIME_ZONE})`}
+      title={
+        published
+          ? `Published as ${published} (${timeZoneLabel(timeZone)}). Showing ${timeZoneLabel(viewerZone)}.`
+          : `Showing ${timeZoneLabel(viewerZone)}.`
+      }
     >
-      {end ? `${main} – ${end}` : main}
-      {local ? <span className="text-content-muted"> · {suffix}</span> : null}
+      {end ? `${start} – ${end}` : start}
+      {showZone ? <span className="text-content-muted"> · {timeZoneLabel(viewerZone)}</span> : null}
     </span>
   );
 }

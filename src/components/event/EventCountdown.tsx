@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTimeZone } from "@/components/system/time-zone-provider";
+import { timeZoneLabel } from "@/lib/time/zone";
 
-type Props = { startsAt: string; timeZone?: string | null };
+type Props = {
+  startsAt: string;
+  endsAt?: string | null;
+  cancelled?: boolean;
+};
+
+type Phase = "pending" | "waiting" | "started" | "live" | "ended" | "cancelled";
 
 function parts(target: number) {
   const diff = Math.max(0, target - Date.now());
@@ -14,39 +22,86 @@ function parts(target: number) {
   };
 }
 
-export function EventCountdown({ startsAt, timeZone }: Props) {
-  const [label, setLabel] = useState<string>("—");
-  const [started, setStarted] = useState(false);
+const DEFAULT_DURATION_MS = 4 * 60 * 60 * 1000;
+
+/**
+ * Counts down to the real UTC start, then reports live, then finished.
+ * Uses the wall clock but recomputes from `Date.now()` on every tick, so a
+ * suspended background tab recovers correctly instead of drifting.
+ */
+export function EventCountdown({ startsAt, endsAt, cancelled = false }: Props) {
+  const { timeZone } = useTimeZone();
+  const [state, setState] = useState<{ phase: Phase; label: string }>({
+    phase: "pending",
+    label: "",
+  });
 
   useEffect(() => {
-    const target = new Date(startsAt).getTime();
+    const start = new Date(startsAt).getTime();
+    const parsedEnd = endsAt ? new Date(endsAt).getTime() : null;
+    const end =
+      parsedEnd && Number.isFinite(parsedEnd) && parsedEnd > start
+        ? parsedEnd
+        : start + DEFAULT_DURATION_MS;
+
     const tick = () => {
-      if (Number.isNaN(target)) {
-        setLabel("Time to be announced");
+      if (!Number.isFinite(start)) {
+        setState({ phase: "ended", label: "Time to be announced" });
         return;
       }
-      if (target <= Date.now()) {
-        setStarted(true);
-        setLabel("Event started");
+      if (cancelled) {
+        setState({ phase: "cancelled", label: "Cancelled" });
         return;
       }
-      const value = parts(target);
-      setLabel(
-        `${value.days}d ${String(value.hours).padStart(2, "0")}h ${String(value.minutes).padStart(2, "0")}m ${String(value.seconds).padStart(2, "0")}s`,
-      );
+      const now = Date.now();
+      if (now >= end) {
+        setState({ phase: "ended", label: "Finished" });
+        return;
+      }
+      if (now >= start) {
+        setState({ phase: "live", label: "Live now" });
+        return;
+      }
+      const value = parts(start);
+      setState({
+        phase: "waiting",
+        label: `${value.days}d ${String(value.hours).padStart(2, "0")}h ${String(
+          value.minutes,
+        ).padStart(2, "0")}m ${String(value.seconds).padStart(2, "0")}s`,
+      });
     };
-    tick();
+
+    const frame = requestAnimationFrame(tick);
     const timer = window.setInterval(tick, 1000);
-    return () => window.clearInterval(timer);
-  }, [startsAt]);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [startsAt, endsAt, cancelled]);
+
+  const started = state.phase === "live" || state.phase === "ended";
 
   return (
     <div className="countdown" aria-live="off">
-      <span className="countdown__label">Starts in</span>
-      <span className={started ? "countdown__value countdown__value--started" : "countdown__value"}>
-        {label}
+      <span className="countdown__label">
+        {state.phase === "live" ? "Status" : state.phase === "ended" ? "Status" : "Starts in"}
       </span>
-      {timeZone ? <span className="countdown__zone">{timeZone.replace("Asia/", "")}</span> : null}
+      <span
+        className={
+          started
+            ? "countdown__value countdown__value--started"
+            : "countdown__value"
+        }
+      >
+        {state.label || "\u00a0"}
+      </span>
+      <span className="countdown__zone">{timeZoneLabel(timeZone)}</span>
     </div>
   );
 }

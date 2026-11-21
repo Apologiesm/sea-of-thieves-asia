@@ -3,13 +3,13 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ASIAN_TIMEZONES,
   EVENT_PLATFORMS,
   EVENT_REGIONS,
   EVENT_STATUSES,
   EVENT_TYPES,
 } from "@/lib/content/site-config";
 import { isoToZonedLocal, zonedDateTimeToIso } from "@/lib/event/time";
+import { DEFAULT_TIME_ZONE, TIME_ZONE_OPTIONS, getTimeZoneOffsetLabel } from "@/lib/time/zone";
 import { MediaPasteUploader } from "@/components/MediaPasteUploader";
 import type { EventRecord, EventStatus, EventType } from "@/lib/event/types";
 
@@ -35,7 +35,7 @@ const EMPTY: Values = {
   eventType: "fleet_night",
   region: "",
   platform: "",
-  timezone: "Asia/Singapore",
+  timezone: DEFAULT_TIME_ZONE,
   startsAt: "",
   endsAt: "",
   location: "",
@@ -154,8 +154,15 @@ export function EventForm({ event }: { event?: EventRecord }) {
           <label>
             <span className={labelClass}>Timezone</span>
             <select className={fieldClass} value={values.timezone} onChange={(e) => set("timezone", e.target.value)}>
-              {ASIAN_TIMEZONES.map((zone) => <option key={zone}>{zone}</option>)}
+              {TIME_ZONE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} ({getTimeZoneOffsetLabel(option.value)})
+                </option>
+              ))}
             </select>
+            <span className="mt-1 block text-[11px] text-content-muted">
+              Times below are entered in this zone and saved as UTC.
+            </span>
           </label>
           <label>
             <span className={labelClass}>Location / channel</span>

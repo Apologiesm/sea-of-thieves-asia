@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EventStatusControl } from "@/components/event/EventStatusControl";
 import { RsvpControl } from "@/components/event/RsvpControl";
 import { getEvent, getMyRsvp, getRsvpCounts } from "@/lib/event/queries";
-import { timezoneLabel } from "@/lib/event/time";
+import { eventStatusLabel, getEventStatus } from "@/lib/time/zone";
 import { LocalTime } from "@/components/ui/local-time";
 import { createClient } from "@/lib/supabase/server";
 import { EVENT_TYPES, EVENT_PRIVACY_NOTICE } from "@/lib/content/site-config";
@@ -66,8 +66,8 @@ export default async function EventDetailPage({ params }: Props) {
           <div className="lg:col-span-7">
             <Card>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <Badge tone="accent">{event.status}</Badge>
-                <span className="text-xs text-content-muted">{timezoneLabel(event.timezone)}</span>
+                <Badge tone="accent">{eventStatusLabel(getEventStatus(event))}</Badge>
+                <span className="text-xs text-content-muted">Times shown in your selected zone</span>
               </div>
               <dl className="mt-4">
                 <Row

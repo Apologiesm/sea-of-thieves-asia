@@ -1,11 +1,14 @@
 export type EventStatus = "draft" | "published" | "cancelled" | "completed";
 export type EventType =
+  | "fight_nights"
+  | "last_ship_standing"
   | "fleet_night"
-  | "pvp_tournament"
   | "treasure_hunt"
-  | "new_captain_orientation"
   | "stream_night"
-  | "community_challenge";
+  | "community_challenge"
+  // Legacy values kept so existing rows still type-check and render.
+  | "pvp_tournament"
+  | "new_captain_orientation";
 export type RsvpStatus = "going" | "maybe" | "cant_go";
 
 export type EventRecord = {

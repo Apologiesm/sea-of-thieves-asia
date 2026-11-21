@@ -169,13 +169,21 @@ export const CINEMATIC = {
   },
 } as const;
 
+/**
+ * Event formats. The first six are the community formats the site advertises
+ * and the ones shown in "Event formats we run". The two legacy types
+ * (pvp_tournament, new_captain_orientation) are kept so older records still
+ * render correctly.
+ */
 export const EVENT_TYPES = [
+  { value: "fight_nights", label: "Fight Nights" },
+  { value: "last_ship_standing", label: "Last Ship Standing" },
   { value: "fleet_night", label: "Fleet Night" },
-  { value: "pvp_tournament", label: "PvP Tournament" },
   { value: "treasure_hunt", label: "Treasure Hunt" },
-  { value: "new_captain_orientation", label: "New Captain Orientation" },
   { value: "stream_night", label: "Stream Night" },
   { value: "community_challenge", label: "Community Challenge" },
+  { value: "pvp_tournament", label: "PvP Tournament (legacy)" },
+  { value: "new_captain_orientation", label: "New Captain Orientation (legacy)" },
 ] as const;
 
 export const EVENT_STATUSES = ["draft", "published", "cancelled", "completed"] as const;

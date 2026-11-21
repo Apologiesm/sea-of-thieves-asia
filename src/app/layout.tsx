@@ -5,6 +5,9 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { BackToTop } from "@/components/content/BackToTop";
 import { HoverGlowController } from "@/components/ui/HoverGlowController";
+import { TimeZoneProvider } from "@/components/system/time-zone-provider";
+import { LiveRefresh } from "@/components/system/live-refresh";
+import { getViewerTimeZone } from "@/lib/time/viewer";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
 import { getLayoutConfig } from "@/lib/site/layout";
@@ -40,8 +43,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const settings = await getSiteSettings();
-  const layout = await getLayoutConfig();
+  const [settings, layout, timeZone] = await Promise.all([
+    getSiteSettings(),
+    getLayoutConfig(),
+    getViewerTimeZone(),
+  ]);
   const flagByHref: Record<string, keyof typeof settings.features> = {
     "/events": "events",
     "/crew": "crew",
@@ -67,6 +73,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="flex min-h-dvh flex-col overflow-x-clip">
+        <TimeZoneProvider initial={timeZone}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-canvas"
@@ -88,6 +95,8 @@ export default async function RootLayout({
         <SiteFooter navLinks={navLinks} />
         <HoverGlowController />
         <BackToTop />
+        <LiveRefresh />
+        </TimeZoneProvider>
       </body>
     </html>
   );

@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EVENT_TYPES } from "@/lib/content/site-config";
-import { timezoneLabel } from "@/lib/event/time";
+import { eventStatusLabel, getEventStatus } from "@/lib/time/zone";
 import { LocalTime } from "@/components/ui/local-time";
 import type { EventRecord } from "@/lib/event/types";
 
 export function EventCard({ event }: { event: EventRecord }) {
   const typeLabel = EVENT_TYPES.find((type) => type.value === event.event_type)?.label ?? "Community event";
+  const lifecycle = getEventStatus(event);
 
   return (
     <Card className="flex h-full flex-col">
@@ -16,16 +17,15 @@ export function EventCard({ event }: { event: EventRecord }) {
           <p className="text-xs uppercase tracking-[0.14em] text-brand">{typeLabel}</p>
           <h3 className="mt-2 text-lg font-semibold text-content">{event.title}</h3>
         </div>
-        <Badge tone="accent">{event.status}</Badge>
+        <Badge tone="accent">{eventStatusLabel(lifecycle)}</Badge>
       </div>
       {event.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={event.image_url} alt={`${event.title} image`} className="media-card-cover mt-3" loading="lazy" />
       ) : null}
       <p className="mt-3 text-sm font-medium text-content">
-        <LocalTime iso={event.starts_at} timeZone={event.timezone} />
+        <LocalTime iso={event.starts_at} endIso={event.ends_at} timeZone={event.timezone} showZone />
       </p>
-      <p className="text-xs text-content-muted">{timezoneLabel(event.timezone)}</p>
       {event.description ? (
         <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-content-muted">{event.description}</p>
       ) : null}

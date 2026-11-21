@@ -54,12 +54,12 @@ See `docs/content.md` for the full placeholder contract.
 `SUPABASE_DB_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`,
 `BOOTSTRAP_ADMIN_DISCORD_IDS`
 
-### Supabase tables (20 real tables; 31 migrations in `supabase/migrations/`)
+### Supabase tables (21 real tables; 33 migrations in `supabase/migrations/`)
 `profiles`, `user_roles`, `user_consents`, `announcements`, `guides`,
 `gallery_items`, `comments`, `reports`, `moderation_actions`, `audit_log`,
 `crew_listings`, `crew_applications`, `events`, `event_hosts`, `event_rsvps`,
 `official_updates`, `discord_events`, `discord_announcements`, `site_settings`,
-`site_layout_config`.
+`site_layout_config`, `sync_state`.
 
 > **`partner_events` was DROPPED in `0016_discord_events.sql` and is
 > referenced nowhere in `src/`.** It is dead. Do not recreate it, and do not
@@ -108,18 +108,20 @@ Key RPCs: `is_admin`, `is_moderator`, `is_owner_role`, `is_event_host`,
 > **`/announcements`** (`NAV_LINKS` in `src/lib/content/site-config.ts`).
 > Never invent a `/news` page; extend `/announcements`.
 
-### API routes (35, all under `src/app/api/`)
+### API routes (37, all under `src/app/api/`)
 `account/delete`, `admin/audit`, `admin/control`, `admin/control/delete`,
 `admin/official-updates`, `admin/people`, `admin/reports`, `admin/roles`,
 `announcements`, `announcements/[id]`, `comments`, `comments/[id]`,
 `content/image`, `crew`, `crew/[id]`, `crew/[id]/report`,
-`cron/sync-discord-roles`, `cron/sync-partner`, `discord/announcements`,
+`cron/official-news`, `cron/sync-discord-roles`, `cron/sync-partner`,
+`discord/announcements`,
 `discord/events`, `discord/role-command`, `events`, `events/[id]`,
 `events/[id]/rsvp`, `events/[id]/status`, `gallery`, `gallery/[id]`, `guides`,
 `guides/[id]`, `health`, `moderation/crew`, `profile`, `reports`,
 `sync/official-sot`, `webhooks/discord`.
-Note: `/api/cron/sync-partner` actually runs the **official news** sync
-(`syncOfficialUpdates`), not partner events.
+The only scheduled job is `/api/cron/official-news` (daily, `0 3 * * *`).
+`/api/cron/sync-partner` and `/api/sync/official-sot` remain as manual triggers
+and must not be added back to `vercel.json` — see §6.
 
 ### Feature wiring (do not disconnect)
 - **Home** (`src/app/page.tsx`): hero video backdrop (`.hero-section` +
@@ -148,10 +150,21 @@ Note: `/api/cron/sync-partner` actually runs the **official news** sync
 - **Homepage previews** (`src/components/home/home-previews.tsx`): live rows for
   events, crew, gallery and guides, falling back to that section's empty state.
   No hardcoded sample content.
-- **Time display:** timestamps render through `LocalTime`
-  (`src/components/ui/local-time.tsx`). Server output uses the published
-  timezone, then the browser's own zone is applied after hydration; the
-  published time stays in the `title` attribute.
+- **Time system:** `src/lib/time/zone.ts` is the single source of truth
+  (`getEventStatus`, `formatInTimeZone`, `convertLocalInputToUtc`,
+  `getTimeZoneOffsetLabel`, `TIME_ZONE_OPTIONS`). UTC is the default; the
+  browser zone is never auto-applied. `TimeZoneProvider`
+  (`src/components/system/time-zone-provider.tsx`) holds the visitor's choice
+  from the `sot_tz` cookie / `localStorage`, and mirrors it to
+  `profiles.timezone` via `POST /api/profile/timezone` when signed in.
+  `LocalTime` renders in that zone; `RegionClock` ticks once per second. Do not
+  add a second date-conversion path in a component.
+- **Realtime:** `LiveRefresh` (`src/components/system/live-refresh.tsx`)
+  subscribes to `postgres_changes` on events, announcements, crew listings,
+  gallery and guides, then calls `router.refresh()`. Migration `0032` added
+  those tables to the `supabase_realtime` publication. A 2-minute poll is the
+  fallback when the socket does not connect. The CSP in `next.config.ts` and
+  `vercel.json` must allow `wss://*.supabase.co` or this silently breaks.
 - **Guides:** moderator-authored markdown; `guides.body`, `guides.image_url`.
 - **Gallery:** uploads to bucket `gallery`, moderator approval at
   `/admin/gallery`; `gallery_items`.
