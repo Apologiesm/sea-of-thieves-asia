@@ -284,6 +284,19 @@ Production: **https://sea-of-thieves-asia.vercel.app**
 (project `sea-of-thieves-asia`, Vercel org `kohi6`; private GitHub repo
 `Apologiesm/sea-of-thieves-asia`, branch `main`).
 
+Hosted Supabase: project ref **`yszetsslwuegqexkajph`**, region
+`ap-southeast-1`, URL `https://yszetsslwuegqexkajph.supabase.co`
+(dashboard: https://supabase.com/dashboard/project/yszetsslwuegqexkajph).
+All 26 migrations are applied there. Vercel holds the hosted URL + anon +
+service-role + DB URL in both Production and Preview.
+
+Supabase Auth: Site URL `https://sea-of-thieves-asia.vercel.app`, allowed
+redirects `https://sea-of-thieves-asia.vercel.app/auth/callback`,
+`http://localhost:3000/auth/callback`, and Vercel preview hosts.
+Discord OAuth2 redirect to register: `https://yszetsslwuegqexkajph.supabase.co/auth/v1/callback`.
+
+`/api/health` must return `{"status":"ok"}`.
+
 **When the user says "publish" or "update live site", do this automatically —
 no further confirmation needed:**
 

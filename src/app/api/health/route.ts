@@ -26,7 +26,7 @@ export async function GET() {
 
   return NextResponse.json({
     status: "ok",
-    database: "local",
+    database: "supabase",
     rls: "enforced",
   });
 }
