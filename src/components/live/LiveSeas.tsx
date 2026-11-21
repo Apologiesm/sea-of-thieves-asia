@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { RegionClock } from "@/components/content/RegionClock";
 import { EventCountdown } from "@/components/event/EventCountdown";
 import { getLiveSnapshot } from "@/lib/live/queries";
-import { formatDateTime } from "@/lib/event/time";
+import { LocalTime } from "@/components/ui/local-time";
 import {
   EVENT_FORMATS,
   LIVE_SEAS,
@@ -33,9 +33,11 @@ export async function LiveSeas() {
                     {current ? current.title : LIVE_SEAS.noLive}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-content-muted">
-                    {current
-                      ? formatDateTime(current.starts_at, current.timezone)
-                      : LIVE_SEAS.noLiveDetail}
+                    {current ? (
+                      <LocalTime iso={current.starts_at} timeZone={current.timezone} />
+                    ) : (
+                      LIVE_SEAS.noLiveDetail
+                    )}
                   </p>
                 </div>
                 <StatusDot live={Boolean(current)} />
@@ -52,7 +54,7 @@ export async function LiveSeas() {
                         {next.title}
                       </Link>
                       <span className="text-xs text-content-muted">
-                        {formatDateTime(next.starts_at, next.timezone)}
+                        <LocalTime iso={next.starts_at} timeZone={next.timezone} />
                       </span>
                     </div>
                     {next.starts_at ? (

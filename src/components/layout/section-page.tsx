@@ -1,7 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/content/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
-import { SITE } from "@/lib/content/site-config";
 
 type SectionPageProps = {
   title: string;
@@ -24,7 +23,7 @@ export function SectionPage({
       <Container>
         <div className="py-12 sm:py-16">
           <EmptyState
-            title={emptyTitle ?? `${title}: ${SITE.comingSoon}`}
+            title={emptyTitle ?? title}
             description={emptyDescription ?? "Nothing has been published yet."}
           />
         </div>

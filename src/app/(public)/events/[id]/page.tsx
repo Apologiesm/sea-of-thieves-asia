@@ -8,7 +8,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EventStatusControl } from "@/components/event/EventStatusControl";
 import { RsvpControl } from "@/components/event/RsvpControl";
 import { getEvent, getMyRsvp, getRsvpCounts } from "@/lib/event/queries";
-import { formatDateTime, formatTimeRange, timezoneLabel } from "@/lib/event/time";
+import { timezoneLabel } from "@/lib/event/time";
+import { LocalTime } from "@/components/ui/local-time";
 import { createClient } from "@/lib/supabase/server";
 import { EVENT_TYPES, EVENT_PRIVACY_NOTICE } from "@/lib/content/site-config";
 
@@ -16,7 +17,13 @@ export const metadata: Metadata = { title: "Event detail" };
 
 type Props = { params: Promise<{ id: string }> };
 
-function Row({ label, value }: { label: string; value: string | null | undefined }) {
+function Row({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode | null | undefined;
+}) {
   if (!value) return null;
   return (
     <div className="border-t border-border py-4 first:border-t-0">
@@ -63,8 +70,10 @@ export default async function EventDetailPage({ params }: Props) {
                 <span className="text-xs text-content-muted">{timezoneLabel(event.timezone)}</span>
               </div>
               <dl className="mt-4">
-                <Row label="When" value={formatTimeRange(event.starts_at, event.ends_at, event.timezone)} />
-                <Row label="Date" value={formatDateTime(event.starts_at, event.timezone)} />
+                <Row
+                  label="When"
+                  value={<LocalTime iso={event.starts_at} endIso={event.ends_at} timeZone={event.timezone} />}
+                />
                 <Row label="Region" value={event.region} />
                 <Row label="Platform" value={event.platform} />
                 <Row label="Location / channel" value={event.location} />

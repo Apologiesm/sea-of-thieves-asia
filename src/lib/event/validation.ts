@@ -76,6 +76,12 @@ export const eventFiltersSchema = z.object({
   platform: z.preprocess((v) => (typeof v === "string" ? sanitizeLine(v, 80) : ""), z.string()).default(""),
   date: z.preprocess((v) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ""), z.string()).default(""),
   status: z.preprocess((v) => (typeof v === "string" ? sanitizeLine(v, 20) : ""), z.string()).default("published"),
+  when: z
+    .preprocess(
+      (v) => (v === "upcoming" || v === "past" ? v : ""),
+      z.enum(["", "upcoming", "past"]),
+    )
+    .default(""),
 });
 
 export const rsvpSchema = z.object({

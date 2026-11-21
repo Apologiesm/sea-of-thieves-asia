@@ -104,12 +104,12 @@ export const NAV_LINKS: readonly { href: string; label: string }[] = [
 ] as const;
 
 export const HERO = {
-  eyebrow: "Sea of Thieves Asia · Asia region",
+  eyebrow: "Sea of Thieves Asia · Unofficial fan community",
   title: "Set Sail With Sea of Thieves Asia",
-  subtitle: "Find your crew. Conquer the seas.",
-  body: "A place for pirates across the region to gather, share voyages, and build stories on the high seas.",
-  primaryCta: { label: "Explore the community", href: "#community" },
-  secondaryCta: { label: "See what is coming", href: "#sections" },
+  subtitle: "Different waters. Different time zones. One shared horizon.",
+  body: "Find a crew for tonight, post the voyage you want to run, or read what other captains learned the hard way. Events carry their own regional time, so a fleet night in Jakarta reads correctly in Manila and Seoul.",
+  primaryCta: { label: "Find a crew", href: "/crew" },
+  secondaryCta: { label: "Browse events", href: "/events" },
   status: "Built by players, for players · Asia region",
 } as const;
 
@@ -266,7 +266,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Community voyages, meetups, and seasonal activities will be announced here. Nothing is published until it is real.",
     emptyTitle: "No voyages on the horizon",
-    emptyDescription: "No events have been published yet. Scheduled voyages will appear here.",
+    emptyDescription: "Nothing is on the calendar right now. Hosts publish voyages here, and each one shows its own regional time.",
     reverse: false,
   },
   {
@@ -276,7 +276,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Find a crew for a specific run, a weekly session, or a first voyage. Listings open when members start posting them.",
     emptyTitle: "No crews posted yet",
-    emptyDescription: "No crew listings have been posted yet.",
+    emptyDescription: "Nobody is recruiting at the moment. Post the voyage you want to run, or check back after the next fleet night.",
     reverse: true,
   },
   {
@@ -286,7 +286,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "A moderated collection of screenshots and artwork from the community. Every image gets here through review.",
     emptyTitle: "The gallery is waiting",
-    emptyDescription: "No media has been approved yet.",
+    emptyDescription: "Upload a screenshot from your last voyage. Everything is reviewed before it appears here.",
     reverse: false,
   },
   {
@@ -296,7 +296,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Practical guides for new and veteran pirates, built from real experience rather than filler.",
     emptyTitle: "No guides published yet",
-    emptyDescription: "No guides have been published yet.",
+    emptyDescription: "Moderators publish guides as they are written. If you know a voyage type well, ask in Discord about contributing one.",
     reverse: true,
   },
   {
@@ -306,7 +306,7 @@ export const PREVIEWS: readonly PreviewConfig[] = [
     description:
       "Updates from the community team, posted here once there is something genuine to report.",
     emptyTitle: "All quiet for now",
-    emptyDescription: "No announcements have been published yet.",
+    emptyDescription: "Community announcements appear here when the team has something worth posting.",
     reverse: false,
   },
 ] as const;
@@ -334,7 +334,11 @@ export const FOOTER = {
     },
     {
       title: "Community",
-      items: SOCIAL_LINKS.filter((l) => l.key !== "contact").map((l) => ({
+      // Only configured destinations are listed. An unset social link is
+      // omitted rather than rendered as a dead "coming soon" row.
+      items: SOCIAL_LINKS.filter(
+        (l) => l.key !== "contact" && l.value !== PLACEHOLDER,
+      ).map((l) => ({
         label: l.label,
         value: l.value,
       })),

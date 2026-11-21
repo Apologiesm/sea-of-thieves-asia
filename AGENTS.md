@@ -54,7 +54,7 @@ See `docs/content.md` for the full placeholder contract.
 `SUPABASE_DB_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`,
 `BOOTSTRAP_ADMIN_DISCORD_IDS`
 
-### Supabase tables (20 real tables; 29 migrations in `supabase/migrations/`)
+### Supabase tables (20 real tables; 31 migrations in `supabase/migrations/`)
 `profiles`, `user_roles`, `user_consents`, `announcements`, `guides`,
 `gallery_items`, `comments`, `reports`, `moderation_actions`, `audit_log`,
 `crew_listings`, `crew_applications`, `events`, `event_hosts`, `event_rsvps`,
@@ -66,6 +66,12 @@ See `docs/content.md` for the full placeholder contract.
 > trust older docs that mention it.
 
 RLS is enabled on every table (policies in `0004` onward, hardened in `0013`).
+
+Public read projections (RLS-safe views used by anonymous pages):
+`public_profiles` and `public_crew_listings` (migration `0031`). The crew view
+omits `contact_method` / `contact_consent`, so visitors can browse open crews
+without contact details reaching the browser. `crew_listings` itself stays
+members-only.
 
 ### Storage buckets (4 — verified in migrations)
 | Bucket | Public | Purpose |
@@ -136,7 +142,16 @@ Note: `/api/cron/sync-partner` actually runs the **official news** sync
   (`is_event_host` includes admin/moderator/owner). Table `events`
   (has `image_url`), `event_rsvps`, `event_hosts`.
 - **Crew / LFG:** listings + applications + moderation queue.
-  `crew_listings` (has `image_url`), `crew_applications`.
+  `crew_listings` (has `image_url`), `crew_applications`. Public pages read
+  `public_crew_listings`; `listCrewListings` also drops full crews and expired
+  listings so a stale crew is never shown as available.
+- **Homepage previews** (`src/components/home/home-previews.tsx`): live rows for
+  events, crew, gallery and guides, falling back to that section's empty state.
+  No hardcoded sample content.
+- **Time display:** timestamps render through `LocalTime`
+  (`src/components/ui/local-time.tsx`). Server output uses the published
+  timezone, then the browser's own zone is applied after hydration; the
+  published time stays in the `title` attribute.
 - **Guides:** moderator-authored markdown; `guides.body`, `guides.image_url`.
 - **Gallery:** uploads to bucket `gallery`, moderator approval at
   `/admin/gallery`; `gallery_items`.

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/event/time";
+import { LocalTime } from "@/components/ui/local-time";
 import { DISCORD_EVENTS } from "@/lib/content/site-config";
 
 type DiscordEvent = {
@@ -63,7 +63,7 @@ export async function DiscordEvents({ limit = 6 }: { limit?: number }) {
                   <div className="partner-card__body">
                     <div className="partner-card__meta">
                       <span>Live event</span>
-                      <span>{formatDateTime(event.starts_at, "Asia/Singapore")}</span>
+                      <span><LocalTime iso={event.starts_at} timeZone="Asia/Singapore" /></span>
                     </div>
                     <h3>{event.title}</h3>
                     {event.description ? <p>{event.description}</p> : null}

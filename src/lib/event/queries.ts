@@ -6,17 +6,28 @@ export async function listEvents(filters: EventFilters, includeAll = false): Pro
   const supabase = await createClient();
   if (!supabase) return [];
 
+  // Past events read most-recent-first; upcoming events read soonest-first.
+  const ascending = filters.when !== "past";
+
   let query = supabase
     .from("events")
     .select("*")
     .eq("is_enabled", true)
     .order("is_featured", { ascending: false })
     .order("sort_order", { ascending: true })
-    .order("starts_at", { ascending: true })
+    .order("starts_at", { ascending })
     .limit(100);
+
+  if (filters.when === "upcoming") {
+    query = query.gte("starts_at", new Date().toISOString());
+  } else if (filters.when === "past") {
+    query = query.lt("starts_at", new Date().toISOString());
+  }
 
   if (!includeAll && filters.status !== "all") query = query.eq("status", filters.status);
   if (includeAll && filters.status && filters.status !== "all") query = query.eq("status", filters.status);
+  // Cancelled voyages are never public inventory, even when listing "all".
+  if (filters.status === "all") query = query.neq("status", "cancelled");
   if (filters.type) query = query.eq("event_type", filters.type);
   if (filters.region) query = query.ilike("region", `%${filters.region}%`);
   if (filters.platform) query = query.ilike("platform", `%${filters.platform}%`);

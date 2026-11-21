@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EVENT_TYPES } from "@/lib/content/site-config";
-import { formatDateTime, timezoneLabel } from "@/lib/event/time";
+import { timezoneLabel } from "@/lib/event/time";
+import { LocalTime } from "@/components/ui/local-time";
 import type { EventRecord } from "@/lib/event/types";
 
 export function EventCard({ event }: { event: EventRecord }) {
@@ -22,7 +23,7 @@ export function EventCard({ event }: { event: EventRecord }) {
         <img src={event.image_url} alt={`${event.title} image`} className="media-card-cover mt-3" loading="lazy" />
       ) : null}
       <p className="mt-3 text-sm font-medium text-content">
-        {formatDateTime(event.starts_at, event.timezone)}
+        <LocalTime iso={event.starts_at} timeZone={event.timezone} />
       </p>
       <p className="text-xs text-content-muted">{timezoneLabel(event.timezone)}</p>
       {event.description ? (

@@ -33,7 +33,9 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
     q: one(params.q), region: one(params.region), platform: one(params.platform),
     language: one(params.language), playstyle: one(params.playstyle),
     shipPreference: one(params.shipPreference), rolePreference: one(params.rolePreference),
-    availability: one(params.availability), date: one(params.date), status: one(params.status) || "published",
+    availability: one(params.availability), date: one(params.date),
+    status: one(params.status) || "published",
+    when: one(params.when) === "all" ? "" : one(params.when) || "upcoming",
   });
   const values = filters.success ? filters.data : eventFiltersSchema.parse({});
   const events = await listEvents(values);
@@ -56,6 +58,20 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   Object.entries(values).forEach(([key, value]) => {
     if (value) query.set(key, String(value));
   });
+  // "All" is a real URL state even though it means "no time filter".
+  if (values.when === "") query.set("when", "all");
+
+  // The time toggle keeps every other filter intact and resets the view.
+  function listQuery(when: "upcoming" | "past" | "all") {
+    const next = new URLSearchParams(query);
+    next.set("when", when);
+    return next.toString();
+  }
+
+  function whenToggle(current: string, target: string) {
+    const active = target === "all" ? current !== "upcoming" && current !== "past" : current === target;
+    return active ? "view-toggle view-toggle--active" : "view-toggle";
+  }
 
   return (
     <>
@@ -70,6 +86,9 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-content-muted">{events.length} published {events.length === 1 ? "event" : "events"}</p>
             <div className="flex flex-wrap gap-3">
+              <Link href={`/events?${listQuery("upcoming")}`} className={whenToggle(values.when, "upcoming")}>Upcoming</Link>
+              <Link href={`/events?${listQuery("past")}`} className={whenToggle(values.when, "past")}>Past</Link>
+              <Link href={`/events?${listQuery("all")}`} className={whenToggle(values.when, "all")}>All</Link>
               <Link href={`/events?${query.toString()}`} className={view === "list" ? "view-toggle view-toggle--active" : "view-toggle"}>List</Link>
               <Link href={`/events?${query.toString()}&view=calendar&month=${month}`} className={view === "calendar" ? "view-toggle view-toggle--active" : "view-toggle"}>Calendar</Link>
               {canManage ? (
@@ -96,8 +115,16 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
           <div className="mt-8">
             {events.length === 0 ? (
               <EmptyState
-                title="No events scheduled yet"
-                description="No events have been published yet. Hosts will add real voyages here."
+                title={
+                  values.when === "past"
+                    ? "No past voyages recorded"
+                    : "No events scheduled yet"
+                }
+                description={
+                  values.when === "past"
+                    ? "Once hosted voyages finish they are kept here so the community can see what ran."
+                    : "Nothing is on the calendar right now. Hosts publish voyages here, and every listing shows its own regional time."
+                }
               />
             ) : view === "calendar" ? (
               <EventCalendar events={events} month={month} />

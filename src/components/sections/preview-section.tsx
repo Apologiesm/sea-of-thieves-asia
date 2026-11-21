@@ -1,10 +1,19 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/content/empty-state";
 import { SECTIONS, type PreviewConfig } from "@/lib/content/site-config";
 import { cn } from "@/lib/utils";
 
-export function PreviewSection({ preview, index }: { preview: PreviewConfig; index: number }) {
+export function PreviewSection({
+  preview,
+  index,
+  children,
+}: {
+  preview: PreviewConfig;
+  index: number;
+  children?: ReactNode;
+}) {
   const href = SECTIONS.find((section) => section.key === preview.key)?.href ?? "#";
 
   return (
@@ -47,10 +56,13 @@ export function PreviewSection({ preview, index }: { preview: PreviewConfig; ind
             </Link>
           </div>
           <div className="lg:col-span-7" data-voyage-reveal>
-            <EmptyState
-              title={preview.emptyTitle}
-              description={preview.emptyDescription}
-            />
+            {children ?? (
+              <EmptyState
+                compact
+                title={preview.emptyTitle}
+                description={preview.emptyDescription}
+              />
+            )}
           </div>
         </div>
       </Container>

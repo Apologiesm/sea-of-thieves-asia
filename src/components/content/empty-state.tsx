@@ -1,4 +1,3 @@
-import { SITE } from "@/lib/content/site-config";
 import { cn } from "@/lib/utils";
 import type { EmptyStateProps } from "@/types/content";
 
@@ -23,10 +22,7 @@ export function EmptyState({
         <span className="compass-mark" aria-hidden="true">
           <span className="compass-mark__inner" />
         </span>
-        <span className="mt-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">
-          {SITE.comingSoon}
-        </span>
-        <p className="mt-3 text-base font-semibold text-content sm:text-lg">
+        <p className="mt-5 text-base font-semibold text-content sm:text-lg">
           {title}
         </p>
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-content-muted">

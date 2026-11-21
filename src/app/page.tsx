@@ -6,7 +6,7 @@ import { JoinCta } from "@/components/sections/join-cta";
 import { LiveSeas } from "@/components/live/LiveSeas";
 import { OfficialUpdates } from "@/components/official/OfficialUpdates";
 import { DiscordEvents } from "@/components/discord/DiscordEvents";
-import { PreviewSection } from "@/components/sections/preview-section";
+import { HomePreviews } from "@/components/home/home-previews";
 import { CinematicVoyage } from "@/components/sections/cinematic-voyage";
 import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { VoyageScrollController } from "@/components/scroll/VoyageScrollController";
@@ -54,11 +54,7 @@ export default async function HomePage() {
     about: <About />,
     features: <CommunityFeatures />,
     previews: (
-      <div id="sections">
-        {previews.map((preview, index) => (
-          <PreviewSection key={preview.key} preview={preview} index={index} />
-        ))}
-      </div>
+      <HomePreviews previews={previews} />
     ),
     join: <JoinCta />,
   };

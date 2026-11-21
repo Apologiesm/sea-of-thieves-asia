@@ -35,4 +35,6 @@ export type EventFilters = {
   platform: string;
   date: string;
   status: string;
+  /** "upcoming" | "past" | "" (no time filter). */
+  when: string;
 };
