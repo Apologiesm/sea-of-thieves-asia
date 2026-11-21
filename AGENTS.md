@@ -54,11 +54,12 @@ See `docs/content.md` for the full placeholder contract.
 `SUPABASE_DB_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`,
 `BOOTSTRAP_ADMIN_DISCORD_IDS`
 
-### Supabase tables (19 real tables; 25 migrations in `supabase/migrations/`)
+### Supabase tables (20 real tables; 29 migrations in `supabase/migrations/`)
 `profiles`, `user_roles`, `user_consents`, `announcements`, `guides`,
 `gallery_items`, `comments`, `reports`, `moderation_actions`, `audit_log`,
 `crew_listings`, `crew_applications`, `events`, `event_hosts`, `event_rsvps`,
-`official_updates`, `discord_events`, `discord_announcements`, `site_settings`.
+`official_updates`, `discord_events`, `discord_announcements`, `site_settings`,
+`site_layout_config`.
 
 > **`partner_events` was DROPPED in `0016_discord_events.sql` and is
 > referenced nowhere in `src/`.** It is dead. Do not recreate it, and do not
@@ -94,7 +95,8 @@ Key RPCs: `is_admin`, `is_moderator`, `is_owner_role`, `is_event_host`,
 - **Admin:** `/admin`, `/admin/control`, `/admin/users`, `/admin/reports`,
   `/admin/gallery`, `/admin/guides`, `/admin/announcements`, `/admin/settings`
 - **Other:** `/` (home), `/login`, `/profile`, `/settings`, `/tools`,
-  `/privacy`, `/terms`, `/conduct`, `/security`, `/data-request`
+  `/privacy`, `/terms`, `/conduct`, `/security`, `/data-request`,
+  `/admin/master` (master control panel)
 
 > **There is no `/news` route.** The navigation label "News" points to
 > **`/announcements`** (`NAV_LINKS` in `src/lib/content/site-config.ts`).
@@ -114,10 +116,22 @@ Note: `/api/cron/sync-partner` actually runs the **official news** sync
 (`syncOfficialUpdates`), not partner events.
 
 ### Feature wiring (do not disconnect)
-- **Home** (`src/app/page.tsx`): hero video backdrop, owner-ordered sections
-  (`site_settings.home.sectionOrder`, drag-reorder in `/admin/control`), live
-  board, official news, Discord board, previews, join CTA, GSAP scroll progress
-  + pointer-glow (`HoverGlowController`, `data-glow`).
+- **Home** (`src/app/page.tsx`): hero video backdrop (`.hero-section` +
+  `VideoLayer variant="hero"`, `/media/sot1-hero.mp4`), then the cinematic
+  **Horizon → Fleet → Tavern** sequence (`src/components/sections/cinematic-voyage.tsx`,
+  copy in `CINEMATIC` in `site-config.ts`), then owner-ordered sections
+  (`site_layout_config.home_sections`, drag-reorder in `/admin/master` and
+  `/admin/control`), live board, official news, Discord board, previews, join
+  CTA, GSAP scroll progress + pointer-glow (`HoverGlowController`, `data-glow`).
+  The three scene keys (`horizon`, `fleet`, `tavern`) are ordinary homepage
+  section keys — they can be reordered or hidden like any other.
+- **Cinematic scenes** stay cheap on purpose: the still JPG is always the base
+  layer, the matching `-motion.mp4` is attached lazily by `IntersectionObserver`
+  only when the visitor allows it (`prefers-reduced-motion`, Save-Data and 2G
+  all skip video), parallax is GSAP/ScrollTrigger with per-scene travel, and the
+  component reverts its context on unmount. **There is no global page video
+  layer any more** (`sot2-page.mp4` was removed); do not re-add a fixed
+  full-page video, it is what used to hide the footer.
 - **Events:** calendar + countdowns, RSVPs, host authorization
   (`is_event_host` includes admin/moderator/owner). Table `events`
   (has `image_url`), `event_rsvps`, `event_hosts`.
@@ -131,11 +145,21 @@ Note: `/api/cron/sync-partner` actually runs the **official news** sync
 - **Official news:** `src/lib/official/sync.ts` fetches
   seaofthieves.com/news, dedupes by slug, upserts `official_updates`
   (`source`, `featured`, `hidden`). Manual button → `POST /api/sync/official-sot`
-  (admin session or `Bearer CRON_SECRET`); hourly cron in `vercel.json`.
+  (admin session or `Bearer CRON_SECRET`); **daily** cron in `vercel.json`
+  (Hobby plan rejects sub-daily schedules).
   Feature/hide via `/api/admin/official-updates`.
 - **Owner control center** (`/admin/control`): feature flags, Discord channel
   config, outgoing webhook, homepage order, official sync, master delete.
   Persists to `site_settings`, every change audit-logged.
+- **Master control** (`/admin/master`): layout engine + kill switches.
+  `src/lib/site/layout.ts` reads `site_layout_config` (`home_sections`,
+  `nav_order`, `kill_switches`); `src/lib/admin/content.ts` exposes universal
+  content CRUD (`sort_order` / `is_enabled` / `is_featured` on the six content
+  tables). Kill switches (`maintenanceMode`, `crewSubmissions`,
+  `galleryUploads`, `officialSync`, `discordAutoPost`) are enforced
+  server-side in the matching API routes, not just hidden in the UI.
+  `0028_master_control.sql` also grants `*_master_admin_all` RLS overrides and
+  protects the owner role (`admin_set_role` + `is_owner_user`).
 - **Tools** (`/tools`): voyage checklist.
 - **Profile/settings:** consent + account deletion (`/api/account/delete`).
 

@@ -8,7 +8,6 @@ import { formatDateTime } from "@/lib/event/time";
 import {
   EVENT_FORMATS,
   LIVE_SEAS,
-  PLACEHOLDER,
   QUICK_ACTIONS,
 } from "@/lib/content/site-config";
 
@@ -80,8 +79,8 @@ export async function LiveSeas() {
               </div>
               <div className="mt-4 grid gap-3">
                 {updates.length === 0 ? (
-                  <p className="text-sm text-content-muted" aria-label={`${LIVE_SEAS.noUpdates}: ${PLACEHOLDER}`}>
-                    {LIVE_SEAS.noUpdates} · {PLACEHOLDER}
+                  <p className="text-sm text-content-muted">
+                    {LIVE_SEAS.noUpdates}
                   </p>
                 ) : (
                   updates.map((update) => (

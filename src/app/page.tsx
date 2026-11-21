@@ -7,13 +7,25 @@ import { LiveSeas } from "@/components/live/LiveSeas";
 import { OfficialUpdates } from "@/components/official/OfficialUpdates";
 import { DiscordEvents } from "@/components/discord/DiscordEvents";
 import { PreviewSection } from "@/components/sections/preview-section";
+import { CinematicVoyage } from "@/components/sections/cinematic-voyage";
 import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { VoyageScrollController } from "@/components/scroll/VoyageScrollController";
 import { PREVIEWS } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
 import { getLayoutConfig } from "@/lib/site/layout";
 
-const DEFAULT_ORDER = ["live", "news", "discord", "about", "features", "previews", "join"];
+const DEFAULT_ORDER = [
+  "horizon",
+  "fleet",
+  "tavern",
+  "live",
+  "news",
+  "discord",
+  "about",
+  "features",
+  "previews",
+  "join",
+];
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
@@ -31,6 +43,11 @@ export default async function HomePage() {
   });
 
   const sections: Record<string, ReactNode> = {
+    // The three cinematic scenes are rendered as one continuous sequence so
+    // their parallax layers stay in a single scroll context.
+    horizon: null,
+    fleet: null,
+    tavern: null,
     live: settings.features.events ? <LiveSeas /> : null,
     news: settings.features.news ? <OfficialUpdates limit={6} /> : null,
     discord: settings.features.discordEvents ? <DiscordEvents limit={6} /> : null,
@@ -46,14 +63,44 @@ export default async function HomePage() {
     join: <JoinCta />,
   };
 
+  const cinematicKeys = ["horizon", "fleet", "tavern"];
+
   const savedOrder = layout.home.order?.length
     ? layout.home.order
     : settings.home.sectionOrder?.length
       ? settings.home.sectionOrder
       : DEFAULT_ORDER;
-  const order = [...savedOrder, ...DEFAULT_ORDER.filter((key) => !savedOrder.includes(key))];
+  // Older saved orders predate the cinematic scenes: keep them directly after
+  // the hero so the page still opens with the Horizon -> Fleet -> Tavern arc.
+  const missingCinematic = cinematicKeys.filter((key) => !savedOrder.includes(key));
+  const order = [
+    ...missingCinematic,
+    ...savedOrder,
+    ...DEFAULT_ORDER.filter((key) => !savedOrder.includes(key) && !missingCinematic.includes(key)),
+  ];
   const hidden = new Set(layout.home.hidden);
   const finalOrder = order.filter((key) => !hidden.has(key));
+
+  const showCinematic = cinematicKeys.some((key) => finalOrder.includes(key));
+
+  // The three scenes render as one sequenced block, placed where the owner put
+  // the first cinematic section in the homepage order.
+  const rendered: ReactNode[] = [];
+  let cinematicPlaced = false;
+  for (const key of finalOrder) {
+    if (cinematicKeys.includes(key)) {
+      if (showCinematic && !cinematicPlaced) {
+        rendered.push(<CinematicVoyage key="cinematic-voyage" />);
+        cinematicPlaced = true;
+      }
+      continue;
+    }
+    rendered.push(
+      <div key={key} data-section={key}>
+        {sections[key]}
+      </div>,
+    );
+  }
 
   return (
     <>
@@ -71,9 +118,7 @@ export default async function HomePage() {
           </div>
         </section>
       ) : (
-        finalOrder.map((key) => (
-          <div key={key} data-section={key}>{sections[key]}</div>
-        ))
+        rendered
       )}
       <VoyageProgress />
       <VoyageScrollController />

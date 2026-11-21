@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 export const DEFAULT_HOME_ORDER = [
+  "horizon",
+  "fleet",
+  "tavern",
   "live",
   "news",
   "discord",

@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { PLACEHOLDER, SECURITY_CONTACT_EMAIL } from "@/lib/content/site-config";
+import { SECURITY_CONTACT_EMAIL } from "@/lib/content/site-config";
 
 export const metadata: Metadata = { title: "Security" };
 
 export default function SecurityPage() {
-  const configured = SECURITY_CONTACT_EMAIL !== PLACEHOLDER;
+  const configured = SECURITY_CONTACT_EMAIL.length > 0;
   return (
     <>
       <PageHeader eyebrow="Safety" title="Security" description="How to report a vulnerability privately." />
@@ -22,9 +22,9 @@ export default function SecurityPage() {
             {configured ? (
               <a href={`mailto:${SECURITY_CONTACT_EMAIL}`} className="mt-3 inline-block text-content underline underline-offset-4">{SECURITY_CONTACT_EMAIL}</a>
             ) : (
-              <p className="mt-3" aria-label={`Security contact: ${PLACEHOLDER}`}>Security contact: {PLACEHOLDER}</p>
+              <p className="mt-3">No security contact has been published yet. Until an address is added, report problems through the community Discord and they will be passed to the site owner.</p>
             )}
-            <p className="mt-3">The address is intentionally shown as a placeholder until the site owner provides one. No fake contact route is published.</p>
+            <p className="mt-3">No fake contact route is published here.</p>
           </Card>
           <Card>
             <h2 className="text-lg font-semibold text-content">Current controls</h2>

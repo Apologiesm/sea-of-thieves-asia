@@ -45,3 +45,6 @@ next-env.d.ts
 # logs
 *.log
 .env*
+
+# Windows Explorer sidecar files
+*:Zone.Identifier

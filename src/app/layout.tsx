@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { BackToTop } from "@/components/content/BackToTop";
 import { HoverGlowController } from "@/components/ui/HoverGlowController";
-import { VideoLayer } from "@/components/visuals/VideoLayer";
 import { NAV_LINKS, SITE } from "@/lib/content/site-config";
 import { getSiteSettings } from "@/lib/site/settings";
 import { getLayoutConfig } from "@/lib/site/layout";
@@ -68,7 +67,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="flex min-h-dvh flex-col overflow-x-clip">
-        <VideoLayer src="/media/sot2-page.mp4" poster="/media/sot2-page.jpg" variant="page" />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-canvas"

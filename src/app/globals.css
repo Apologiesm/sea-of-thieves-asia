@@ -35,7 +35,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Two distinct video layers: hero clip only in the hero, page clip below. */
+  /* Hero clip only: there is no global page video any more. */
   .video-layer {
     overflow: hidden;
     pointer-events: none;
@@ -53,13 +53,6 @@
     inset: 0;
     z-index: 0;
     opacity: 1;
-  }
-
-  .video-layer--page {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    opacity: 0;
   }
 
   .hero-scrim {
@@ -95,13 +88,6 @@
       background-image: url("/media/sot1-hero.jpg");
       background-size: cover;
       background-position: center;
-    }
-
-    .video-layer--page {
-      background-image: url("/media/sot2-page.jpg");
-      background-size: cover;
-      background-position: center;
-      opacity: 0.5;
     }
   }
 
@@ -1888,4 +1874,161 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   .sortable-card,
   .sortable-card.dragging { transition: none; transform: none; }
+}
+
+/* --- Cinematic voyage: Horizon / Fleet / Tavern -------------------------- */
+.cinematic {
+  position: relative;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cinematic__scene {
+  position: relative;
+  display: flex;
+  min-height: clamp(30rem, 78vh, 46rem);
+  align-items: flex-end;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+  isolation: isolate;
+}
+
+.cinematic__scene:last-child {
+  border-bottom: 0;
+}
+
+/* Media sits slightly larger than the frame so parallax never reveals an edge. */
+.cinematic__media {
+  position: absolute;
+  inset: -8% 0;
+  z-index: 0;
+  will-change: transform;
+}
+
+.cinematic__still,
+.cinematic__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+
+.cinematic__still {
+  display: block;
+}
+
+.cinematic__video {
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+/* Reveal the clip only once it is actually decoding frames. */
+[data-video-state="playing"] .cinematic__video {
+  opacity: 1;
+}
+
+.cinematic__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      0deg,
+      rgba(9, 14, 26, 0.94) 0%,
+      rgba(9, 14, 26, 0.72) 34%,
+      rgba(9, 14, 26, 0.28) 62%,
+      rgba(9, 14, 26, 0.12) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(9, 14, 26, 0.78) 0%,
+      rgba(9, 14, 26, 0.35) 46%,
+      rgba(9, 14, 26, 0) 78%
+    );
+}
+
+.cinematic__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem 3.5rem;
+}
+
+.cinematic__copy {
+  max-width: 34rem;
+}
+
+.cinematic__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+}
+
+.cinematic__index {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.1em;
+  opacity: 0.75;
+}
+
+.cinematic__title {
+  margin-top: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.4vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: #f8fafc;
+  text-wrap: balance;
+  text-shadow: 0 2px 22px rgba(4, 8, 16, 0.55);
+}
+
+.cinematic__body {
+  margin-top: 1rem;
+  max-width: 32rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(226, 234, 244, 0.92);
+  text-shadow: 0 1px 14px rgba(4, 8, 16, 0.6);
+}
+
+.cinematic__detail {
+  margin-top: 0.9rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--color-brand);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(200, 164, 92, 0.95);
+  text-shadow: 0 1px 12px rgba(4, 8, 16, 0.6);
+}
+
+@media (min-width: 640px) {
+  .cinematic__inner {
+    padding: 0 1.5rem 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cinematic__inner {
+    padding: 0 2rem 6.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic__media {
+    inset: 0;
+    transform: none !important;
+  }
+
+  .cinematic__video {
+    display: none;
+  }
 }

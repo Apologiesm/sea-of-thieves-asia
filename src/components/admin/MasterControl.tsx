@@ -14,6 +14,9 @@ import type { KillSwitches, LayoutConfig } from "@/lib/site/layout";
 type Row = Record<string, unknown> & { id: string };
 
 const HOME_SECTION_LABELS: Record<string, string> = {
+  horizon: "Horizon scene",
+  fleet: "Fleet scene",
+  tavern: "Tavern scene",
   live: "Live seas",
   news: "Official updates",
   discord: "Discord feed",

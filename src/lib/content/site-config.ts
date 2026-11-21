@@ -115,25 +115,58 @@ export const HERO = {
 
 export const ABOUT = {
   eyebrow: "About the community",
-  title: "A home for Asian pirates",
+  title: "A home for pirates across Asia",
   paragraphs: [
-    "Sea of Thieves Asia brings players from across the region together around one shared love of the seas. Whether you are charting your first voyage or chasing a legendary title, there is room here for you.",
-    "This site is being built around the community, not in place of it. Every section will fill with real members, real voyages, and real stories once they are ready to be shared.",
+    "From Singapore and Jakarta to Manila, Seoul, Tokyo and beyond, Sea of Thieves Asia gathers players who sail the same seas in very different time zones. The fleets here meet on weekday evenings after work, on weekend mornings before the heat sets in, and late at night across the region.",
+    "Everything on this site is shaped by the people who actually sail: crews listing the languages they speak, hosts publishing voyages with times shown in your own zone, and guides written by players who learned the hard way. Nothing is published until a real member posts it.",
   ],
   pillars: [
     {
-      title: "Across the region",
-      body: "One gathering place for players across Asian time zones and communities.",
+      title: "One region, many hours",
+      body: "Events carry their own timezone and show your local time, so a fleet night in Jakarta still reads clearly in Manila or Seoul.",
     },
     {
-      title: "Built together",
-      body: "Guides, events, and crew listings shaped by the people who sail them.",
+      title: "Crews that speak your language",
+      body: "Listings show the languages a crew actually uses — English, Bahasa Indonesia, Mandarin, Japanese, Korean, Thai, Tagalog and more.",
     },
     {
-      title: "Player first",
-      body: "Minimal data, clear controls, and respect for every member's privacy.",
+      title: "Built from real voyages",
+      body: "Guides, screenshots and event reports come from members' own sessions, shared with their permission.",
     },
   ],
+} as const;
+
+export const CINEMATIC = {
+  horizon: {
+    key: "horizon",
+    eyebrow: "Horizon",
+    title: "First light over the archipelago",
+    body: "Morning sails across the region, from the South China Sea to the straits around Singapore and the islands north of the Philippines.",
+    detail: "Fleets here are usually posted for the evening, once the region's work day ends.",
+    image: "/media/sot-horizon.jpg",
+    video: "/media/sot-horizon-motion.mp4",
+    alt: "A pirate looking out over calm water at sunrise from the deck of a sloop.",
+  },
+  fleet: {
+    key: "fleet",
+    eyebrow: "Fleet",
+    title: "Sails on the same water",
+    body: "Fleet nights put three, four or six crews on one stretch of ocean and let the evening run itself: galleon lines off an outpost, a brigantine contest, a sloop doing the quiet work.",
+    detail: "Crew listings show timezone and languages up front, so you can pick a ship that sails when you do.",
+    image: "/media/sot-galleon.jpg",
+    video: "/media/sot-galleon-motion.mp4",
+    alt: "A galleon anchored off a palm-covered island at golden hour.",
+  },
+  tavern: {
+    key: "tavern",
+    eyebrow: "Tavern",
+    title: "The lantern stays lit",
+    body: "Between voyages the conversation lives on Discord: voyage planning, trade runs, tall tale help, and the screenshots worth keeping. New captains are always welcome to pull up a chair.",
+    detail: "Guides, event reports and gallery submissions are reviewed by moderators before they go public.",
+    image: "/media/sot-tavern.jpg",
+    video: "/media/sot-tavern-motion.mp4",
+    alt: "The lit window of a tavern on the water at dusk.",
+  },
 } as const;
 
 export const EVENT_TYPES = [
@@ -314,8 +347,6 @@ export const FOOTER = {
         { label: "Terms", value: "/terms" },
         { label: "Security", value: "/security" },
         { label: "Data request", value: "/data-request" },
-        { label: "Contact", value: PLACEHOLDER },
-        { label: "Credits", value: PLACEHOLDER },
       ] as FooterItem[],
     },
   ],
@@ -354,7 +385,7 @@ export const ROLE_LABELS = {
 export const ADMIN_PRIVACY_NOTICE =
   "Moderation actions are private. Only authorized moderators and admins can view reports or change content status. Every sensitive action is written to an audit log.";
 
-export const SECURITY_CONTACT_EMAIL = PLACEHOLDER;
+export const SECURITY_CONTACT_EMAIL = "";
 
 export const LIVE_SEAS = {
   eyebrow: "Live seas",
@@ -364,21 +395,21 @@ export const LIVE_SEAS = {
   nextLabel: "Next on the horizon",
   noLive: "No event is live right now",
   noLiveDetail: "Hosts publish events through the events system. When one starts, it appears here automatically.",
-  noNext: "Next event timing: " + PLACEHOLDER,
+  noNext: "No voyage scheduled yet",
   updatesTitle: "In-game updates",
   updatesDetail: "Community-curated notes only. Official news is never reproduced without permission.",
   noUpdates: "No in-game updates published yet",
   formatsTitle: "Event formats we run",
-  formatsDetail: "Timings are shown only when a host confirms them. Until then they stay marked for replacement.",
+  formatsDetail: "Each host sets the start time when they publish a voyage, and it is shown in your own region's clock.",
 } as const;
 
 export const EVENT_FORMATS = [
-  { key: "fight_nights", label: "Fight Nights", note: "Open PvP evenings", timing: PLACEHOLDER },
-  { key: "last_ship_standing", label: "Last Ship Standing", note: "Fleet elimination", timing: PLACEHOLDER },
-  { key: "fleet_night", label: "Fleet Night", note: "Casual group sailing", timing: PLACEHOLDER },
-  { key: "treasure_hunt", label: "Treasure Hunt", note: "Region-wide goal", timing: PLACEHOLDER },
-  { key: "stream_night", label: "Stream Night", note: "Community creators", timing: PLACEHOLDER },
-  { key: "community_challenge", label: "Community Challenge", note: "Seasonal objective", timing: PLACEHOLDER },
+  { key: "fight_nights", label: "Fight Nights", note: "Open PvP evenings", timing: "Set by host" },
+  { key: "last_ship_standing", label: "Last Ship Standing", note: "Fleet elimination", timing: "Set by host" },
+  { key: "fleet_night", label: "Fleet Night", note: "Casual group sailing", timing: "Set by host" },
+  { key: "treasure_hunt", label: "Treasure Hunt", note: "Region-wide goal", timing: "Set by host" },
+  { key: "stream_night", label: "Stream Night", note: "Community creators", timing: "Set by host" },
+  { key: "community_challenge", label: "Community Challenge", note: "Seasonal objective", timing: "Set by host" },
 ] as const;
 
 export const QUICK_ACTIONS = [

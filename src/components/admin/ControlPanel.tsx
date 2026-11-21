@@ -8,6 +8,9 @@ import { SortableList, type SortableItem } from "@/components/admin/SortableList
 export type DeleteItem = { id: string; title: string; type: string };
 
 const SECTION_ITEMS: SortableItem[] = [
+  { id: "horizon", title: "Horizon", subtitle: "Cinematic scene: sunrise at sea", avatar: "HZ" },
+  { id: "fleet", title: "Fleet", subtitle: "Cinematic scene: galleon off the island", avatar: "FL" },
+  { id: "tavern", title: "Tavern", subtitle: "Cinematic scene: lanterns after dark", avatar: "TV" },
   { id: "live", title: "Live seas", subtitle: "Current and upcoming events", avatar: "LS" },
   { id: "news", title: "Official updates", subtitle: "News from Sea of Thieves", avatar: "ON" },
   { id: "discord", title: "Discord feed", subtitle: "Community announcements", avatar: "DF" },

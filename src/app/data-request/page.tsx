@@ -3,12 +3,12 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { PLACEHOLDER, SECURITY_CONTACT_EMAIL } from "@/lib/content/site-config";
+import { SECURITY_CONTACT_EMAIL } from "@/lib/content/site-config";
 
 export const metadata: Metadata = { title: "Data request" };
 
 export default function DataRequestPage() {
-  const configured = SECURITY_CONTACT_EMAIL !== PLACEHOLDER;
+  const configured = SECURITY_CONTACT_EMAIL.length > 0;
   return (
     <>
       <PageHeader eyebrow="Privacy" title="Data deletion request" description="How to remove your data from Sea of Thieves Asia." />
@@ -27,7 +27,7 @@ export default function DataRequestPage() {
             {configured ? (
               <a href={`mailto:${SECURITY_CONTACT_EMAIL}`} className="mt-3 inline-block text-content underline underline-offset-4">{SECURITY_CONTACT_EMAIL}</a>
             ) : (
-              <p className="mt-3">Contact: {PLACEHOLDER}</p>
+              <p className="mt-3">No contact address has been published yet. Ask in the community Discord and a moderator will pass your request to the site owner.</p>
             )}
             <p className="mt-3">Do not include passwords or service-role keys in any request.</p>
           </Card>
