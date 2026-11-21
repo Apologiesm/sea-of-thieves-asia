@@ -43,7 +43,7 @@ See `docs/content.md` for the full placeholder contract.
 - **Hosting:** Vercel (`vercel.json`: security headers + crons)
 
 ### Scripts
-`dev`, `build`, `start`, `lint`, `typecheck`, `supabase:start|stop|status|reset|test`,
+`dev`, `build`, `start`, `lint`, `typecheck`, `test`, `supabase:start|stop|status|reset|test`,
 `bot:webrole`, `bot:announcements`
 
 ### Environment variables (names only — values live in `.env.local`, never commit)
@@ -54,18 +54,25 @@ See `docs/content.md` for the full placeholder contract.
 `SUPABASE_DB_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`,
 `BOOTSTRAP_ADMIN_DISCORD_IDS`
 
-### Supabase tables (21 real tables; 33 migrations in `supabase/migrations/`)
+### Supabase tables (23 real tables; 34 migrations in `supabase/migrations/`)
 `profiles`, `user_roles`, `user_consents`, `announcements`, `guides`,
 `gallery_items`, `comments`, `reports`, `moderation_actions`, `audit_log`,
 `crew_listings`, `crew_applications`, `events`, `event_hosts`, `event_rsvps`,
 `official_updates`, `discord_events`, `discord_announcements`, `site_settings`,
-`site_layout_config`, `sync_state`.
+`site_layout_config`, `sync_state`, `official_events`, `official_event_exceptions`.
 
 > **`partner_events` was DROPPED in `0016_discord_events.sql` and is
 > referenced nowhere in `src/`.** It is dead. Do not recreate it, and do not
 > trust older docs that mention it.
 
 RLS is enabled on every table (policies in `0004` onward, hardened in `0013`).
+
+Official Sea of Thieves events live in `official_events` (migration `0034`),
+deliberately separate from community `events`. Dated events use
+`starts_at`/`ends_at`; recurring events store a `recurrence` jsonb rule
+(`{"kind":"weekly","weekday":2,"startTime":"10:00","durationMinutes":null}`),
+so a newly launched official event never needs an enum change.
+`official_event_exceptions` skips a single occurrence (holiday, cancellation).
 
 Public read projections (RLS-safe views used by anonymous pages):
 `public_profiles` and `public_crew_listings` (migration `0031`). The crew view
@@ -176,6 +183,21 @@ and must not be added back to `vercel.json` — see §6.
   (admin session or `Bearer CRON_SECRET`); **daily** cron in `vercel.json`
   (Hobby plan rejects sub-daily schedules).
   Feature/hide via `/api/admin/official-updates`.
+- **Official next event:** `src/lib/official/event-sync.ts` reads
+  `seaofthieves.com/event-hub`, parses each `event-panel`
+  (`src/lib/official/event-hub.ts`), interprets the published date wording
+  (`src/lib/official/schedule.ts`: dated range, weekly rule, twice-daily
+  window), and upserts `official_events`. The same job runs from the one daily
+  cron. `src/lib/official/event-queries.ts` expands the rules and picks what is
+  live and what is next; `NextOfficialEvent` renders it after the hero on `/`
+  and above the lists on `/events`, with a 1-second client countdown in the
+  visitor's `sot_tz` zone. Rules that matter:
+  - An event with no readable official date is never stored, never guessed.
+  - `official_events` rows survive a failed sync; only a successful read writes.
+  - A dated Last Ship Standing suppresses the Fight Night it replaces
+    (`SUPPRESSION_RULES`); nothing else is suppressed.
+  - `tier = 'ambient'` (Gold Rush) never outranks a headline event.
+  - Events without a published end are shown as "End time not published".
 - **Owner control center** (`/admin/control`): feature flags, Discord channel
   config, outgoing webhook, homepage order, official sync, master delete.
   Persists to `site_settings`, every change audit-logged.

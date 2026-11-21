@@ -1,4 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  OFFICIAL_PROXY_PREFIX as PROXY_PREFIX,
+  fetchOfficialHtml as fetchHtml,
+  fetchOfficialText as fetchText,
+} from "@/lib/official/fetch";
 
 /**
  * Official Sea of Thieves news synchronisation.
@@ -22,7 +27,6 @@ const PROXY_RSS = "https://r.jina.ai/http://www.seaofthieves.com/news.rss";
 
 const MAX_ITEMS = 20;
 const MAX_ENRICH = 12;
-const FETCH_TIMEOUT_MS = 12_000;
 
 export type ParsedUpdate = {
   external_id: string;
@@ -74,45 +78,6 @@ function toIso(value: string | null | undefined): string | null {
   if (!value) return null;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
-}
-
-const PROXY_PREFIX = "https://r.jina.ai/";
-
-async function fetchText(url: string): Promise<string | null> {
-  try {
-    const response = await fetch(url, {
-      cache: "no-store",
-      headers: { accept: "text/html,application/xhtml+xml,application/xml,text/xml,*/*" },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    });
-    if (!response.ok) return null;
-    return await response.text();
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Official pages sit behind an Azure WAF that refuses non-browser clients.
- * Ask the read-only proxy for raw HTML only after a direct attempt fails, so
- * the primary source stays the official site whenever it is reachable.
- */
-async function fetchHtml(url: string): Promise<{ html: string; viaProxy: boolean } | null> {
-  const direct = await fetchText(url);
-  if (direct && direct.includes("<")) return { html: direct, viaProxy: false };
-
-  try {
-    const response = await fetch(`${PROXY_PREFIX}${url}`, {
-      cache: "no-store",
-      headers: { accept: "text/html", "X-Return-Format": "html" },
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!response.ok) return null;
-    const html = await response.text();
-    return html.includes("<") ? { html, viaProxy: true } : null;
-  } catch {
-    return null;
-  }
 }
 
 function slugFromUrl(url: string): string {

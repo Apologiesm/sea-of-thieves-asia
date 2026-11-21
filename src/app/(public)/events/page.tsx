@@ -9,6 +9,7 @@ import { EventCalendar } from "@/components/event/EventCalendar";
 import { EventCountdown } from "@/components/event/EventCountdown";
 import { DiscordEvents } from "@/components/discord/DiscordEvents";
 import { EventFilters } from "@/components/event/EventFilters";
+import { NextOfficialEvent } from "@/components/official/next-official-event";
 import { getNextEvent, listEvents } from "@/lib/event/queries";
 import { eventFiltersSchema } from "@/lib/event/validation";
 import { createClient } from "@/lib/supabase/server";
@@ -80,6 +81,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         title="Community events"
         description="Fleet nights, tournaments, treasure hunts and more — published by real hosts."
       />
+      <NextOfficialEvent />
       <DiscordEvents limit={12} />
       <Container>
         <div className="py-10 sm:py-14">

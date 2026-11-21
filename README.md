@@ -56,6 +56,7 @@ Security contact: `SECURITY_CONTACT_EMAIL` in `site-config.ts` is currently
 | Live Seas board | `src/components/live/LiveSeas.tsx`, `src/lib/live/queries.ts`, `LIVE_SEAS` / `EVENT_FORMATS` in `site-config.ts` |
 | Discord event board | `src/app/api/discord/events/route.ts`, `src/components/discord/DiscordEvents.tsx` |
 | Official game news | `src/lib/official/sync.ts`, `src/components/official/OfficialUpdates.tsx`, migration `0015_official_updates.sql` |
+| Next official event | `src/lib/official/{event-sync,event-hub,schedule,event-queries}.ts`, `src/components/official/next-official-event*.tsx`, migration `0034_official_events.sql` |
 | Event calendar + countdown | `src/components/event/EventCalendar.tsx`, `EventCountdown.tsx`, `src/lib/event/time.ts` |
 | Voyage checklist tool | `src/app/tools/page.tsx`, `src/components/content/VoyageChecklist.tsx` |
 | Events | `src/app/(public)/events`, `src/lib/event/*`, Supabase table `events`; authorized hosts use `/events/new` and `/events/manage` |
@@ -187,7 +188,8 @@ Settings are stored in `public.site_settings`; every change is audit-logged.
    once configured.
 3. Deploy with `vercel --prod` or connect the Git repository. `vercel.json`
    contains the security headers and **one daily cron** (`0 3 * * *`) that calls
-   `/api/cron/official-news` to refresh official news. The Hobby plan rejects
+   `/api/cron/official-news` to refresh official news **and** the official event
+   schedule behind the homepage countdown. The Hobby plan rejects
    sub-daily schedules, so the site shows the last successful sync time instead
    of implying a live feed. `/api/cron/sync-partner` remains as a manual alias
    and is no longer scheduled.
@@ -216,7 +218,7 @@ Secrets are never exposed to the client: `src/lib/supabase/admin.ts` uses
    reverses. Progress indicator updates.
 5. Check placeholder links show "Coming soon" and real links open correctly.
 6. Check `/login`, `/profile`, `/settings`, `/report`, `/admin` (auth required).
-7. Run `npm run build` and `npx supabase db test` before every beta release.
+7. Run `npm test`, `npm run build` and `npx supabase db test` before every beta release.
 
 ## Known beta limitations
 

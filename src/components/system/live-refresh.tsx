@@ -13,7 +13,14 @@ import { createClient as createBrowserSupabase } from "@/lib/supabase/client";
  * to a slow polling refresh, so the site still updates on its own.
  */
 
-const TABLES = ["events", "announcements", "crew_listings", "gallery_items", "guides"] as const;
+const TABLES = [
+  "events",
+  "announcements",
+  "crew_listings",
+  "gallery_items",
+  "guides",
+  "official_events",
+] as const;
 
 const REALTIME_GRACE_MS = 12_000;
 const POLL_MS = 120_000;

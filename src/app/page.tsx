@@ -8,6 +8,7 @@ import { OfficialUpdates } from "@/components/official/OfficialUpdates";
 import { DiscordEvents } from "@/components/discord/DiscordEvents";
 import { HomePreviews } from "@/components/home/home-previews";
 import { CinematicVoyage } from "@/components/sections/cinematic-voyage";
+import { NextOfficialEvent } from "@/components/official/next-official-event";
 import { VoyageProgress } from "@/components/scroll/VoyageProgress";
 import { VoyageScrollController } from "@/components/scroll/VoyageScrollController";
 import { PREVIEWS } from "@/lib/content/site-config";
@@ -101,6 +102,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      {/* Rendered outside the section loop: the official countdown must survive
+          an empty community calendar and any saved homepage order. */}
+      <NextOfficialEvent />
       {layout.killSwitches.maintenanceMode ? (
         <section aria-labelledby="maintenance-title" className="border-b border-border">
           <div className="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:px-6">

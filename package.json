@@ -14,7 +14,8 @@
     "supabase:reset": "supabase db reset",
     "supabase:test": "supabase db test",
     "bot:webrole": "node scripts/discord-webrole-bot.mjs",
-    "bot:announcements": "node scripts/discord-announcements-bot.mjs"
+    "bot:announcements": "node scripts/discord-announcements-bot.mjs",
+    "test": "node --test tests/"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",

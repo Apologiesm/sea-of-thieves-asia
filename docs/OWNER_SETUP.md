@@ -123,7 +123,7 @@ frequent than daily):
 
 | Path | Schedule | Purpose |
 |---|---|---|
-| `/api/cron/official-news` | 03:00 UTC daily | Official Sea of Thieves news, images and video metadata |
+| `/api/cron/official-news` | 03:00 UTC daily | Official Sea of Thieves news (images, video) **and** the Event Hub schedule that feeds the next-event countdown |
 
 It accepts `Authorization: Bearer $CRON_SECRET`, which Vercel sends
 automatically when the environment variable exists. Admins can also run it
@@ -157,6 +157,52 @@ device.
 
 Event hosts enter times in any of the same 14 zones; the value is converted to
 UTC before saving, and `events.timezone` keeps the original zone for reference.
+
+## 6c. The official next-event countdown
+
+The band under the homepage hero (and above the lists on `/events`) is filled
+only from the official Event Hub at
+<https://www.seaofthieves.com/event-hub>. It is not a community event and does
+not depend on any member posting anything.
+
+How it stays current:
+
+- The same daily cron that refreshes news also reads the Event Hub and upserts
+  `official_events`. Nothing else needs to run.
+- Recurring wording such as `Weekly (from Tuesday 10am UTC)` is stored as a
+  recurrence rule, not as a date. Dated wording such as
+  `25th November 2026 (10:00 AM) - 2nd December 2026 (10:00 AM)` is stored as
+  real UTC start and end timestamps.
+- If the Event Hub cannot be reached, nothing is deleted. The last verified
+  schedule keeps being displayed and `sync_state` records the failure.
+- If Rare has not published anything the site can verify, the band says
+  "Next official event not yet announced" instead of inventing a date.
+
+Force a refresh right now:
+
+```bash
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://sea-of-thieves-asia.vercel.app/api/cron/official-news
+```
+
+Check what the database holds:
+
+```sql
+select name, tier, schedule_note, starts_at, ends_at, checked_at
+from public.official_events
+order by starts_at nulls last, name;
+```
+
+Skip one occurrence (a holiday, a cancelled week) without touching the rule:
+
+```sql
+insert into public.official_event_exceptions (event_external_id, occurs_on, kind, reason)
+values ('weekly-fight-nights-weekly-1000', '2026-12-29', 'skip', 'Holiday break');
+```
+
+`occurs_on` is the UTC calendar date of that occurrence. Delete the row to
+restore it. Owners and admins can edit both tables directly; the site never
+needs a redeploy to change a schedule.
 
 ---
 
