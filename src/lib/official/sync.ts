@@ -21,7 +21,7 @@ const PROXY_NEWS = "https://r.jina.ai/http://www.seaofthieves.com/news";
 const PROXY_RSS = "https://r.jina.ai/http://www.seaofthieves.com/news.rss";
 
 const MAX_ITEMS = 20;
-const MAX_ENRICH = 8;
+const MAX_ENRICH = 12;
 const FETCH_TIMEOUT_MS = 12_000;
 
 export type ParsedUpdate = {
@@ -76,6 +76,8 @@ function toIso(value: string | null | undefined): string | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
+const PROXY_PREFIX = "https://r.jina.ai/";
+
 async function fetchText(url: string): Promise<string | null> {
   try {
     const response = await fetch(url, {
@@ -85,6 +87,29 @@ async function fetchText(url: string): Promise<string | null> {
     });
     if (!response.ok) return null;
     return await response.text();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Official pages sit behind an Azure WAF that refuses non-browser clients.
+ * Ask the read-only proxy for raw HTML only after a direct attempt fails, so
+ * the primary source stays the official site whenever it is reachable.
+ */
+async function fetchHtml(url: string): Promise<{ html: string; viaProxy: boolean } | null> {
+  const direct = await fetchText(url);
+  if (direct && direct.includes("<")) return { html: direct, viaProxy: false };
+
+  try {
+    const response = await fetch(`${PROXY_PREFIX}${url}`, {
+      cache: "no-store",
+      headers: { accept: "text/html", "X-Return-Format": "html" },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!response.ok) return null;
+    const html = await response.text();
+    return html.includes("<") ? { html, viaProxy: true } : null;
   } catch {
     return null;
   }
@@ -196,24 +221,36 @@ function parseNewsHtml(html: string): ParsedUpdate[] {
     return entry ? imageFromJsonLd(entry) : null;
   };
 
-  // Article cards: link text followed by a date, as rendered by the news index.
-  const cardPattern =
-    /<a[^>]+href="(?:https:\/\/www\.seaofthieves\.com)?(\/news\/[a-z0-9-]+)"[^>]*>([\s\S]{0,400}?)<\/a>/gi;
-  for (const match of html.matchAll(cardPattern)) {
+  // Article cards. The official listing wraps each headline in a link whose
+  // inner markup varies, so match the link and read a bounded window after it.
+  const linkPattern = /<a[^>]+href="([^"]*\/news\/[a-z0-9-]+)"[^>]*>/gi;
+  for (const match of html.matchAll(linkPattern)) {
     const href = absolute(match[1]);
     const slug = slugFromUrl(href);
     if (!slug || byUrl.has(href)) continue;
 
-    const inner = match[2];
-    const headingMatch = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/i.exec(inner);
-    const text = clean(headingMatch?.[1] ?? inner);
+    const from = match.index ?? 0;
+    const window = html.slice(from, from + 1400);
+    const headingMatch = /<h[1-4][^>]*>([\s\S]{0,300}?)<\/h[1-4]>/i.exec(window);
+    const ariaLabel = /aria-label="([^"]{4,200})"/i.exec(match[0])?.[1] ?? null;
+    const text = clean(headingMatch?.[1] ?? ariaLabel ?? "");
+
+    // A bare "Read More" link has no headline of its own; the structured data
+    // pass below picks that article up with its real title.
+    if (!text || /^(read more|news|see more|find out more)/i.test(text)) continue;
+
+    const imgMatch = /<img[^>]+>/i.exec(window)?.[0] ?? "";
     const img =
-      /<img[^>]+src="([^"]+)"[^>]*>/i.exec(inner)?.[1] ?? null;
-    const dateMatch = /([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/.exec(clean(inner));
+      /\bdata-src=["']([^"']+)["']/i.exec(imgMatch)?.[1] ??
+      /\bdata-lazy-src=["']([^"']+)["']/i.exec(imgMatch)?.[1] ??
+      /\bsrc=["']([^"']+)["']/i.exec(imgMatch)?.[1] ??
+      /\bsrcset=["']([^"',\s]+)/i.exec(imgMatch)?.[1] ??
+      null;
+    const dateMatch = /([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/.exec(clean(window));
 
     byUrl.set(href, {
       external_id: slug,
-      title: (text || titleFromSlug(slug)).slice(0, 200),
+      title: text.slice(0, 200),
       url: href,
       published_at: toIso(dateMatch?.[1] ?? null),
       summary: null,
@@ -306,8 +343,9 @@ function extractYouTube(html: string): { video: string | null; thumb: string | n
 }
 
 async function enrich(item: ParsedUpdate): Promise<ParsedUpdate> {
-  const html = await fetchText(item.url);
-  if (!html) return item;
+  const page = await fetchHtml(item.url);
+  if (!page) return item;
+  const html = page.html;
 
   const ogImage =
     /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i.exec(html)?.[1] ??
@@ -317,14 +355,27 @@ async function enrich(item: ParsedUpdate): Promise<ParsedUpdate> {
     /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i.exec(html)?.[1] ?? null;
   const ogDescription =
     /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i.exec(html)?.[1] ?? null;
+  // The article body prints "Posted in: <Category> on 05 Nov 2026"; the meta
+  // tag is not always present on the official pages.
+  const postedMatch =
+    /Posted in:\s*([^<]{0,60}?)\s+on\s+(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})/i.exec(html);
   const publishedMeta =
     /<meta[^>]+property=["']article:published_time["'][^>]+content=["']([^"']+)["']/i.exec(html)?.[1] ??
+    postedMatch?.[2] ??
     null;
   const { video, thumb } = extractYouTube(html);
+
+  const ogTitle =
+    /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i.exec(html)?.[1] ?? null;
+  const headingTitle = /<h1[^>]*>([\s\S]{0,200}?)<\/h1>/i.exec(html)?.[1] ?? null;
+  const cleanTitle = clean(ogTitle ?? headingTitle ?? "");
 
   const image = ogImage ?? twitterImage;
   return {
     ...item,
+    // Index listings squeeze the summary into the link text; the article page
+    // carries the real headline.
+    title: cleanTitle ? cleanTitle.slice(0, 200) : item.title,
     image_url: image && isOfficialImage(absolute(image)) ? absolute(image) : item.image_url,
     image_source: image ? "og:image" : item.image_source,
     summary: item.summary ?? (ogDescription ? clean(ogDescription).slice(0, 400) : null),
@@ -343,10 +394,12 @@ async function collect(): Promise<{ items: ParsedUpdate[]; source: string }> {
     if (items.length) return { items, source: RSS_URL };
   }
 
-  const directHtml = await fetchText(NEWS_URL);
-  if (directHtml) {
-    const items = parseNewsHtml(directHtml);
-    if (items.length) return { items, source: NEWS_URL };
+  const indexPage = await fetchHtml(NEWS_URL);
+  if (indexPage) {
+    const items = parseNewsHtml(indexPage.html);
+    if (items.length) {
+      return { items, source: indexPage.viaProxy ? `${PROXY_PREFIX}${NEWS_URL}` : NEWS_URL };
+    }
   }
 
   const proxyRss = await fetchText(PROXY_RSS);
@@ -405,9 +458,9 @@ export async function syncOfficialUpdates(): Promise<SyncResult> {
       (existingRows ?? []).map((row) => [row.external_id as string, row]),
     );
 
-    const enrichTargets = items
-      .filter((item) => !item.image_url || !item.video_url)
-      .slice(0, MAX_ENRICH);
+    // The listing page does not carry dates or media, so the newest items are
+    // always read in full. This is a daily job; a dozen article reads is cheap.
+    const enrichTargets = items.slice(0, MAX_ENRICH);
     const enriched = new Map<string, ParsedUpdate>();
     for (const item of enrichTargets) {
       enriched.set(item.external_id, await enrich(item));
@@ -439,7 +492,8 @@ export async function syncOfficialUpdates(): Promise<SyncResult> {
         previous.title !== row.title ||
         previous.summary !== row.summary ||
         previous.image_url !== row.image_url ||
-        previous.video_url !== row.video_url
+        previous.video_url !== row.video_url ||
+        previous.published_at !== row.published_at
       ) {
         changed += 1;
       }
