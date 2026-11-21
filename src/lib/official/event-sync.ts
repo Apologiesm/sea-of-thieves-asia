@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchOfficialHtml } from "@/lib/official/fetch";
 import { parseEventHub, featuredShipFrom, type ParsedEventPanel } from "@/lib/official/event-hub";
+import { findHubPanel, indexHubPanels, parseHubPanels, type HubPanel } from "@/lib/official/hub-data";
 import {
   mergeOfficialEvents,
   officialEventKey,
@@ -14,11 +15,18 @@ import {
 /**
  * Official Sea of Thieves event synchronisation.
  *
- * One source, read in priority order:
- *   1. The Event Hub page, which is where Rare publishes every live, weekly
- *      and upcoming event together with its headline and date wording.
- *   2. The event's own page, read only to recover artwork (the hub paints its
- *      images with client-side CSS, so no URL is present in the HTML).
+ * One source, read three ways:
+ *   1. The Event Hub markup, which is where Rare publishes every live, weekly
+ *      and upcoming event together with its heading, date wording and flag.
+ *   2. The Event Hub's own serialised JSON, which is the only place the card
+ *      artwork and exact UTC boundaries exist — the markup leaves every image
+ *      blank and paints it client-side.
+ *   3. The event's own page, read only when a panel still has no artwork.
+ *
+ * Artwork is copied into the public `covers` bucket rather than hotlinked, so
+ * every visitor request stays on our own storage and a CDN change at Rare
+ * cannot leave the site with a broken image. If the copy fails the official URL
+ * is used instead: a real picture beats a placeholder.
  *
  * A run that parses nothing writes nothing and records the failure: stored
  * events always survive a bad day at the source.
@@ -28,6 +36,9 @@ export const EVENT_SOURCE = "official_events";
 export const EVENT_HUB_URL = "https://www.seaofthieves.com/event-hub";
 
 const MAX_ARTWORK_FETCHES = 6;
+const MAX_ARTWORK_UPLOADS = 8;
+const ARTWORK_BUCKET = "covers";
+const ARTWORK_MAX_BYTES = 6 * 1024 * 1024;
 
 export type EventSyncResult = {
   ok: boolean;
@@ -60,8 +71,19 @@ function categoryFor(schedule: ParsedSchedule): string {
   return "Official event";
 }
 
-export function panelToRecord(panel: ParsedEventPanel): OfficialEventRecord | null {
-  const schedule = parseOfficialDateLine(panel.dateLine, panel.body);
+export type ExactWindow = { startsAt: string; endsAt: string };
+
+export function panelToRecord(
+  panel: ParsedEventPanel,
+  exact?: ExactWindow | null,
+): OfficialEventRecord | null {
+  let schedule = parseOfficialDateLine(panel.dateLine, panel.body);
+  // The hub's JSON carries the same window to the second, in UTC. Prefer it for
+  // dated events, and use it to rescue a panel whose prose date we could not
+  // read. Recurring rules are never overwritten this way.
+  if (exact && (schedule.kind === "unscheduled" || schedule.kind === "range")) {
+    schedule = { kind: "range", startsAt: exact.startsAt, endsAt: exact.endsAt };
+  }
   // No readable schedule means nothing to count down to. The hub wording is
   // kept out of the engine rather than guessed at.
   if (schedule.kind === "unscheduled") return null;
@@ -94,6 +116,7 @@ type Row = {
   description: string | null;
   source_url: string | null;
   artwork_url: string | null;
+  artwork_source: string | null;
   starts_at: string | null;
   ends_at: string | null;
   schedule_note: string | null;
@@ -105,7 +128,12 @@ type Row = {
 
 type DbRow = Row & { checked_at: string; verified_at: string; updated_at: string };
 
-function toRow(record: OfficialEventRecord, flag: string | null, checkedAt: string): DbRow {
+function toRow(
+  record: OfficialEventRecord,
+  flag: string | null,
+  checkedAt: string,
+  artworkSource: string | null,
+): DbRow {
   return {
     external_id: record.externalId,
     name: record.name,
@@ -114,6 +142,7 @@ function toRow(record: OfficialEventRecord, flag: string | null, checkedAt: stri
     description: record.description,
     source_url: record.sourceUrl,
     artwork_url: record.artworkUrl,
+    artwork_source: artworkSource,
     starts_at: record.startsAt,
     ends_at: record.endsAt,
     schedule_note: record.scheduleNote,
@@ -160,6 +189,50 @@ async function artworkFor(url: string | null): Promise<string | null> {
   return /^https:\/\//i.test(absolute) ? absolute : null;
 }
 
+/** Stable storage path per event, so a re-copy overwrites instead of piling up. */
+export function artworkPath(externalId: string): string {
+  const slug = externalId
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90);
+  return `official/${slug || "official-event"}.jpg`;
+}
+
+/**
+ * Copy an official image into public storage and return its permanent URL.
+ * Returns null on any failure so the caller can fall back to the source URL.
+ */
+async function storeArtwork(
+  admin: NonNullable<ReturnType<typeof createAdminClient>>,
+  externalId: string,
+  sourceUrl: string,
+): Promise<string | null> {
+  try {
+    const response = await fetch(sourceUrl, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return null;
+    const contentType = (response.headers.get("content-type") ?? "").split(";")[0].trim();
+    if (!contentType.startsWith("image/")) return null;
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength < 1024 || bytes.byteLength > ARTWORK_MAX_BYTES) return null;
+
+    const path = artworkPath(externalId);
+    const { error } = await admin.storage.from(ARTWORK_BUCKET).upload(path, bytes, {
+      contentType,
+      cacheControl: "604800",
+      upsert: true,
+    });
+    if (error) return null;
+    return admin.storage.from(ARTWORK_BUCKET).getPublicUrl(path).data.publicUrl ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function recordRun(result: EventSyncResult): Promise<void> {
   const admin = createAdminClient();
   if (!admin) return;
@@ -196,16 +269,22 @@ export async function syncOfficialEvents(options?: { now?: Date }): Promise<Even
   }
 
   const panels = parseEventHub(page.html);
+  const hubIndex = indexHubPanels(parseHubPanels(page.html));
   const flags = new Map<string, string | null>();
+  const hubById = new Map<string, HubPanel>();
   const parsed: OfficialEventRecord[] = [];
   const seen = new Set<string>();
 
   for (const panel of panels) {
-    const record = panelToRecord(panel);
+    const hub = findHubPanel(hubIndex, panel.name, null);
+    const exact: ExactWindow | null =
+      hub?.startsAt && hub.endsAt ? { startsAt: hub.startsAt, endsAt: hub.endsAt } : null;
+    const record = panelToRecord(panel, exact);
     if (!record) continue;
     if (seen.has(record.externalId)) continue; // duplicate announcement
     seen.add(record.externalId);
     flags.set(record.externalId, panel.flag);
+    if (hub?.imageUrl) hubById.set(record.externalId, hub);
     parsed.push(record);
   }
 
@@ -224,16 +303,45 @@ export async function syncOfficialEvents(options?: { now?: Date }): Promise<Even
   const { data: existingRows } = await admin
     .from("official_events")
     .select(
-      "external_id, name, category, flag, description, source_url, artwork_url, starts_at, ends_at, schedule_note, recurrence, tier, status, featured_ship",
+      "external_id, name, category, flag, description, source_url, artwork_url, artwork_source, starts_at, ends_at, schedule_note, recurrence, tier, status, featured_ship",
     );
   const existing = (existingRows ?? []).map((row) => fromRow(row as Row));
   const existingById = new Map(existing.map((event) => [event.externalId, event]));
+  const previous = new Map(
+    (existingRows ?? []).map((row) => [row.external_id as string, row as Row]),
+  );
 
   const merged = mergeOfficialEvents(parsed, existing);
 
-  // Artwork lookups are expensive; only pay for events we have nothing for.
+  // Artwork, in two tiers. The hub's own JSON gives the real card for every
+  // event; that file is copied into storage once and reused until Rare changes
+  // it. Only a panel the JSON never describes falls back to its own page.
+  const artworkSource = new Map<string, string | null>();
+  let uploads = 0;
   let fetches = 0;
   for (const record of merged) {
+    const published = hubById.get(record.externalId)?.imageUrl ?? null;
+    if (published) {
+      const previousSource = previous.get(record.externalId)?.artwork_source ?? null;
+      const alreadyMirrored =
+        previousSource === published &&
+        typeof record.artworkUrl === "string" &&
+        record.artworkUrl.includes("/storage/v1/object/public/");
+      if (alreadyMirrored) {
+        artworkSource.set(record.externalId, published);
+        continue;
+      }
+      if (uploads < MAX_ARTWORK_UPLOADS) {
+        uploads += 1;
+        const stored = await storeArtwork(admin, record.externalId, published);
+        // A failed copy still leaves the real picture on screen, served from
+        // the official CDN the CSP already trusts.
+        record.artworkUrl = stored ?? published;
+        artworkSource.set(record.externalId, published);
+      }
+      continue;
+    }
+
     if (record.artworkUrl) continue;
     if (fetches >= MAX_ARTWORK_FETCHES) break;
     if (existingById.get(record.externalId)?.artworkUrl) continue;
@@ -241,11 +349,17 @@ export async function syncOfficialEvents(options?: { now?: Date }): Promise<Even
     record.artworkUrl = await artworkFor(record.sourceUrl);
   }
 
-  const previous = new Map(
-    (existingRows ?? []).map((row) => [row.external_id as string, row as Row]),
-  );
   const checkedAt = (options?.now ?? new Date()).toISOString();
-  const rows = merged.map((record) => toRow(record, flags.get(record.externalId) ?? null, checkedAt));
+  const rows = merged.map((record) =>
+    toRow(
+      record,
+      flags.get(record.externalId) ?? null,
+      checkedAt,
+      artworkSource.has(record.externalId)
+        ? artworkSource.get(record.externalId) ?? null
+        : previous.get(record.externalId)?.artwork_source ?? null,
+    ),
+  );
 
   const changed = rows.filter((row) => {
     const before = previous.get(row.external_id);
@@ -258,6 +372,7 @@ export async function syncOfficialEvents(options?: { now?: Date }): Promise<Even
       before.schedule_note !== row.schedule_note ||
       JSON.stringify(before.recurrence) !== JSON.stringify(row.recurrence) ||
       before.artwork_url !== row.artwork_url ||
+      before.artwork_source !== row.artwork_source ||
       before.flag !== row.flag ||
       before.status !== row.status
     );

@@ -54,7 +54,7 @@ See `docs/content.md` for the full placeholder contract.
 `SUPABASE_DB_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`,
 `BOOTSTRAP_ADMIN_DISCORD_IDS`
 
-### Supabase tables (23 real tables; 34 migrations in `supabase/migrations/`)
+### Supabase tables (23 real tables; 33 migrations in `supabase/migrations/`)
 `profiles`, `user_roles`, `user_consents`, `announcements`, `guides`,
 `gallery_items`, `comments`, `reports`, `moderation_actions`, `audit_log`,
 `crew_listings`, `crew_applications`, `events`, `event_hosts`, `event_rsvps`,
@@ -67,7 +67,7 @@ See `docs/content.md` for the full placeholder contract.
 
 RLS is enabled on every table (policies in `0004` onward, hardened in `0013`).
 
-Official Sea of Thieves events live in `official_events` (migration `0034`),
+Official Sea of Thieves events live in `official_events` (migrations `0034`–`0035`),
 deliberately separate from community `events`. Dated events use
 `starts_at`/`ends_at`; recurring events store a `recurrence` jsonb rule
 (`{"kind":"weekly","weekday":2,"startTime":"10:00","durationMinutes":null}`),
@@ -180,12 +180,13 @@ and must not be added back to `vercel.json` — see §6.
 - **Branding:** `public/brand/logo-asia.png` is the owner-supplied gold
   "Sea of Thieves asia" lockup (644x456, transparent, shadow baked in). It is
   rendered only through `BrandLockup` (header with `priority`, footer with
-  `size="lg"`), the hero (`hero-logo`) and `/login` (`login-logo`); do not inline
-  a second copy of the path in a new component. `src/app/icon.png`,
-  `apple-icon.png` and `opengraph-image.png` are that same file centred on
-  `#0b1120` — regenerate them from the master rather than drawing new marks.
-  Keep the non-affiliation wording in the hero eyebrow and the footer: the mark
-  names a game this community does not own.
+  `size="lg"`) and `/login` (`login-logo`); do not inline a second copy of the
+  path in a new component. The hero deliberately does **not** repeat it — the
+  owner asked for the mark to stay in the chrome, and the `h1` already names the
+  community. `src/app/icon.png`, `apple-icon.png` and `opengraph-image.png` are
+  that same file centred on `#0b1120` — regenerate them from the master rather
+  than drawing new marks. Keep the non-affiliation wording in the hero eyebrow
+  and the footer: the mark names a game this community does not own.
 
 - **Official news:** `src/lib/official/sync.ts` fetches
   seaofthieves.com/news, dedupes by slug, upserts `official_updates`
@@ -194,15 +195,26 @@ and must not be added back to `vercel.json` — see §6.
   (Hobby plan rejects sub-daily schedules).
   Feature/hide via `/api/admin/official-updates`.
 - **Official next event:** `src/lib/official/event-sync.ts` reads
-  `seaofthieves.com/event-hub`, parses each `event-panel`
-  (`src/lib/official/event-hub.ts`), interprets the published date wording
-  (`src/lib/official/schedule.ts`: dated range, weekly rule, twice-daily
-  window), and upserts `official_events`. The same job runs from the one daily
-  cron. `src/lib/official/event-queries.ts` expands the rules and picks what is
-  live and what is next; `NextOfficialEvent` renders it after the hero on `/`
-  and above the lists on `/events`, with a 1-second client countdown in the
-  visitor's `sot_tz` zone. Rules that matter:
-  - An event with no readable official date is never stored, never guessed.
+  `seaofthieves.com/event-hub` and upserts `official_events`. The same job runs
+  from the one daily cron. `src/lib/official/event-queries.ts` expands the rules
+  and picks what is live and what is next; `NextOfficialEvent` renders it after
+  the hero on `/` and above the lists on `/events`, with a 1-second client
+  countdown in the visitor's `sot_tz` zone. The hub is read twice, for two
+  different jobs:
+  - The **markup** (`event-hub.ts`) for headings, date wording and status
+    flags — the visible, published words.
+  - The **serialised JSON** the page ships (`hub-data.ts`). This is the only
+    place card artwork and exact UTC boundaries exist: the markup leaves every
+    `event-panel-inner__image` empty and paints it client-side, so scraping
+    markup alone never yields an image.
+  Artwork is copied into the public `covers` bucket at
+  `official/<external_id>.jpg` and `artwork_url` points at storage;
+  `artwork_source` keeps the official CDN URL so a changed picture is re-copied.
+  If the copy fails, the official URL is stored instead (the CSP already allows
+  `*.azureedge.net`). Rules that matter:
+  - An event with no readable official date is never stored, never guessed. A
+    prose date we cannot parse may be rescued by the JSON's `StartDate`/
+    `EndDate`, never by inference.
   - `official_events` rows survive a failed sync; only a successful read writes.
   - A dated Last Ship Standing suppresses the Fight Night it replaces
     (`SUPPRESSION_RULES`); nothing else is suppressed.

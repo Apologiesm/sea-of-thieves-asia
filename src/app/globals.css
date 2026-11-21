@@ -1199,13 +1199,6 @@ h2 {
 }
 
 /* The wordmark sits above the hero headline as the first brand moment. */
-.hero-logo {
-  width: clamp(9.5rem, 22vw, 13rem);
-  height: auto;
-  margin-bottom: 1.35rem;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.55));
-}
-
 .login-logo {
   width: 10.5rem;
   height: auto;
@@ -2197,7 +2190,27 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Official cards are 16:9 and this well is taller than that, so the sides are
+     cropped. Bias the crop towards the upper third, where the artwork puts its
+     subjects and its logo. */
+  object-position: center 35%;
   aspect-ratio: 16 / 10;
+}
+
+/* Darken the cropped edges so the official watermarks the crop cuts through
+   read as a deliberate vignette rather than a mistake. */
+.official-next__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 17, 32, 0.55) 0%,
+    rgba(10, 17, 32, 0) 30%,
+    rgba(10, 17, 32, 0.1) 62%,
+    rgba(10, 17, 32, 0.72) 100%
+  );
 }
 
 .official-next__media-fallback {

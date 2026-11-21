@@ -175,6 +175,11 @@ How it stays current:
   real UTC start and end timestamps.
 - If the Event Hub cannot be reached, nothing is deleted. The last verified
   schedule keeps being displayed and `sync_state` records the failure.
+- Each event's card artwork is copied from the official page into the public
+  `covers` bucket under `official/`, so the site never hotlinks a CDN and a
+  broken external image cannot blank the band. `artwork_source` remembers which
+  official file a stored picture came from, which is how a changed card is
+  noticed and re-copied on the next run.
 - If Rare has not published anything the site can verify, the band says
   "Next official event not yet announced" instead of inventing a date.
 
