@@ -156,6 +156,32 @@ function toRow(
   };
 }
 
+/**
+ * Postgres hands timestamps back as "2026-11-25T10:00:14+00:00" while we write
+ * "2026-11-25T10:00:14.000Z". Comparing the strings would report a change on
+ * every run, so compare the instants.
+ */
+function sameInstant(left: string | null, right: string | null): boolean {
+  if (left === right) return true;
+  if (!left || !right) return false;
+  const a = Date.parse(left);
+  const b = Date.parse(right);
+  return !Number.isNaN(a) && !Number.isNaN(b) && a === b;
+}
+
+/**
+ * jsonb does not preserve key order, so two identical recurrence objects can
+ * serialise differently. Compare them with sorted keys instead.
+ */
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, item]) => item !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right));
+  return `{${entries.map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`).join(",")}}`;
+}
+
 function fromRow(row: Row): OfficialEventRecord {
   return {
     externalId: row.external_id,
@@ -367,10 +393,10 @@ export async function syncOfficialEvents(options?: { now?: Date }): Promise<Even
     return (
       before.name !== row.name ||
       before.description !== row.description ||
-      before.starts_at !== row.starts_at ||
-      before.ends_at !== row.ends_at ||
+      !sameInstant(before.starts_at, row.starts_at) ||
+      !sameInstant(before.ends_at, row.ends_at) ||
       before.schedule_note !== row.schedule_note ||
-      JSON.stringify(before.recurrence) !== JSON.stringify(row.recurrence) ||
+      canonicalJson(before.recurrence) !== canonicalJson(row.recurrence) ||
       before.artwork_url !== row.artwork_url ||
       before.artwork_source !== row.artwork_source ||
       before.flag !== row.flag ||

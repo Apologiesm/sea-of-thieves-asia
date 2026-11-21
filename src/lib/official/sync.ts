@@ -64,6 +64,19 @@ function clean(value: string): string {
     .trim();
 }
 
+/**
+ * Postgres returns "2026-11-05T10:00:00+00:00" for a timestamp we wrote as
+ * "2026-11-05T10:00:00.000Z". Comparing the strings would label every article
+ * as changed on every run, so compare the instants instead.
+ */
+function sameInstant(left: string | null, right: string | null): boolean {
+  if (left === right) return true;
+  if (!left || !right) return false;
+  const a = Date.parse(left);
+  const b = Date.parse(right);
+  return !Number.isNaN(a) && !Number.isNaN(b) && a === b;
+}
+
 function absolute(url: string): string {
   if (url.startsWith("//")) return `https:${url}`;
   if (url.startsWith("/")) return `https://www.seaofthieves.com${url}`;
@@ -458,7 +471,7 @@ export async function syncOfficialUpdates(): Promise<SyncResult> {
         previous.summary !== row.summary ||
         previous.image_url !== row.image_url ||
         previous.video_url !== row.video_url ||
-        previous.published_at !== row.published_at
+        !sameInstant(previous.published_at as string | null, row.published_at)
       ) {
         changed += 1;
       }
