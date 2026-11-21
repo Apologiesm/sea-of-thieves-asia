@@ -82,7 +82,7 @@ export function SiteHeader({ navLinks = NAV_LINKS }: { navLinks?: readonly NavLi
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-canvas/95 backdrop-blur-md">
       <Container>
-        <div className="flex min-h-20 items-center justify-between gap-4 max-md:min-h-16">
+        <div className="flex min-h-[5.5rem] items-center justify-between gap-4 max-md:min-h-16">
           <Link
             href="/"
             className="group flex items-center gap-3 rounded-md py-2"
