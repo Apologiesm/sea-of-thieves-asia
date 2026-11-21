@@ -177,6 +177,23 @@ and must not be added back to `vercel.json` — see §6.
   `/admin/gallery`; `gallery_items`.
 - **Announcements:** native cards, optional cover (`covers` bucket),
   pinned/status; `announcements.cover_image_url`.
+- **Typography:** the whole site is set in **Windlass**
+  (`src/app/fonts/Windlass.ttf`, loaded with `next/font/local` in
+  `src/app/layout.tsx`, exposed as `--font-windlass`). `--font-sans` and
+  `--font-display` both point at it, so there is one typeface and no
+  `font-mono` anywhere. Three consequences to keep in mind:
+  - The file ships **one weight (400)**. `font-synthesis-weight: none` is set on
+    `body` on purpose: a synthetic bold smears the strokes. Headings earn their
+    hierarchy from size, tracking and colour, never from `font-weight` alone —
+    do not "fix" a flat-looking heading by adding weight.
+  - Lowercase glyphs are small capitals, so ordinary sentence-case copy reads
+    as small caps. `p` carries `line-height: 1.72` and `body` a little
+    `letter-spacing` because the face runs wide and tall.
+  - The file has no glyphs for `—`, `·`, `…`, `°` or `×`. Those fall back to
+    Georgia/Palatino and look slightly lighter; it is expected, not a bug.
+    Prefer phrasing that avoids them in new copy, but do not strip them from
+    existing content.
+
 - **Branding:** `public/brand/logo-asia.png` is the owner-supplied gold
   "Sea of Thieves asia" lockup (644x456, transparent, shadow baked in). It is
   rendered only through `BrandLockup` (header with `priority`, footer with

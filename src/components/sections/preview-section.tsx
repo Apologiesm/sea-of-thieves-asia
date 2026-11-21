@@ -30,7 +30,7 @@ export function PreviewSection({
         >
           <div className="lg:col-span-5" data-voyage-reveal>
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-brand">
+              <span className="font-sans text-xs uppercase tracking-[0.14em] text-brand">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="h-px w-10 bg-border" aria-hidden="true" />

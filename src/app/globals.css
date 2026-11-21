@@ -16,9 +16,12 @@
   --color-ember: #b9734a;
   --color-nutmeg: #7c4a3a;
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  /* Windlass, loaded in layout.tsx. One weight ships with the file, so bold is
+     never synthesised: everything sits at 400 and heading hierarchy is carried
+     by size, tracking and colour. The sans and display roles intentionally
+     point at the same face — the site speaks in one voice. */
+  --font-sans: var(--font-windlass), "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-display: var(--font-windlass), "Palatino Linotype", "Book Antiqua", Georgia, serif;
 
   --radius-card: 0.75rem;
 }
@@ -33,6 +36,16 @@
     color: var(--color-content);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    /* The face has a single weight; a synthetic bold would smear it. */
+    font-synthesis-weight: none;
+    font-synthesis-style: none;
+    /* Windlass draws lowercase as small capitals and runs wide, so it needs
+       more air between the lines than a normal text face. */
+    letter-spacing: 0.008em;
+  }
+
+  p {
+    line-height: 1.72;
   }
 
   /* Hero clip only: there is no global page video any more. */
@@ -329,7 +342,7 @@
 .scene-loader__percent {
   display: block;
   margin-top: 0.6rem;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-sans);
   font-size: 0.7rem;
 }
 
@@ -620,7 +633,7 @@
 }
 
 .region-clock__time {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: clamp(1.9rem, 6vw, 2.6rem);
   font-weight: 700;
   line-height: 1;
@@ -654,7 +667,7 @@
 }
 
 .region-clock__zone {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 0.68rem;
   color: var(--color-brand);
 }
@@ -692,7 +705,7 @@
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 0.66rem;
   color: var(--color-brand);
   text-align: right;
@@ -775,7 +788,7 @@
 }
 
 .voyage-card__index {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 0.72rem;
   color: var(--color-brand);
 }
@@ -973,7 +986,7 @@ h2 {
 }
 
 .countdown__value {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-brand);
@@ -1069,7 +1082,7 @@ h2 {
   font-size: 0.68rem;
 }
 
-.calendar__event span { color: var(--color-brand); font-family: ui-monospace, monospace; }
+.calendar__event span { color: var(--color-brand); font-family: var(--font-sans); }
 .calendar__event strong { color: var(--color-content); font-weight: 600; line-height: 1.25; }
 
 /* --- Tools --------------------------------------------------------------- */
@@ -1103,7 +1116,7 @@ h2 {
 
 .checklist__count {
   margin-top: 0.6rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   color: var(--color-content-muted);
 }
@@ -2021,7 +2034,7 @@ h2 {
 }
 
 .cinematic__index {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   letter-spacing: 0.1em;
   opacity: 0.75;
 }

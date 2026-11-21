@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -14,6 +15,21 @@ import { getLayoutConfig } from "@/lib/site/layout";
 import { getSiteUrl } from "@/lib/env";
 
 const siteUrl = getSiteUrl();
+
+/**
+ * Windlass, the owner-supplied display face. It ships one weight, so everything
+ * on the site reads in the same stroke: hierarchy comes from size, spacing and
+ * colour rather than from a fake bold. Self-hosted through next/font/local, so
+ * there is no third-party request and no layout shift while it loads.
+ */
+const windlass = localFont({
+  src: "./fonts/Windlass.ttf",
+  display: "swap",
+  weight: "400",
+  style: "normal",
+  variable: "--font-windlass",
+  fallback: ["Palatino Linotype", "Book Antiqua", "Georgia", "serif"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -71,7 +87,7 @@ export default async function RootLayout({
     });
 
   return (
-    <html lang="en">
+    <html lang="en" className={windlass.variable}>
       <body className="flex min-h-dvh flex-col overflow-x-clip">
         <TimeZoneProvider initial={timeZone}>
         <a

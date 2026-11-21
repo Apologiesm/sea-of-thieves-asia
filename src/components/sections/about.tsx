@@ -35,7 +35,7 @@ export function About() {
               <ol className="relative grid gap-px overflow-hidden rounded-lg border border-border/70 bg-border/60 sm:grid-cols-3">
                 {ABOUT.pillars.map((pillar, index) => (
                   <li key={pillar.title} className="bg-surface p-5 sm:p-6">
-                    <span className="font-mono text-xs text-brand">
+                    <span className="font-sans text-xs uppercase tracking-[0.14em] text-brand">
                       0{index + 1}
                     </span>
                     <h3 className="mt-5 text-base font-semibold text-content">
